@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Newsreader:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  body{margin:0;background:#EDE9E2;font-family:'Manrope',sans-serif;}
+  .num{font-variant-numeric:tabular-nums;}
+</style>
+</helmet>
+
+<div style="padding:48px; display:flex; flex-direction:column; gap:40px; max-width:1400px;">
+
+  <div style="display:flex; align-items:baseline; gap:16px;">
+    <h1 style="font-family:'Newsreader',serif; font-size:32px; margin:0; color:#14181C;">ComfortOS — Visual Direction</h1>
+    <span style="font-size:14px; color:#6B665C;">Round 1 · palette, type, core components across 3 cities</span>
+  </div>
+
+  <!-- Palette -->
+  <section style="background:#FAF7F2; border-radius:4px; padding:32px;">
+    <h2 style="font-family:'Newsreader',serif; font-style:italic; font-weight:400; font-size:20px; margin:0 0 20px; color:#14181C;">Constant base + shifting environmental accent</h2>
+    <div style="display:flex; gap:24px; flex-wrap:wrap;">
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        <div style="width:120px; height:70px; background:#FAF7F2; border:1px solid #E4DFD6; border-radius:3px;"></div>
+        <div style="width:120px; height:70px; background:#14181C; border-radius:3px;"></div>
+        <span style="font-size:12px; color:#6B665C;">Paper / Ink (constant)</span>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        <div style="width:120px; height:150px; background:linear-gradient(160deg,#E8A33D,#C97A2B); border-radius:3px;"></div>
+        <span style="font-size:12px; color:#6B665C;">Minneapolis accent — warm shelter</span>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        <div style="width:120px; height:150px; background:linear-gradient(160deg,#5C9391,#3D6E6D); border-radius:3px;"></div>
+        <span style="font-size:12px; color:#6B665C;">Seattle accent — wet slate-teal</span>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        <div style="width:120px; height:150px; background:linear-gradient(160deg,#D97757,#B24E33); border-radius:3px;"></div>
+        <span style="font-size:12px; color:#6B665C;">Phoenix accent — terracotta heat</span>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        <div style="width:180px; height:150px; background:linear-gradient(90deg,#5C9391,#E8A33D); border-radius:3px;"></div>
+        <span style="font-size:12px; color:#6B665C;">Comfort Score spectrum (city-independent)</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Type -->
+  <section style="background:#FAF7F2; border-radius:4px; padding:32px;">
+    <h2 style="font-family:'Newsreader',serif; font-style:italic; font-weight:400; font-size:20px; margin:0 0 20px; color:#14181C;">Type</h2>
+    <div style="display:flex; gap:64px; flex-wrap:wrap;">
+      <div>
+        <div style="font-family:'Newsreader',serif; font-size:36px; color:#14181C;">Minneapolis</div>
+        <div style="font-size:13px; color:#6B665C; margin-top:6px;">Newsreader — city names, headline moments</div>
+      </div>
+      <div>
+        <div class="num" style="font-family:'Manrope',sans-serif; font-weight:800; font-size:44px; color:#14181C;">14 min</div>
+        <div style="font-size:13px; color:#6B665C; margin-top:6px;">Manrope 800 — numbers get the strongest weight on screen</div>
+      </div>
+      <div>
+        <div style="font-family:'Manrope',sans-serif; font-weight:500; font-size:16px; color:#14181C;">31% less wind exposure</div>
+        <div style="font-size:13px; color:#6B665C; margin-top:6px;">Manrope 500 — body / reasons</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Component row across 3 cities, light mode -->
+  <section>
+    <h2 style="font-family:'Newsreader',serif; font-style:italic; font-weight:400; font-size:20px; margin:0 0 20px; color:#14181C;">Core components — light mode, tested against all three cities</h2>
+    <div style="display:flex; gap:24px; flex-wrap:wrap;">
+
+      <!-- Minneapolis card -->
+      <div style="width:320px; background:#FAF7F2; border-radius:6px; padding:24px; display:flex; flex-direction:column; gap:20px;">
+        <div>
+          <div style="font-family:'Newsreader',serif; font-size:22px; color:#14181C;">Minneapolis</div>
+          <div class="num" style="font-family:'Manrope',sans-serif; font-weight:800; font-size:40px; color:#14181C; margin-top:4px;">18°F</div>
+          <div style="font-size:14px; color:#6B665C;">Feels like 4°F · Strong NW wind</div>
+        </div>
+        <div style="height:1px; background:#E4DFD6;"></div>
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div style="width:52px; height:52px; border-radius:50%; background:conic-gradient(#E8A33D 0 42%, #E4DFD6 42% 100%); display:flex; align-items:center; justify-content:center;">
+            <div style="width:38px; height:38px; border-radius:50%; background:#FAF7F2; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px;">42</div>
+          </div>
+          <div>
+            <div style="font-size:13px; font-weight:600; color:#14181C;">Outdoor Comfort</div>
+            <div style="font-size:12px; color:#6B665C;">Cold & windy</div>
+          </div>
+        </div>
+        <div style="background:#F2EDE3; border-radius:6px; padding:14px 16px; display:flex; justify-content:space-between; align-items:center; border-left:3px solid #E8A33D;">
+          <div>
+            <div style="font-size:11px; letter-spacing:.04em; text-transform:uppercase; color:#B87F2A; font-weight:700;">Recommended</div>
+            <div class="num" style="font-family:'Manrope',sans-serif; font-weight:800; font-size:26px; color:#14181C;">Comfort · 10 min</div>
+            <div style="font-size:13px; color:#6B665C; margin-top:2px;">31% less wind · 22% more sun</div>
+          </div>
+          <div style="font-size:13px; color:#6B665C;">+2 min</div>
+        </div>
+      </div>
+
+      <!-- Seattle card -->
+      <div style="width:320px; background:#FAF7F2; border-radius:6px; padding:24px; display:flex; flex-direction:column; gap:20px;">
+        <div>
+          <div style="font-family:'Newsreader',serif; font-size:22px; color:#14181C;">Seattle</div>
+          <div class="num" style="font-family:'Manrope',sans-serif; font-weight:800; font-size:40px; color:#14181C; margin-top:4px;">48°F</div>
+          <div style="font-size:14px; color:#6B665C;">Rain · SW wind 9 mph</div>
+        </div>
+        <div style="height:1px; background:#E4DFD6;"></div>
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div style="width:52px; height:52px; border-radius:50%; background:conic-gradient(#5C9391 0 61%, #E4DFD6 61% 100%); display:flex; align-items:center; justify-content:center;">
+            <div style="width:38px; height:38px; border-radius:50%; background:#FAF7F2; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px;">61</div>
+          </div>
+          <div>
+            <div style="font-size:13px; font-weight:600; color:#14181C;">Outdoor Comfort</div>
+            <div style="font-size:12px; color:#6B665C;">Wet, mild</div>
+          </div>
+        </div>
+        <div style="background:#EFF2F1; border-radius:6px; padding:14px 16px; display:flex; justify-content:space-between; align-items:center; border-left:3px solid #5C9391;">
+          <div>
+            <div style="font-size:11px; letter-spacing:.04em; text-transform:uppercase; color:#3D6E6D; font-weight:700;">Recommended</div>
+            <div class="num" style="font-family:'Manrope',sans-serif; font-weight:800; font-size:26px; color:#14181C;">Comfort · 13 min</div>
+            <div style="font-size:13px; color:#6B665C; margin-top:2px;">Mostly covered walkway</div>
+          </div>
+          <div style="font-size:13px; color:#6B665C;">+2 min</div>
+        </div>
+      </div>
+
+      <!-- Phoenix card -->
+      <div style="width:320px; background:#FAF7F2; border-radius:6px; padding:24px; display:flex; flex-direction:column; gap:20px;">
+        <div>
+          <div style="font-family:'Newsreader',serif; font-size:22px; color:#14181C;">Phoenix</div>
+          <div class="num" style="font-family:'Manrope',sans-serif; font-weight:800; font-size:40px; color:#14181C; margin-top:4px;">108°F</div>
+          <div style="font-size:14px; color:#6B665C;">Sunny · UV 10</div>
+        </div>
+        <div style="height:1px; background:#E4DFD6;"></div>
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div style="width:52px; height:52px; border-radius:50%; background:conic-gradient(#D97757 0 33%, #E4DFD6 33% 100%); display:flex; align-items:center; justify-content:center;">
+            <div style="width:38px; height:38px; border-radius:50%; background:#FAF7F2; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px;">33</div>
+          </div>
+          <div>
+            <div style="font-size:13px; font-weight:600; color:#14181C;">Outdoor Comfort</div>
+            <div style="font-size:12px; color:#6B665C;">Extreme heat</div>
+          </div>
+        </div>
+        <div style="background:#F5EDE9; border-radius:6px; padding:14px 16px; display:flex; justify-content:space-between; align-items:center; border-left:3px solid #D97757;">
+          <div>
+            <div style="font-size:11px; letter-spacing:.04em; text-transform:uppercase; color:#B24E33; font-weight:700;">Recommended</div>
+            <div class="num" style="font-family:'Manrope',sans-serif; font-weight:800; font-size:26px; color:#14181C;">Comfort · 14 min</div>
+            <div style="font-size:13px; color:#6B665C; margin-top:2px;">Mostly shaded, less direct sun</div>
+          </div>
+          <div style="font-size:13px; color:#6B665C;">+2 min</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Dark mode + map language -->
+  <section style="background:#14181C; border-radius:6px; padding:32px;">
+    <h2 style="font-family:'Newsreader',serif; font-style:italic; font-weight:400; font-size:20px; margin:0 0 20px; color:#F2EDE3;">Dark mode + comfort-map language (night walking)</h2>
+    <div style="display:flex; gap:24px; flex-wrap:wrap; align-items:flex-start;">
+
+      <div style="width:320px; background:#1D2228; border-radius:6px; padding:24px; display:flex; flex-direction:column; gap:16px;">
+        <div style="font-family:'Newsreader',serif; font-size:20px; color:#F2EDE3;">Minneapolis</div>
+        <div class="num" style="font-family:'Manrope',sans-serif; font-weight:800; font-size:34px; color:#F2EDE3;">18°F</div>
+        <div style="font-size:13px; color:#9A968C;">Feels like 4°F · Strong NW wind</div>
+        <div style="background:#262C33; border-radius:6px; padding:14px 16px; border-left:3px solid #E8A33D;">
+          <div style="font-size:11px; letter-spacing:.04em; text-transform:uppercase; color:#EDB65E; font-weight:700;">Recommended</div>
+          <div class="num" style="font-family:'Manrope',sans-serif; font-weight:800; font-size:24px; color:#F2EDE3;">Comfort · 10 min</div>
+        </div>
+      </div>
+
+      <div style="width:420px; height:280px; background:#0F1216; border-radius:6px; position:relative; overflow:hidden;">
+        <svg width="100%" height="100%" viewBox="0 0 420 280">
+          <rect width="420" height="280" fill="#0F1216"/>
+          <path d="M40,240 L120,240 L120,90 L200,90 L200,240 L280,240 L280,60 L360,60" stroke="#2A3138" stroke-width="18" fill="none" stroke-linecap="round"/>
+          <path d="M40,220 Q160,120 380,180" stroke="#E8A33D" stroke-width="10" fill="none" stroke-linecap="round" opacity="0.9" filter="blur(0px)"/>
+          <path d="M40,220 Q160,120 380,180" stroke="#E8A33D" stroke-width="26" fill="none" stroke-linecap="round" opacity="0.18"/>
+          <path d="M60,60 L200,160" stroke="#5C6470" stroke-width="6" fill="none" stroke-dasharray="2 8" stroke-linecap="round" opacity="0.7"/>
+        </svg>
+        <div style="position:absolute; bottom:12px; left:16px; font-size:11px; color:#9A968C;">Radiant route = comfort · dashed = exposed segment</div>
+      </div>
+
+    </div>
+  </section>
+
+  <div style="font-size:13px; color:#6B665C; max-width:700px;">
+    Same components, same layout, same type scale in all three cities — only the accent hue and the reasons text change. Next: full IA + wireframes, then hi-fi screens (Home Map, Route Comparison, Active Nav, Comfort Map, Future Departure) per city.
+  </div>
+
+</div>
+
+</x-dc>
+</body>
+</html>

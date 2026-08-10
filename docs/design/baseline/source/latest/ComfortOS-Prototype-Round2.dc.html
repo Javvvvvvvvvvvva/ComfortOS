@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Newsreader:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  body{margin:0;background:#DAD4C6;font-family:'Manrope',sans-serif;}
+  .num{font-variant-numeric:tabular-nums;}
+  @keyframes comfortPulse{0%{opacity:.55;transform:scale(1);}50%{opacity:.15;transform:scale(2.1);}100%{opacity:0;transform:scale(2.6);}}
+</style>
+</helmet>
+
+<div style="width:100%; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:44px; box-sizing:border-box;">
+  <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" dark="{{ dark }}" hint-size="402px,874px">
+
+    <div style="{{ screenWrapStyle }}">
+
+      <!-- shared top chrome: dev preview switcher (hidden during nav) -->
+      <sc-if value="{{ showChrome }}" hint-placeholder-val="{{ true }}">
+        <div style="padding:62px 16px 0; display:flex; align-items:center; justify-content:space-between; box-sizing:border-box;">
+          <div style="display:flex; align-items:center; gap:6px; border:1px dashed {{ theme.subtext }}; border-radius:20px; padding:4px 6px;">
+            <span style="font-size:9px; letter-spacing:.06em; color:{{ theme.subtext }}; font-weight:700; padding-left:4px;">PREVIEW</span>
+            <sc-for list="{{ devButtons }}" as="b" hint-placeholder-count="3">
+              <div onClick="{{ b.onClick }}" style="{{ b.chipStyle }}">{{ b.label }}</div>
+            </sc-for>
+          </div>
+          <div onClick="{{ toggleDark }}" style="{{ darkToggleStyle }}">{{ darkToggleLabel }}</div>
+        </div>
+      </sc-if>
+
+      <!-- HOME SCREEN -->
+      <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex; flex-direction:column; height:calc(100% - 46px); box-sizing:border-box;">
+          <div style="padding:12px 20px 0; display:flex; justify-content:space-between; align-items:baseline;">
+            <div style="font-family:'Newsreader',serif; font-size:19px; color:{{ theme.text }};">{{ city.name }}</div>
+            <div style="font-size:12px; color:{{ theme.subtext }};">{{ time.temp }} · {{ time.windDesc }}</div>
+          </div>
+          <div style="display:flex; align-items:baseline; gap:8px; padding:4px 20px 14px;">
+            <div class="num" style="font-family:'Manrope',sans-serif; font-weight:800; font-size:20px; color:{{ comfortColor }};">{{ time.comfort }}</div>
+            <div style="font-size:13px; color:{{ theme.subtext }};">Outdoor Comfort · {{ time.cond }}</div>
+          </div>
+          <div style="padding:0 20px 14px;">
+            <div onClick="{{ goComparison }}" style="background:{{ theme.card }}; border-radius:16px; padding:16px 18px; display:flex; align-items:center; gap:10px; box-shadow:0 2px 12px rgba(0,0,0,0.12); cursor:pointer;">
+              <svg width="18" height="18" viewBox="0 0 18 18"><circle cx="8" cy="8" r="6.5" fill="none" stroke="{{ theme.subtext }}" stroke-width="1.8"/><line x1="13" y1="13" x2="17" y2="17" stroke="{{ theme.subtext }}" stroke-width="1.8" stroke-linecap="round"/></svg>
+              <div style="font-size:17px; font-weight:600; color:{{ theme.text }};">Where are you going?</div>
+            </div>
+          </div>
+          <div style="flex:1; position:relative; margin:4px 16px 16px; border-radius:18px; overflow:hidden; background:{{ theme.mapBg }};">
+            <svg viewBox="0 0 380 640" width="100%" height="100%" preserveAspectRatio="xMidYMid slice">
+              <rect x="0" y="0" width="380" height="640" fill="{{ theme.mapBg }}"/>
+              <path d="M215,470 Q200,520 230,565 Q270,585 310,560 Q330,520 305,480 Q265,455 215,470 Z" fill="{{ theme.parkFill }}" opacity="0.6"/>
+              <line x1="60" y1="0" x2="60" y2="640" stroke="{{ theme.mutedLine }}" stroke-width="9" opacity="0.4"/>
+              <line x1="160" y1="0" x2="160" y2="640" stroke="{{ theme.mutedLine }}" stroke-width="9" opacity="0.4"/>
+              <line x1="260" y1="0" x2="260" y2="640" stroke="{{ theme.mutedLine }}" stroke-width="9" opacity="0.4"/>
+              <line x1="0" y1="220" x2="380" y2="220" stroke="{{ theme.mutedLine }}" stroke-width="9" opacity="0.4"/>
+              <line x1="0" y1="380" x2="380" y2="380" stroke="{{ theme.mutedLine }}" stroke-width="9" opacity="0.4"/>
+              <line x1="0" y1="560" x2="380" y2="560" stroke="{{ theme.mutedLine }}" stroke-width="9" opacity="0.4"/>
+              <g fill="{{ theme.buildingFill }}" opacity="0.8">
+                <rect x="10" y="12" width="34" height="46"/>
+                <rect x="10" y="64" width="34" height="30"/>
+                <rect x="70" y="12" width="34" height="70"/>
+                <rect x="70" y="88" width="30" height="40"/>
+                <rect x="170" y="12" width="80" height="40"/>
+                <rect x="170" y="56" width="80" height="55"/>
+                <rect x="270" y="12" width="80" height="90"/>
+                <rect x="10" y="230" width="30" height="45"/>
+                <rect x="70" y="230" width="80" height="65"/>
+                <rect x="170" y="230" width="76" height="65"/>
+                <rect x="270" y="150" width="80" height="60"/>
+                <rect x="270" y="230" width="80" height="65"/>
+                <rect x="10" y="390" width="34" height="60"/>
+                <rect x="10" y="460" width="34" height="90"/>
+                <rect x="70" y="390" width="34" height="60"/>
+                <rect x="316" y="390" width="34" height="150"/>
+                <rect x="10" y="570" width="140" height="40"/>
+              </g>
+              <rect x="0" y="0" width="380" height="640" fill="{{ theme.bg }}" opacity="0.1"/>
+              <sc-for list="{{ homeAmbientSegments }}" as="seg" hint-placeholder-count="14">
+                <path d="{{ seg.d }}" stroke="{{ seg.stroke }}" stroke-width="{{ seg.haloWidth }}" fill="none" stroke-linecap="round" opacity="{{ seg.haloOpacity }}" style="filter:blur(3px);"/>
+                <path d="{{ seg.d }}" stroke="{{ seg.stroke }}" stroke-width="{{ seg.width }}" fill="none" stroke-linecap="round" opacity="0.85"/>
+              </sc-for>
+              <circle cx="60" cy="80" r="10" fill="{{ theme.text }}" opacity="0.9"/>
+              <circle cx="60" cy="80" r="10" fill="{{ theme.text }}" style="animation: comfortPulse 2.2s ease-out infinite;"/>
+            </svg>
+            <div onClick="{{ goComfortMap }}" style="position:absolute; top:12px; right:12px; background:{{ theme.card }}; color:{{ theme.text }}; font-size:12px; font-weight:600; padding:8px 12px; border-radius:20px; box-shadow:0 2px 8px rgba(0,0,0,0.15); cursor:pointer;">Comfort Map</div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ROUTE COMPARISON SCREEN -->
+      <sc-if value="{{ isComparison }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex; flex-direction:column; height:calc(100% - 46px); box-sizing:border-box;">
+          <div style="display:flex; align-items:center; gap:10px; padding:10px 20px 4px;">
+            <div onClick="{{ goHome }}" style="width:30px; height:30px; border-radius:15px; background:{{ theme.card }}; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:14px; color:{{ theme.text }};">‹</div>
+            <div style="font-size:15px; font-weight:600; color:{{ theme.text }};">Anchor Coffee Co.</div>
+          </div>
+          <div style="flex:0 0 200px; position:relative; margin:8px 16px; border-radius:18px; overflow:hidden; background:{{ theme.mapBg }};">
+            <svg viewBox="0 0 380 640" width="100%" height="100%" preserveAspectRatio="xMidYMid slice">
+              <rect x="0" y="0" width="380" height="640" fill="{{ theme.mapBg }}"/>
+              <path d="M215,470 Q200,520 230,565 Q270,585 310,560 Q330,520 305,480 Q265,455 215,470 Z" fill="{{ theme.parkFill }}" opacity="0.8"/>
+              <line x1="60" y1="0" x2="60" y2="640" stroke="{{ theme.mutedLine }}" stroke-width="9" opacity="0.55"/>
+              <line x1="160" y1="0" x2="160" y2="640" stroke="{{ theme.mutedLine }}" stroke-width="9" opacity="0.55"/>
+              <line x1="260" y1="0" x2="260" y2="640" stroke="{{ theme.mutedLine }}" stroke-width="9" opacity="0.55"/>
+              <line x1="0" y1="220" x2="380" y2="220" stroke="{{ theme.mutedLine }}" stroke-width="9" opacity="0.55"/>
+              <line x1="0" y1="380" x2="380" y2="380" stroke="{{ theme.mutedLine }}" stroke-width="9" opacity="0.55"/>
+              <line x1="0" y1="560" x2="380" y2="560" stroke="{{ theme.mutedLine }}" stroke-width="9" opacity="0.55"/>
+              <line x1="110" y1="0" x2="110" y2="640" stroke="{{ theme.mutedLine }}" stroke-width="2.5" opacity="0.35"/>
+              <line x1="210" y1="0" x2="210" y2="640" stroke="{{ theme.mutedLine }}" stroke-width="2.5" opacity="0.35"/>
+              <line x1="310" y1="0" x2="310" y2="640" stroke="{{ theme.mutedLine }}" stroke-width="2.5" opacity="0.35"/>
+              <line x1="0" y1="140" x2="380" y2="140" stroke="{{ theme.mutedLine }}" stroke-width="2.5" opacity="0.35"/>
+              <line x1="0" y1="300" x2="380" y2="300" stroke="{{ theme.mutedLine }}" stroke-width="2.5" opacity="0.35"/>
+              <line x1="0" y1="460" x2="380" y2="460" stroke="{{ theme.mutedLine }}" stroke-width="2.5" opacity="0.35"/>
+              <g fill="{{ theme.buildingFill }}">
+                <rect x="10" y="12" width="34" height="46" opacity="0.95"/>
+                <rect x="10" y="64" width="34" height="30" opacity="0.75"/>
+                <rect x="10" y="100" width="18" height="32" opacity="0.9"/>
+                <rect x="32" y="100" width="12" height="32" opacity="0.7"/>
+                <rect x="10" y="150" width="34" height="60" opacity="0.85"/>
+                <rect x="70" y="12" width="34" height="70" opacity="0.85"/>
+                <rect x="70" y="88" width="16" height="40" opacity="0.7"/>
+                <rect x="90" y="88" width="14" height="40" opacity="0.95"/>
+                <rect x="70" y="134" width="34" height="70" opacity="0.75"/>
+                <rect x="170" y="12" width="80" height="40" opacity="0.8"/>
+                <rect x="170" y="56" width="38" height="55" opacity="0.9"/>
+                <rect x="212" y="56" width="38" height="55" opacity="0.7"/>
+                <rect x="170" y="115" width="80" height="30" opacity="0.85"/>
+                <rect x="270" y="12" width="34" height="90" opacity="0.9"/>
+                <rect x="270" y="106" width="34" height="30" opacity="0.7"/>
+                <rect x="316" y="12" width="34" height="45" opacity="0.85"/>
+                <rect x="316" y="61" width="34" height="30" opacity="0.75"/>
+                <rect x="10" y="230" width="30" height="45" opacity="0.85"/>
+                <rect x="44" y="230" width="14" height="45" opacity="0.7"/>
+                <rect x="10" y="280" width="44" height="16" opacity="0.6"/>
+                <rect x="70" y="230" width="80" height="65" opacity="0.9"/>
+                <rect x="170" y="230" width="34" height="65" opacity="0.75"/>
+                <rect x="212" y="230" width="34" height="65" opacity="0.9"/>
+                <rect x="270" y="150" width="80" height="60" opacity="0.85"/>
+                <rect x="270" y="230" width="34" height="65" opacity="0.7"/>
+                <rect x="316" y="230" width="34" height="65" opacity="0.85"/>
+                <rect x="10" y="390" width="34" height="60" opacity="0.9"/>
+                <rect x="10" y="460" width="34" height="90" opacity="0.75"/>
+                <rect x="70" y="390" width="34" height="30" opacity="0.85"/>
+                <rect x="70" y="428" width="34" height="30" opacity="0.7"/>
+                <rect x="316" y="390" width="34" height="60" opacity="0.9"/>
+                <rect x="316" y="460" width="34" height="90" opacity="0.75"/>
+                <rect x="70" y="470" width="30" height="80" opacity="0.65"/>
+                <rect x="10" y="570" width="140" height="40" opacity="0.6"/>
+                <rect x="230" y="570" width="60" height="40" opacity="0.6"/>
+              </g>
+              <line x1="60" y1="0" x2="60" y2="640" stroke="{{ theme.mapBg }}" stroke-width="1.2" opacity="0.5" stroke-dasharray="6 8"/>
+              <line x1="0" y1="380" x2="380" y2="380" stroke="{{ theme.mapBg }}" stroke-width="1.2" opacity="0.5" stroke-dasharray="6 8"/>
+              <text x="66" y="112" font-family="Manrope, sans-serif" font-size="9" letter-spacing="1.5" fill="{{ theme.subtext }}" transform="rotate(-90 66 112)">2ND AVE</text>
+              <text x="120" y="374" font-family="Manrope, sans-serif" font-size="9" letter-spacing="1.5" fill="{{ theme.subtext }}">UNION AVE</text>
+              <text x="266" y="330" font-family="Manrope, sans-serif" font-size="9" letter-spacing="1.5" fill="{{ theme.subtext }}" transform="rotate(-90 266 330)">WILLOW LN</text>
+              <sc-for list="{{ routeMapSegments }}" as="seg" hint-placeholder-count="14">
+                <path d="{{ seg.d }}" stroke="{{ seg.haloStroke }}" stroke-width="{{ seg.haloWidth }}" fill="none" stroke-linecap="round" opacity="{{ seg.haloOpacity }}" style="filter:blur(4px);"/>
+                <path d="{{ seg.d }}" stroke="{{ seg.stroke }}" stroke-width="{{ seg.width }}" stroke-dasharray="{{ seg.dash }}" fill="none" stroke-linecap="round" opacity="{{ seg.opacity }}"/>
+              </sc-for>
+              <circle cx="60" cy="80" r="9" fill="{{ theme.text }}"/>
+              <circle cx="320" cy="560" r="9" fill="{{ selectedRouteObj.accent }}"/>
+            </svg>
+          </div>
+          <div style="flex:1; overflow:auto; background:{{ theme.card }}; border-radius:20px 20px 0 0; margin-top:6px; padding:16px 16px 20px; display:flex; flex-direction:column; gap:12px;">
+            <div style="width:36px; height:4px; border-radius:2px; background:{{ theme.divider }}; align-self:center;"></div>
+
+            <div style="display:flex; gap:8px;">
+              <sc-for list="{{ timeOptions }}" as="t" hint-placeholder-count="3">
+                <div onClick="{{ t.onClick }}" style="{{ t.chipStyle }}">{{ t.label }}</div>
+              </sc-for>
+            </div>
+
+            <sc-if value="{{ predictiveText }}" hint-placeholder-val="{{ false }}">
+              <div onClick="{{ jumpPredictive }}" style="background:{{ theme.accentSoft }}; border-radius:10px; padding:10px 14px; font-size:13px; color:{{ theme.text }}; cursor:pointer;">{{ predictiveText }}</div>
+            </sc-if>
+
+            <sc-for list="{{ routesArr }}" as="r" hint-placeholder-count="3">
+              <div style="{{ r.cardStyle }}">
+                <div onClick="{{ r.onClick }}" style="cursor:pointer;">
+                  <sc-if value="{{ r.recommended }}" hint-placeholder-val="{{ false }}">
+                    <div style="font-size:10px; letter-spacing:.05em; text-transform:uppercase; font-weight:700; color:{{ r.accent }}; margin-bottom:2px;">Recommended</div>
+                  </sc-if>
+                  <div class="num" style="font-family:'Manrope',sans-serif; font-weight:800; font-size:22px; color:{{ theme.text }};">{{ r.label }} · {{ r.time }} min</div>
+                  <div style="font-size:12px; color:{{ theme.subtext }}; margin-top:2px;">{{ r.dist }}</div>
+                </div>
+                <sc-if value="{{ r.hasTradeoff }}" hint-placeholder-val="{{ false }}">
+                  <div style="{{ r.tradeoffStyle }}">
+                    <div style="font-size:14px; font-weight:700; color:{{ theme.text }}; white-space:nowrap;">{{ r.deltaLabel }}</div>
+                    <div style="color:{{ theme.subtext }};">→</div>
+                    <div style="font-size:16px; font-weight:800; color:{{ r.accent }};">{{ r.topReason }}</div>
+                  </div>
+                  <sc-for list="{{ r.otherReasons }}" as="reason" hint-placeholder-count="1">
+                    <div style="font-size:12px; color:{{ theme.subtext }}; margin-top:5px;">— {{ reason }}</div>
+                  </sc-for>
+                </sc-if>
+                <sc-if value="{{ r.note }}" hint-placeholder-val="{{ false }}">
+                  <div style="font-size:12px; color:{{ theme.subtext }}; margin-top:5px;">{{ r.note }}</div>
+                </sc-if>
+                <sc-if value="{{ r.selected }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex; gap:10px; margin-top:12px; align-items:center;">
+                    <sc-if value="{{ r.showWhy }}" hint-placeholder-val="{{ false }}">
+                      <div onClick="{{ toggleDetail }}" style="font-size:12px; font-weight:600; color:{{ theme.text }}; text-decoration:underline; cursor:pointer;">{{ whyLabel }}</div>
+                    </sc-if>
+                    <div onClick="{{ startNav }}" style="margin-left:auto; background:{{ r.accent }}; color:{{ theme.card }}; font-size:13px; font-weight:700; padding:9px 20px; border-radius:20px; cursor:pointer;">Start</div>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-for>
+
+            <sc-if value="{{ detailOpen }}" hint-placeholder-val="{{ false }}">
+              <div style="background:{{ theme.cardAlt }}; border-radius:10px; padding:14px 16px; display:flex; flex-direction:column; gap:8px;">
+                <div style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:{{ theme.subtext }};">Why this route?</div>
+                <div style="display:flex; justify-content:space-between; font-size:13px; color:{{ theme.text }};"><span>Estimated shade</span><span class="num">{{ time.detail.shade }}%</span></div>
+                <div style="display:flex; justify-content:space-between; font-size:13px; color:{{ theme.text }};"><span>Estimated wind exposure</span><span class="num">{{ time.detail.wind }}%</span></div>
+                <div style="display:flex; justify-content:space-between; font-size:13px; color:{{ theme.text }};"><span>Rain exposure</span><span class="num">{{ time.detail.rain }}%</span></div>
+                <div style="display:flex; justify-content:space-between; font-size:13px; color:{{ theme.subtext }};"><span>Comfort model confidence</span><span>{{ time.detail.confidence }}</span></div>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- COMFORT MAP SCREEN -->
+      <sc-if value="{{ isComfortMap }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex; flex-direction:column; height:calc(100% - 46px); box-sizing:border-box;">
+          <div style="display:flex; align-items:center; gap:10px; padding:10px 20px 8px;">
+            <div onClick="{{ goHome }}" style="width:30px; height:30px; border-radius:15px; background:{{ theme.card }}; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:14px; color:{{ theme.text }};">‹</div>
+            <div style="font-family:'Newsreader',serif; font-size:19px; color:{{ theme.text }};">Comfort Map</div>
+          </div>
+          <div style="display:flex; gap:8px; padding:0 16px 10px;">
+            <sc-for list="{{ layerOptions }}" as="l" hint-placeholder-count="3">
+              <div onClick="{{ l.onClick }}" style="{{ l.chipStyle }}">{{ l.label }}</div>
+            </sc-for>
+          </div>
+          <div style="flex:1; position:relative; margin:0 16px 12px; border-radius:18px; overflow:hidden; background:{{ theme.mapBg }};">
+            <svg viewBox="0 0 380 640" width="100%" height="100%" preserveAspectRatio="xMidYMid slice">
+              <rect x="0" y="0" width="380" height="640" fill="{{ theme.mapBg }}"/>
+              <path d="M215,470 Q200,520 230,565 Q270,585 310,560 Q330,520 305,480 Q265,455 215,470 Z" fill="{{ theme.parkFill }}" opacity="0.8"/>
+              <line x1="60" y1="0" x2="60" y2="640" stroke="{{ theme.mutedLine }}" stroke-width="9" opacity="0.55"/>
+              <line x1="160" y1="0" x2="160" y2="640" stroke="{{ theme.mutedLine }}" stroke-width="9" opacity="0.55"/>
+              <line x1="260" y1="0" x2="260" y2="640" stroke="{{ theme.mutedLine }}" stroke-width="9" opacity="0.55"/>
+              <line x1="0" y1="220" x2="380" y2="220" stroke="{{ theme.mutedLine }}" stroke-width="9" opacity="0.55"/>
+              <line x1="0" y1="380" x2="380" y2="380" stroke="{{ theme.mutedLine }}" stroke-width="9" opacity="0.55"/>
+              <line x1="0" y1="560" x2="380" y2="560" stroke="{{ theme.mutedLine }}" stroke-width="9" opacity="0.55"/>
+              <line x1="110" y1="0" x2="110" y2="640" stroke="{{ theme.mutedLine }}" stroke-width="2.5" opacity="0.35"/>
+              <line x1="210" y1="0" x2="210" y2="640" stroke="{{ theme.mutedLine }}" stroke-width="2.5" opacity="0.35"/>
+              <line x1="310" y1="0" x2="310" y2="640" stroke="{{ theme.mutedLine }}" stroke-width="2.5" opacity="0.35"/>
+              <line x1="0" y1="140" x2="380" y2="140" stroke="{{ theme.mutedLine }}" stroke-width="2.5" opacity="0.35"/>
+              <line x1="0" y1="300" x2="380" y2="300" stroke="{{ theme.mutedLine }}" stroke-width="2.5" opacity="0.35"/>
+              <line x1="0" y1="460" x2="380" y2="460" stroke="{{ theme.mutedLine }}" stroke-width="2.5" opacity="0.35"/>
+              <g fill="{{ theme.buildingFill }}">
+                <rect x="10" y="12" width="34" height="46" opacity="0.95"/>
+                <rect x="10" y="64" width="34" height="30" opacity="0.75"/>
+                <rect x="10" y="100" width="18" height="32" opacity="0.9"/>
+                <rect x="32" y="100" width="12" height="32" opacity="0.7"/>
+                <rect x="10" y="150" width="34" height="60" opacity="0.85"/>
+                <rect x="70" y="12" width="34" height="70" opacity="0.85"/>
+                <rect x="70" y="88" width="16" height="40" opacity="0.7"/>
+                <rect x="90" y="88" width="14" height="40" opacity="0.95"/>
+                <rect x="70" y="134" width="34" height="70" opacity="0.75"/>
+                <rect x="170" y="12" width="80" height="40" opacity="0.8"/>
+                <rect x="170" y="56" width="38" height="55" opacity="0.9"/>
+                <rect x="212" y="56" width="38" height="55" opacity="0.7"/>
+                <rect x="170" y="115" width="80" height="30" opacity="0.85"/>
+                <rect x="270" y="12" width="34" height="90" opacity="0.9"/>
+                <rect x="270" y="106" width="34" height="30" opacity="0.7"/>
+                <rect x="316" y="12" width="34" height="45" opacity="0.85"/>
+                <rect x="316" y="61" width="34" height="30" opacity="0.75"/>
+                <rect x="10" y="230" width="30" height="45" opacity="0.85"/>
+                <rect x="44" y="230" width="14" height="45" opacity="0.7"/>
+                <rect x="10" y="280" width="44" height="16" opacity="0.6"/>
+                <rect x="70" y="230" width="80" height="65" opacity="0.9"/>
+                <rect x="170" y="230" width="34" height="65" opacity="0.75"/>
+                <rect x="212" y="230" width="34" height="65" opacity="0.9"/>
+                <rect x="270" y="150" width="80" height="60" opacity="0.85"/>
+                <rect x="270" y="230" width="34" height="65" opacity="0.7"/>
+                <rect x="316" y="230" width="34" height="65" opacity="0.85"/>
+                <rect x="10" y="390" width="34" height="60" opacity="0.9"/>
+                <rect x="10" y="460" width="34" height="90" opacity="0.75"/>
+                <rect x="70" y="390" width="34" height="30" opacity="0.85"/>
+                <rect x="70" y="428" width="34" height="30" opacity="0.7"/>
+                <rect x="316" y="390" width="34" height="60" opacity="0.9"/>
+                <rect x="316" y="460" width="34" height="90" opacity="0.75"/>
+                <rect x="70" y="470" width="30" height="80" opacity="0.65"/>
+                <rect x="10" y="570" width="140" height="40" opacity="0.6"/>
+                <rect x="230" y="570" width="60" height="40" opacity="0.6"/>
+              </g>
+              <line x1="60" y1="0" x2="60" y2="640" stroke="{{ theme.mapBg }}" stroke-width="1.2" opacity="0.5" stroke-dasharray="6 8"/>
+              <line x1="0" y1="380" x2="380" y2="380" stroke="{{ theme.mapBg }}" stroke-width="1.2" opacity="0.5" stroke-dasharray="6 8"/>
+              <text x="66" y="112" font-family="Manrope, sans-serif" font-size="9" letter-spacing="1.5" fill="{{ theme.subtext }}" transform="rotate(-90 66 112)">2ND AVE</text>
+              <text x="120" y="374" font-family="Manrope, sans-serif" font-size="9" letter-spacing="1.5" fill="{{ theme.subtext }}">UNION AVE</text>
+              <text x="266" y="330" font-family="Manrope, sans-serif" font-size="9" letter-spacing="1.5" fill="{{ theme.subtext }}" transform="rotate(-90 266 330)">WILLOW LN</text>
+              <ellipse cx="300" cy="120" rx="70" ry="55" fill="{{ atmoBadColor }}" opacity="0.1" style="filter:blur(14px);"/>
+              <ellipse cx="90" cy="500" rx="70" ry="55" fill="{{ atmoGoodColor }}" opacity="0.12" style="filter:blur(14px);"/>
+              <sc-for list="{{ comfortMapSegments }}" as="seg" hint-placeholder-count="14">
+                <path d="{{ seg.d }}" stroke="{{ seg.stroke }}" stroke-width="{{ seg.haloWidth }}" fill="none" stroke-linecap="round" opacity="{{ seg.haloOpacity }}" style="filter:blur(4px);"/>
+                <path onClick="{{ seg.onClick }}" d="{{ seg.d }}" stroke="{{ seg.stroke }}" stroke-width="{{ seg.width }}" stroke-dasharray="{{ seg.dash }}" fill="none" stroke-linecap="round" style="cursor:pointer;"/>
+              </sc-for>
+            </svg>
+            <sc-if value="{{ selectedSegmentInfo }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute; bottom:12px; left:12px; right:12px; background:{{ theme.card }}; border-radius:12px; padding:12px 16px; box-shadow:0 4px 16px rgba(0,0,0,0.2);">
+                <div style="font-size:14px; font-weight:700; color:{{ theme.text }};">{{ selectedSegmentInfo.name }}</div>
+                <div style="font-size:12px; color:{{ theme.subtext }}; margin-top:2px;">{{ layerLabel }} score: <span class="num" style="font-weight:700; color:{{ theme.text }};">{{ selectedSegmentInfo.score }}</span></div>
+              </div>
+            </sc-if>
+          </div>
+          <div style="padding:0 16px 16px; display:flex; align-items:center; gap:10px;">
+            <div style="width:70px; height:8px; border-radius:4px; background:linear-gradient(90deg,#C1523A,#D9A648,#4F8B85);"></div>
+            <div style="font-size:11px; color:{{ theme.subtext }};">{{ legendText }}</div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ACTIVE NAVIGATION OVERLAY -->
+      <sc-if value="{{ navMode }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute; inset:0; display:flex; flex-direction:column;">
+          <div style="flex:1; position:relative; background:{{ theme.mapBg }};">
+            <svg viewBox="0 0 380 640" width="100%" height="100%" preserveAspectRatio="xMidYMid slice">
+              <rect x="0" y="0" width="380" height="640" fill="{{ theme.mapBg }}"/>
+              <path d="M215,470 Q200,520 230,565 Q270,585 310,560 Q330,520 305,480 Q265,455 215,470 Z" fill="{{ theme.parkFill }}" opacity="0.8"/>
+              <line x1="60" y1="0" x2="60" y2="640" stroke="{{ theme.mutedLine }}" stroke-width="9" opacity="0.55"/>
+              <line x1="160" y1="0" x2="160" y2="640" stroke="{{ theme.mutedLine }}" stroke-width="9" opacity="0.55"/>
+              <line x1="260" y1="0" x2="260" y2="640" stroke="{{ theme.mutedLine }}" stroke-width="9" opacity="0.55"/>
+              <line x1="0" y1="220" x2="380" y2="220" stroke="{{ theme.mutedLine }}" stroke-width="9" opacity="0.55"/>
+              <line x1="0" y1="380" x2="380" y2="380" stroke="{{ theme.mutedLine }}" stroke-width="9" opacity="0.55"/>
+              <line x1="0" y1="560" x2="380" y2="560" stroke="{{ theme.mutedLine }}" stroke-width="9" opacity="0.55"/>
+              <line x1="110" y1="0" x2="110" y2="640" stroke="{{ theme.mutedLine }}" stroke-width="2.5" opacity="0.35"/>
+              <line x1="210" y1="0" x2="210" y2="640" stroke="{{ theme.mutedLine }}" stroke-width="2.5" opacity="0.35"/>
+              <line x1="310" y1="0" x2="310" y2="640" stroke="{{ theme.mutedLine }}" stroke-width="2.5" opacity="0.35"/>
+              <line x1="0" y1="140" x2="380" y2="140" stroke="{{ theme.mutedLine }}" stroke-width="2.5" opacity="0.35"/>
+              <line x1="0" y1="300" x2="380" y2="300" stroke="{{ theme.mutedLine }}" stroke-width="2.5" opacity="0.35"/>
+              <line x1="0" y1="460" x2="380" y2="460" stroke="{{ theme.mutedLine }}" stroke-width="2.5" opacity="0.35"/>
+              <g fill="{{ theme.buildingFill }}">
+                <rect x="10" y="12" width="34" height="46" opacity="0.95"/>
+                <rect x="10" y="64" width="34" height="30" opacity="0.75"/>
+                <rect x="10" y="100" width="18" height="32" opacity="0.9"/>
+                <rect x="32" y="100" width="12" height="32" opacity="0.7"/>
+                <rect x="10" y="150" width="34" height="60" opacity="0.85"/>
+                <rect x="70" y="12" width="34" height="70" opacity="0.85"/>
+                <rect x="70" y="88" width="16" height="40" opacity="0.7"/>
+                <rect x="90" y="88" width="14" height="40" opacity="0.95"/>
+                <rect x="70" y="134" width="34" height="70" opacity="0.75"/>
+                <rect x="170" y="12" width="80" height="40" opacity="0.8"/>
+                <rect x="170" y="56" width="38" height="55" opacity="0.9"/>
+                <rect x="212" y="56" width="38" height="55" opacity="0.7"/>
+                <rect x="170" y="115" width="80" height="30" opacity="0.85"/>
+                <rect x="270" y="12" width="34" height="90" opacity="0.9"/>
+                <rect x="270" y="106" width="34" height="30" opacity="0.7"/>
+                <rect x="316" y="12" width="34" height="45" opacity="0.85"/>
+                <rect x="316" y="61" width="34" height="30" opacity="0.75"/>
+                <rect x="10" y="230" width="30" height="45" opacity="0.85"/>
+                <rect x="44" y="230" width="14" height="45" opacity="0.7"/>
+                <rect x="10" y="280" width="44" height="16" opacity="0.6"/>
+                <rect x="70" y="230" width="80" height="65" opacity="0.9"/>
+                <rect x="170" y="230" width="34" height="65" opacity="0.75"/>
+                <rect x="212" y="230" width="34" height="65" opacity="0.9"/>
+                <rect x="270" y="150" width="80" height="60" opacity="0.85"/>
+                <rect x="270" y="230" width="34" height="65" opacity="0.7"/>
+                <rect x="316" y="230" width="34" height="65" opacity="0.85"/>
+                <rect x="10" y="390" width="34" height="60" opacity="0.9"/>
+                <rect x="10" y="460" width="34" height="90" opacity="0.75"/>
+                <rect x="70" y="390" width="34" height="30" opacity="0.85"/>
+                <rect x="70" y="428" width="34" height="30" opacity="0.7"/>
+                <rect x="316" y="390" width="34" height="60" opacity="0.9"/>
+                <rect x="316" y="460" width="34" height="90" opacity="0.75"/>
+                <rect x="70" y="470" width="30" height="80" opacity="0.65"/>
+                <rect x="10" y="570" width="140" height="40" opacity="0.6"/>
+                <rect x="230" y="570" width="60" height="40" opacity="0.6"/>
+              </g>
+              <line x1="60" y1="0" x2="60" y2="640" stroke="{{ theme.mapBg }}" stroke-width="1.2" opacity="0.5" stroke-dasharray="6 8"/>
+              <line x1="0" y1="380" x2="380" y2="380" stroke="{{ theme.mapBg }}" stroke-width="1.2" opacity="0.5" stroke-dasharray="6 8"/>
+              <text x="66" y="112" font-family="Manrope, sans-serif" font-size="9" letter-spacing="1.5" fill="{{ theme.subtext }}" transform="rotate(-90 66 112)">2ND AVE</text>
+              <text x="120" y="374" font-family="Manrope, sans-serif" font-size="9" letter-spacing="1.5" fill="{{ theme.subtext }}">UNION AVE</text>
+              <text x="266" y="330" font-family="Manrope, sans-serif" font-size="9" letter-spacing="1.5" fill="{{ theme.subtext }}" transform="rotate(-90 266 330)">WILLOW LN</text>
+              <sc-for list="{{ routeMapSegments }}" as="seg" hint-placeholder-count="14">
+                <path d="{{ seg.d }}" stroke="{{ seg.haloStroke }}" stroke-width="{{ seg.haloWidth }}" fill="none" stroke-linecap="round" opacity="{{ seg.haloOpacity }}" style="filter:blur(4px);"/>
+                <path d="{{ seg.d }}" stroke="{{ seg.stroke }}" stroke-width="{{ seg.width }}" stroke-dasharray="{{ seg.dash }}" fill="none" stroke-linecap="round" opacity="{{ seg.opacity }}"/>
+              </sc-for>
+              <circle cx="160" cy="220" r="10" fill="{{ selectedRouteObj.accent }}"/>
+            </svg>
+            <div onClick="{{ exitNav }}" style="position:absolute; top:62px; right:16px; width:30px; height:30px; border-radius:15px; background:{{ theme.card }}; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:14px; color:{{ theme.text }};">×</div>
+            <div style="position:absolute; top:62px; left:16px; right:58px; background:{{ selectedRouteObj.accent }}; color:{{ theme.card }}; border-radius:14px; padding:14px 18px;">
+              <div style="font-size:18px; font-weight:800;">Turn right on Bridge Path</div>
+              <div style="font-size:13px; opacity:0.85; margin-top:2px;">300 ft</div>
+            </div>
+          </div>
+          <div style="background:{{ theme.card }}; padding:16px 20px 22px; border-radius:20px 20px 0 0;">
+            <div style="font-size:13px; font-weight:600; color:{{ theme.subtext }};">Microclimate guidance</div>
+            <div style="font-size:17px; font-weight:700; color:{{ theme.text }}; margin-top:2px;">{{ microclimateNote }}</div>
+            <div style="font-size:13px; color:{{ theme.subtext }}; margin-top:2px;">{{ microclimateSubtitle }}</div>
+          </div>
+        </div>
+      </sc-if>
+
+    </div>
+
+  </x-import>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:500,&quot;height&quot;:950},&quot;darkMode&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Behavior&quot;},&quot;startScreen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;home&quot;,&quot;options&quot;:[&quot;home&quot;,&quot;comparison&quot;,&quot;comfortmap&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Behavior&quot;}}">
+const SEGMENT_DEFS = [
+  {id:'s1', d:'M60,80 L60,220', name:'Elm St'},
+  {id:'s2', d:'M60,220 L60,380', name:'2nd Ave'},
+  {id:'s3', d:'M60,220 L160,220', name:'Riverside Dr'},
+  {id:'s4', d:'M160,220 L160,380', name:'Market St'},
+  {id:'s5', d:'M60,380 L60,560', name:'Chapel Row'},
+  {id:'s6', d:'M160,380 L160,560', name:'Union Ave'},
+  {id:'s7', d:'M160,220 L260,220', name:'Garden Walk'},
+  {id:'s8', d:'M60,560 L320,560', name:'Commerce St'},
+  {id:'s9', d:'M160,560 L260,560', name:'Bridge Path'},
+  {id:'s10', d:'M260,220 L260,460', name:'Willow Ln'},
+  {id:'s11', d:'M260,460 L260,560', name:'Harbor Way'},
+  {id:'sF', d:'M260,560 L320,560', name:'Central Plaza'},
+  {id:'sA', d:'M60,300 L160,300', name:'Cross St'},
+  {id:'sB', d:'M160,460 L260,460', name:'Mill Row'}
+];
+const ROUTE_MEMBERSHIP = {
+  fastest: ['s1','s2','s5','s8'],
+  comfort: ['s1','s3','s4','s6','s9','sF'],
+  context: ['s1','s3','s7','s10','s11','sF']
+};
+const CITY_DATA = {
+  mn: { name:'Minneapolis', shortName:'MSP', accent:'#E8A33D', contextName:'Stay Warm',
+    layers:[{id:'comfort',label:'Comfort'},{id:'wind',label:'Wind'},{id:'shelter',label:'Sun & Shelter'}],
+    timeLabels:{ now:'Now', '+30':'3:30 PM', '+60':'4:00 PM' },
+    segments:{
+      comfort:[65,40,70,68,35,72,75,25,78,82,80,88,45,60],
+      wind:[60,25,65,70,20,68,78,12,75,85,82,90,40,58],
+      shelter:[62,30,68,72,22,70,80,15,76,86,83,88,42,60]
+    },
+    times:{
+      now:{temp:'18°F', feels:'Feels like 4°F', cond:'Cold & windy', windDesc:'NW wind 17 mph', comfort:42, predictive:null,
+        routes:{fastest:{time:8,dist:'0.6 mi',note:'More exposed to wind'}, comfort:{time:10,dist:'0.7 mi',reasons:['31% less wind exposure','22% more sunlight']}, context:{time:11,dist:'0.8 mi',reasons:['48% less wind exposure','35% more sunlight']}},
+        detail:{shade:58,wind:31,rain:0,confidence:'High'}},
+      '+30':{temp:'20°F', feels:'Feels like 9°F', cond:'Calmer wind', windDesc:'NW wind 12 mph', comfort:51, predictive:'Better at 3:30 PM · +9 Comfort · wind expected to weaken',
+        routes:{fastest:{time:8,dist:'0.6 mi',note:'More exposed to wind'}, comfort:{time:10,dist:'0.7 mi',reasons:['28% less wind exposure','18% more sunlight']}, context:{time:12,dist:'0.8 mi',reasons:['40% less wind exposure','30% more sunlight']}},
+        detail:{shade:55,wind:22,rain:0,confidence:'High'}},
+      '+60':{temp:'21°F', feels:'Feels like 12°F', cond:'Mild wind', windDesc:'NW wind 8 mph', comfort:58, predictive:'Better at 4:00 PM · +16 Comfort · wind continuing to ease',
+        routes:{fastest:{time:8,dist:'0.6 mi',note:'More exposed to wind'}, comfort:{time:9,dist:'0.7 mi',reasons:['24% less wind exposure','15% more sunlight']}, context:{time:12,dist:'0.8 mi',reasons:['33% less wind exposure','26% more sunlight']}},
+        detail:{shade:52,wind:14,rain:0,confidence:'Medium'}}
+    }
+  },
+  sea: { name:'Seattle', shortName:'SEA', accent:'#4E8C8A', contextName:'Stay Dry',
+    layers:[{id:'comfort',label:'Comfort'},{id:'rain',label:'Rain'},{id:'wind',label:'Wind'}],
+    timeLabels:{ now:'Now', '+30':'5:00 PM', '+60':'5:30 PM' },
+    segments:{
+      comfort:[60,45,65,62,40,66,70,30,72,78,75,85,48,58],
+      rain:[55,20,60,68,18,65,75,10,70,88,80,92,35,55],
+      wind:[58,30,62,64,28,63,70,25,68,76,72,80,44,56]
+    },
+    times:{
+      now:{temp:'48°F', feels:'Feels like 45°F', cond:'Rain', windDesc:'SW wind 9 mph', comfort:61, predictive:null,
+        routes:{fastest:{time:11,dist:'0.9 mi',note:'Fully exposed to rain'}, comfort:{time:13,dist:'1.0 mi',reasons:['Mostly covered walkway','24% less rain exposure']}, context:{time:14,dist:'1.1 mi',reasons:['57% less rain exposure','Covered most of the way']}},
+        detail:{shade:20,wind:18,rain:70,confidence:'High'}},
+      '+30':{temp:'48°F', feels:'Feels like 46°F', cond:'Light rain', windDesc:'SW wind 7 mph', comfort:66, predictive:'Better at 5:00 PM · +5 Comfort · rain expected to ease',
+        routes:{fastest:{time:11,dist:'0.9 mi',note:'Exposed to light rain'}, comfort:{time:13,dist:'1.0 mi',reasons:['Mostly covered walkway','30% less rain exposure']}, context:{time:14,dist:'1.1 mi',reasons:['62% less rain exposure','Covered most of the way']}},
+        detail:{shade:22,wind:15,rain:50,confidence:'High'}},
+      '+60':{temp:'49°F', feels:'Feels like 47°F', cond:'Rain easing', windDesc:'SW wind 6 mph', comfort:74, predictive:'Better at 5:30 PM · +13 Comfort · rain clearing',
+        routes:{fastest:{time:11,dist:'0.9 mi',note:'Mostly dry now'}, comfort:{time:12,dist:'1.0 mi',reasons:['Rain clearing','Mild wind']}, context:{time:13,dist:'1.1 mi',reasons:['38% less rain exposure','Covered most of the way']}},
+        detail:{shade:25,wind:12,rain:20,confidence:'Medium'}}
+    }
+  },
+  phx: { name:'Phoenix', shortName:'PHX', accent:'#D97757', contextName:'Stay Cool',
+    layers:[{id:'comfort',label:'Comfort'},{id:'shade',label:'Shade'},{id:'heat',label:'Heat'}],
+    timeLabels:{ now:'Now', '+30':'7:30 PM', '+60':'8:00 PM' },
+    segments:{
+      comfort:[35,22,45,50,18,48,60,12,62,75,70,82,28,40],
+      shade:[30,15,48,55,10,50,65,8,68,85,78,90,25,42],
+      heat:[32,18,46,52,12,49,62,10,65,80,74,86,26,40]
+    },
+    times:{
+      now:{temp:'108°F', feels:'Feels like 112°F', cond:'Extreme heat', windDesc:'UV 10', comfort:33, predictive:null,
+        routes:{fastest:{time:12,dist:'1.0 mi',note:'Mostly direct sun'}, comfort:{time:14,dist:'1.1 mi',reasons:['Mostly shaded','18% less direct sun']}, context:{time:15,dist:'1.2 mi',reasons:['62% less direct sun','Shaded the whole way']}},
+        detail:{shade:72,wind:8,rain:0,confidence:'High'}},
+      '+30':{temp:'107°F', feels:'Feels like 110°F', cond:'Extreme heat', windDesc:'UV 9', comfort:36, predictive:'Better at 7:30 PM · +3 Comfort · sun lower, less direct heat',
+        routes:{fastest:{time:12,dist:'1.0 mi',note:'Mostly direct sun'}, comfort:{time:14,dist:'1.1 mi',reasons:['Mostly shaded','22% less direct sun']}, context:{time:15,dist:'1.2 mi',reasons:['64% less direct sun','Shaded the whole way']}},
+        detail:{shade:74,wind:8,rain:0,confidence:'High'}},
+      '+60':{temp:'103°F', feels:'Feels like 105°F', cond:'Sun lowering, still hot', windDesc:'UV 6', comfort:44, predictive:'Better at 8:00 PM · +11 Comfort · direct sun mostly gone',
+        routes:{fastest:{time:12,dist:'1.0 mi',note:'Less direct sun as sun lowers'}, comfort:{time:13,dist:'1.1 mi',reasons:['Mostly shaded','30% less direct sun']}, context:{time:14,dist:'1.2 mi',reasons:['58% less direct sun','Shaded the whole way']}},
+        detail:{shade:70,wind:10,rain:0,confidence:'Medium'}}
+    }
+  }
+};
+const MICRO_NOTE = {
+  mn: { title:'Wind shelter in 300 ft', subtitle:'Protected for the next 6 min' },
+  sea: { title:'Covered walkway in 2 min', subtitle:'Reduced rain exposure for the next 0.3 mi' },
+  phx: { title:'Shade begins in 2 min', subtitle:'Shaded for ~5 min · high sun exposure ahead' }
+};
+
+function colorForScore(score){
+  const good=[79,139,133], bad=[193,82,58];
+  const t = Math.max(0, Math.min(1, score/100));
+  const r = Math.round(bad[0]+(good[0]-bad[0])*t);
+  const g = Math.round(bad[1]+(good[1]-bad[1])*t);
+  const b = Math.round(bad[2]+(good[2]-bad[2])*t);
+  return `rgb(${r},${g},${b})`;
+}
+
+class Component extends DCLogic {
+  constructor(props){
+    super(props);
+    this.state = {
+      city: 'mn',
+      screen: props.startScreen || 'home',
+      timeKey: 'now',
+      selectedRoute: 'comfort',
+      detailOpen: false,
+      navMode: false,
+      layer: 'comfort',
+      selectedSegment: null,
+      dark: !!props.darkMode
+    };
+  }
+
+  setCity(c){ this.setState({ city:c, timeKey:'now', selectedRoute:'comfort', detailOpen:false, navMode:false, layer:'comfort', selectedSegment:null }); }
+  goScreen(s){ this.setState({ screen:s, detailOpen:false, navMode:false, selectedSegment:null }); }
+  setTime(t){ this.setState({ timeKey:t }); }
+  selectRoute(r){ this.setState({ selectedRoute:r, detailOpen:false }); }
+  toggleDetail(){ this.setState(s=>({ detailOpen: !s.detailOpen })); }
+  startNav(){ this.setState({ navMode:true }); }
+  exitNav(){ this.setState({ navMode:false, screen:'home' }); }
+  setLayer(l){ this.setState({ layer:l, selectedSegment:null }); }
+  selectSegment(id){ this.setState(s=>({ selectedSegment: s.selectedSegment===id ? null : id })); }
+  toggleDark(){ this.setState(s=>({ dark: !s.dark })); }
+
+  renderVals(){
+    const s = this.state;
+    const city = CITY_DATA[s.city];
+    const time = city.times[s.timeKey];
+    const dark = s.dark;
+
+    const theme = dark ? {
+      bg:'#14181C', card:'#1D2228', cardAlt:'#20262C', text:'#F2EDE3', subtext:'#9A968C',
+      divider:'#2A3138', mapBg:'#10141A', mutedLine:'#333B42', buildingFill:'#1A2027', parkFill:'#26332A',
+      accentSoft: city.accent + '33'
+    } : {
+      bg:'#EDE9E2', card:'#FAF7F2', cardAlt:'#F2EDE3', text:'#14181C', subtext:'#6B665C',
+      divider:'#E4DFD6', mapBg:'#E7E2D6', mutedLine:'#C9C2B4', buildingFill:'#D8D2C4', parkFill:'#B9C4AC',
+      accentSoft: city.accent + '2A'
+    };
+
+    const routesRaw = [
+      { key:'fastest', label:'Fastest', accent: theme.subtext, data: time.routes.fastest, recommended:false },
+      { key:'comfort', label:'Comfort', accent:'#4F8B85', data: time.routes.comfort, recommended:true },
+      { key:'context', label:city.contextName, accent: city.accent, data: time.routes.context, recommended:false }
+    ];
+    const routesArr = routesRaw.map(r => {
+      const selected = s.selectedRoute === r.key;
+      const delta = r.data.time - time.routes.fastest.time;
+      const reasons = r.data.reasons || (r.data.note ? [r.data.note] : []);
+      return {
+        key: r.key,
+        label: r.label,
+        time: r.data.time,
+        dist: r.data.dist,
+        recommended: r.recommended,
+        note: r.data.note || '',
+        hasTradeoff: r.key !== 'fastest',
+        topReason: reasons[0] || '',
+        otherReasons: reasons.slice(1),
+        deltaLabel: r.key === 'fastest' ? '' : `+${delta} min`,
+        selected,
+        showWhy: r.key !== 'fastest',
+        onClick: () => this.selectRoute(r.key),
+        accent: r.accent,
+        cardStyle: {
+          background: selected ? theme.cardAlt : theme.card,
+          borderRadius: 10,
+          padding: '14px 16px',
+          borderLeft: `3px solid ${selected ? r.accent : 'transparent'}`
+        },
+        tradeoffStyle: { background: r.accent + '22', borderRadius: 8, padding: '9px 12px', display: 'flex', alignItems: 'baseline', gap: 8, marginTop: 10 }
+      };
+    });
+    const selectedRouteObj = routesArr.find(r => r.key === s.selectedRoute);
+
+    const selectedIds = ROUTE_MEMBERSHIP[s.selectedRoute];
+    // segments the selected route passes through that are also "exposed" per the comfort layer read as protected/exposed sub-legs
+    const exposedIds = new Set(SEGMENT_DEFS.filter((seg,i)=> (city.segments.comfort[i] < 45)).map(seg=>seg.id));
+    const routeMapSegments = SEGMENT_DEFS.map(seg => {
+      const onSel = selectedIds.includes(seg.id);
+      const exposed = onSel && s.selectedRoute !== 'fastest' && exposedIds.has(seg.id);
+      const color = onSel ? (exposed ? theme.subtext : selectedRouteObj.accent) : theme.mutedLine;
+      const width = onSel ? 7 : 3;
+      return {
+        id: seg.id, d: seg.d,
+        stroke: color,
+        width,
+        dash: exposed ? '3 5' : 'none',
+        opacity: onSel ? 1 : 0.4,
+        haloStroke: color,
+        haloWidth: onSel ? width + 9 : 0,
+        haloOpacity: onSel ? 0.22 : 0
+      };
+    });
+
+    const layerScores = city.segments[s.layer] || city.segments.comfort;
+    const comfortMapSegments = SEGMENT_DEFS.map((seg, i) => {
+      const score = layerScores[i];
+      let dash = 'none';
+      if (s.layer !== 'comfort' && score < 50) {
+        if (s.layer === 'rain') dash = '2 6';
+        else if (s.layer === 'wind' || s.layer === 'shelter') dash = '5 6';
+        else dash = '1 5';
+      }
+      const width = 3.5 + (score/100)*5.5;
+      const color = colorForScore(score);
+      return {
+        id: seg.id, d: seg.d, name: seg.name, score,
+        stroke: color,
+        width,
+        dash,
+        haloWidth: width + (score/100)*10 + 4,
+        haloOpacity: 0.12 + (score/100)*0.16,
+        onClick: () => this.selectSegment(seg.id)
+      };
+    });
+    const homeAmbientSegments = comfortMapSegments.map(seg => ({
+      ...seg, width: Math.max(2, seg.width*0.55), haloWidth: Math.max(4, seg.haloWidth*0.5), haloOpacity: seg.haloOpacity*0.7
+    }));
+    const selectedSegmentInfo = s.selectedSegment ? comfortMapSegments.find(x => x.id === s.selectedSegment) : null;
+    const layerObj = city.layers.find(l => l.id === s.layer) || city.layers[0];
+
+    const comfortColor = colorForScore(time.comfort);
+    const gaugeStyle = {
+      width:52, height:52, borderRadius:'50%',
+      background: `conic-gradient(${comfortColor} 0 ${time.comfort}%, ${theme.divider} ${time.comfort}% 100%)`,
+      display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0
+    };
+    const gaugeInnerStyle = {
+      width:38, height:38, borderRadius:'50%', background: theme.card,
+      display:'flex', alignItems:'center', justifyContent:'center',
+      fontWeight:700, fontSize:13, color: theme.text
+    };
+
+    const devButtons = ['mn','sea','phx'].map(c => ({
+      key:c, label: CITY_DATA[c].shortName, onClick: () => this.setCity(c),
+      chipStyle: {
+        fontSize:10, fontWeight:700, padding:'4px 8px', borderRadius:14,
+        background: s.city === c ? theme.text : 'transparent',
+        color: s.city === c ? theme.bg : theme.subtext,
+        cursor:'pointer'
+      }
+    }));
+
+    const timeOptions = [{key:'now',label:city.timeLabels.now},{key:'+30',label:city.timeLabels['+30']},{key:'+60',label:city.timeLabels['+60']}].map(t => ({
+      ...t, onClick: () => this.setTime(t.key),
+      chipStyle: {
+        fontSize:12, fontWeight:600, padding:'8px 14px', borderRadius:16,
+        background: s.timeKey === t.key ? theme.text : theme.cardAlt,
+        color: s.timeKey === t.key ? theme.bg : theme.text,
+        cursor:'pointer'
+      }
+    }));
+
+    const layerOptions = city.layers.map(l => ({
+      ...l, onClick: () => this.setLayer(l.id),
+      chipStyle: {
+        fontSize:12, fontWeight:600, padding:'8px 14px', borderRadius:16,
+        background: s.layer === l.id ? theme.text : theme.cardAlt,
+        color: s.layer === l.id ? theme.bg : theme.text,
+        cursor:'pointer'
+      }
+    }));
+
+    const legendText = s.layer === 'comfort' ? 'Brighter = more comfortable'
+      : s.layer === 'rain' ? 'Dotted = exposed to rain'
+      : (s.layer === 'wind' || s.layer === 'shelter') ? 'Dashed = wind-exposed'
+      : 'Dashed = direct sun exposure';
+
+    return {
+      dark, theme, city, time,
+      screenWrapStyle: { height:'100%', width:'100%', position:'relative', overflow:'hidden', background: theme.bg, color: theme.text },
+      showChrome: !s.navMode,
+      isHome: s.screen === 'home' && !s.navMode,
+      isComparison: s.screen === 'comparison' && !s.navMode,
+      isComfortMap: s.screen === 'comfortmap' && !s.navMode,
+      navMode: s.navMode,
+      detailOpen: s.detailOpen,
+      devButtons,
+      darkToggleStyle: { width:30, height:30, borderRadius:15, background: theme.card, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', fontSize:14 },
+      darkToggleLabel: dark ? '☀' : '☾',
+      toggleDark: () => this.toggleDark(),
+      gaugeStyle, gaugeInnerStyle,
+      goComparison: () => this.goScreen('comparison'),
+      goComfortMap: () => this.goScreen('comfortmap'),
+      goHome: () => this.goScreen('home'),
+      homeAmbientSegments,
+      routeMapSegments,
+      routesArr,
+      selectedRouteObj,
+      comfortColor,
+      atmoGoodColor: '#4F8B85',
+      atmoBadColor: city.accent,
+      timeOptions,
+      predictiveText: time.predictive,
+      jumpPredictive: () => this.setTime(s.timeKey === 'now' ? '+30' : '+60'),
+      toggleDetail: () => this.toggleDetail(),
+      whyLabel: 'Why this route?',
+      layerOptions,
+      layerLabel: layerObj.label,
+      comfortMapSegments,
+      selectedSegmentInfo,
+      legendText,
+      startNav: () => this.startNav(),
+      exitNav: () => this.exitNav(),
+      microclimateNote: MICRO_NOTE[s.city].title,
+      microclimateSubtitle: MICRO_NOTE[s.city].subtitle
+    };
+  }
+}
+
+</script>
+</body>
+</html>
