@@ -2,6 +2,8 @@
 
 Stage 5 adds bounded candidate generation on top of the Stage 4.5 raw Comfort Cost reranker. It preserves OSRM walking alternatives as the baseline generator, adds deterministic corridor waypoint candidates for spatial diversity, prefilters candidates before environmental analysis, and reuses request-level weather and building context across accepted candidates. It is still candidate reranking only: no custom A*, no Stay Warm/Dry/Cool route behavior, no Climate DNA route naming, no tree canopy, and no rain/snow/AQI engines.
 
+Stage 5.5 adds a local Overture-oriented building ingestion proof of concept, provider configuration, bounded building-provider caching, and repeatable Minneapolis validation fixtures. Public Overpass remains available, but it is no longer the only code path for engine validation.
+
 ## What Works
 
 - Interactive MapLibre map centered on Minneapolis as the fallback location.
@@ -17,6 +19,10 @@ Stage 5 adds bounded candidate generation on top of the Stage 4.5 raw Comfort Co
 - Pre-analysis rejection for duplicate, excessive-detour, and low-diversity candidates.
 - Bounded environmental analysis so only the strongest 5 candidates are analyzed by default.
 - Shared request-level weather and union-route building context reused across candidate shade, wind, and comfort analysis.
+- Local Overture-oriented building store POC with bbox tile index and normalized `BuildingProvider`.
+- Configurable building provider modes: `overpass`, `local-overture`, and `local-overture-with-overpass-fallback`.
+- Bounded building-provider cache with hit/miss stats and failed-request eviction.
+- Repeatable 18-route Minneapolis validation fixture and route/provider benchmark scripts.
 - Candidate route deduplication with a deterministic route-overlap metric.
 - Candidate diversity metrics: overlap with fastest, unique meters, and maximum lateral separation.
 - Raw-cost Comfort reranking with explicit detour and meaningful-improvement policy.
@@ -103,9 +109,11 @@ docs/decisions/ADR-006-urban-wind-model.md
 docs/decisions/ADR-007-comfort-engine-v1.md
 docs/decisions/ADR-008-comfort-route-reranking-v1.md
 docs/decisions/ADR-009-candidate-generation-v1.md
+docs/decisions/ADR-010-building-ingestion-and-provider-strategy.md
 docs/analysis/STAGE_2_5_BUILDING_DATA_BENCHMARK.md
 docs/analysis/STAGE_3_WIND_ENGINE_AUDIT.md
 docs/analysis/STAGE_4_5_COMFORT_ROUTE_RERANKING_VALIDATION.md
+docs/analysis/STAGE_5_5_BUILDING_PROVIDER_BENCHMARK.md
 docs/analysis/STAGE_5_CANDIDATE_GENERATION_VALIDATION.md
 docs/analysis/STAGE_5_ROUTING_ENGINE_EVALUATION.md
 ```
@@ -130,6 +138,9 @@ GEOCODING_COUNTRY_CODE=US
 WEATHER_BASE_URL=https://api.weather.gov
 WEATHER_USER_AGENT=ComfortOS Stage 1 (contact: replace-with-project-contact)
 BUILDING_OVERPASS_BASE_URL=https://overpass-api.de/api/interpreter
+BUILDING_PROVIDER=overpass
+# BUILDING_PROVIDER=local-overture
+# BUILDING_LOCAL_OVERTURE_STORE_DIR=/absolute/path/to/local/overture/store
 ```
 
 No secrets are required for Stage 2. Replace the weather User-Agent contact placeholder before shared or production use.
@@ -161,6 +172,14 @@ npm run typecheck
 npm test
 npm run lint
 npm run build
+```
+
+Building ingestion and validation:
+
+```bash
+npm run buildings:ingest:overture -- --input fixtures/buildings/minneapolis-overture-sample.geojson --output /tmp/comfortos-overture-sample-store --region minneapolis-sample --bounds -93.33,44.93,-93.20,45.02
+npm run buildings:benchmark -- --local-store /tmp/comfortos-overture-sample-store
+npm run routes:validate:comfort:local -- --local-store /tmp/comfortos-overture-sample-store
 ```
 
 ## Architecture
@@ -229,6 +248,8 @@ Comfort completeness is separate from confidence. Missing wind or shade does not
 
 Route comparison uses a `CandidateGenerator` boundary. OSRM alternatives remain the baseline candidate input. Enhanced mode combines OSRM alternatives with corridor waypoint candidates, deduplicates routes, rejects excessive detours and candidates with too little unique geometry, then analyzes only the bounded candidate set. Every accepted candidate runs through the audited shade, wind, and comfort pipeline using shared weather and building inputs for the request. Only comparable candidates can win Comfort reranking. Selection uses `routeComfortCost.environmentalExposureCost`, bounded by an explicit detour policy and an 8% minimum raw-cost improvement threshold. Rounded `comfortScore` remains presentation-only.
 
+Building providers are selected by configuration and remain behind the normalized `BuildingProvider` interface. The Stage 5.5 local Overture POC is a Node-side JSONL + tile-index store for repeatable engine validation. The current Vinext/Cloudflare worker-like app runtime cannot use the Node `fs` local provider directly; a production-compatible store should expose the indexed Overture extract through a worker-compatible service or storage layer.
+
 ## Known Limitations
 
 - Public Photon and FOSSGIS services are suitable for development only.
@@ -243,6 +264,8 @@ Route comparison uses a `CandidateGenerator` boundary. OSRM alternatives remain 
 - Current location depends on browser permission and device support.
 - NWS coverage is U.S.-only; unsupported coordinates show “Live conditions unavailable” while routing remains usable.
 - Direct Overpass access is suitable for Stage 2 validation only; production should use an Overture-backed ingestion/query service or another building provider behind the same interface.
+- The Stage 5.5 local Overture store validates ingestion/provider architecture, but the checked-in sample fixture is not a real Minneapolis-wide Overture extract.
+- The current app runtime cannot directly use the Node `fs` local provider; direct Node validation can.
 - The Stage 2.5 benchmark recommends height enrichment before production-quality shade because the Minneapolis validation corridor had no explicit building heights.
 - Building shade is not total shade. It excludes trees, awnings, covered walkways, cloud cover, UV intensity, and material heat effects.
 - Shadow geometry is approximate and intended for deterministic engine validation, not final survey-grade analysis.

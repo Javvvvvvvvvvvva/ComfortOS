@@ -57,6 +57,7 @@ export class ComfortRouteComparisonService {
     private readonly shadeService: ShadeAnalysisService,
     private readonly windService: WindAnalysisService,
     private readonly comfortService = new ComfortAnalysisService(),
+    private readonly buildingProviderMode = "unknown",
   ) {}
 
   async compareWalkingRoutes(
@@ -132,6 +133,7 @@ export class ComfortRouteComparisonService {
         rejectedCandidates: prefiltered.rejectedCandidates,
         diversity: buildDiversitySummary(analyzed),
       },
+      buildings: buildBuildingDebug(this.buildingProviderMode, sharedBuildings),
       performanceMs: {
         routingCandidates: Math.round(routingCandidates),
         buildingFetch: Math.round(buildingFetch),
@@ -396,6 +398,20 @@ function buildDiversitySummary(
     windExposureRange: numericRange(winds),
     shadeRatioRange: numericRange(shades),
     routeOverlapRange: numericRange(overlaps),
+  };
+}
+
+function buildBuildingDebug(providerMode: string, buildings: Building[] | null) {
+  return {
+    providerMode,
+    loadedBuildings: buildings?.length ?? 0,
+    explicitHeightBuildings:
+      buildings?.filter((building) => building.heightSource === "provider").length ?? 0,
+    floorDerivedHeightBuildings:
+      buildings?.filter((building) => building.heightSource === "floors-derived").length ?? 0,
+    unknownHeightBuildings:
+      buildings?.filter((building) => building.heightSource === "unknown").length ?? 0,
+    querySucceeded: buildings !== null,
   };
 }
 

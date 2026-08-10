@@ -12,7 +12,11 @@
     "typecheck": "tsc --noEmit",
     "test": "node --import tsx --test tests/*.test.ts",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
-    "db:generate": "drizzle-kit generate"
+    "db:generate": "drizzle-kit generate",
+    "buildings:ingest:overture": "node --import tsx scripts/ingest-overture-buildings.ts",
+    "buildings:benchmark": "node --import tsx scripts/benchmark-building-providers.ts",
+    "routes:validate:comfort": "node --import tsx scripts/validate-comfort-routes.ts",
+    "routes:validate:comfort:local": "node --import tsx scripts/validate-comfort-routes-local.ts"
   },
   "dependencies": {
     "@turf/turf": "^7.4.0",

@@ -15,12 +15,14 @@ export function selectComfortRouteComparison({
   provider,
   performanceMs,
   generation,
+  buildings,
 }: {
   candidates: Omit<AnalyzedRouteCandidate, "role" | "metrics">[];
   policy?: ComfortRouteRerankingPolicy;
   provider?: ComfortRouteComparisonResult["provider"];
   performanceMs?: ComfortRouteComparisonDebug["performanceMs"];
   generation?: ComfortRouteComparisonDebug["generation"];
+  buildings?: ComfortRouteComparisonDebug["buildings"];
 }): ComfortRouteComparisonResult {
   if (candidates.length === 0) {
     throw new Error("Route comparison requires at least one candidate.");
@@ -69,7 +71,7 @@ export function selectComfortRouteComparison({
     candidates: analyzed,
     policy,
     provider,
-    debug: buildDebug(analyzed, performanceMs, generation),
+    debug: buildDebug(analyzed, performanceMs, generation, buildings),
   };
 }
 
@@ -151,6 +153,7 @@ function buildDebug(
   candidates: AnalyzedRouteCandidate[],
   performanceMs?: ComfortRouteComparisonDebug["performanceMs"],
   generation?: ComfortRouteComparisonDebug["generation"],
+  buildings?: ComfortRouteComparisonDebug["buildings"],
 ): ComfortRouteComparisonDebug {
   return {
     note:
@@ -160,6 +163,7 @@ function buildDebug(
     },
     ...(generation ? { generation } : {}),
     ...(performanceMs ? { performanceMs } : {}),
+    ...(buildings ? { buildings } : {}),
     candidates: candidates.map((candidate) => {
       const cost = candidate.comfortAnalysis?.routeComfortCost;
 

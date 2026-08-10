@@ -1,0 +1,128 @@
+[
+  {
+    "id": "downtown-riverfront",
+    "label": "Downtown to Riverfront",
+    "category": "downtown",
+    "origin": { "latitude": 44.9778, "longitude": -93.2650 },
+    "destination": { "latitude": 44.9815, "longitude": -93.2512 }
+  },
+  {
+    "id": "downtown-university",
+    "label": "Downtown to University",
+    "category": "medium",
+    "origin": { "latitude": 44.9778, "longitude": -93.2650 },
+    "destination": { "latitude": 44.9737, "longitude": -93.2277 }
+  },
+  {
+    "id": "north-loop-downtown",
+    "label": "North Loop to Downtown",
+    "category": "downtown",
+    "origin": { "latitude": 44.9848, "longitude": -93.2783 },
+    "destination": { "latitude": 44.9762, "longitude": -93.2692 }
+  },
+  {
+    "id": "stone-arch-university",
+    "label": "Stone Arch to University",
+    "category": "bridge-open",
+    "origin": { "latitude": 44.9819, "longitude": -93.2566 },
+    "destination": { "latitude": 44.9737, "longitude": -93.2348 }
+  },
+  {
+    "id": "mill-district-nicollet",
+    "label": "Mill District to Nicollet",
+    "category": "short",
+    "origin": { "latitude": 44.9767, "longitude": -93.2557 },
+    "destination": { "latitude": 44.9739, "longitude": -93.2746 }
+  },
+  {
+    "id": "loring-downtown",
+    "label": "Loring Park to Downtown",
+    "category": "short",
+    "origin": { "latitude": 44.9684, "longitude": -93.2821 },
+    "destination": { "latitude": 44.9778, "longitude": -93.2650 }
+  },
+  {
+    "id": "uptown-loring",
+    "label": "Uptown to Loring Park",
+    "category": "residential",
+    "origin": { "latitude": 44.9483, "longitude": -93.2981 },
+    "destination": { "latitude": 44.9684, "longitude": -93.2821 }
+  },
+  {
+    "id": "whittier-downtown",
+    "label": "Whittier to Downtown",
+    "category": "residential",
+    "origin": { "latitude": 44.9590, "longitude": -93.2798 },
+    "destination": { "latitude": 44.9778, "longitude": -93.2650 }
+  },
+  {
+    "id": "cedar-riverside-downtown",
+    "label": "Cedar Riverside to Downtown",
+    "category": "river-open",
+    "origin": { "latitude": 44.9678, "longitude": -93.2473 },
+    "destination": { "latitude": 44.9778, "longitude": -93.2650 }
+  },
+  {
+    "id": "east-bank-west-bank",
+    "label": "East Bank to West Bank",
+    "category": "bridge-open",
+    "origin": { "latitude": 44.9744, "longitude": -93.2325 },
+    "destination": { "latitude": 44.9701, "longitude": -93.2425 }
+  },
+  {
+    "id": "prospect-park-university",
+    "label": "Prospect Park to University",
+    "category": "medium",
+    "origin": { "latitude": 44.9699, "longitude": -93.2169 },
+    "destination": { "latitude": 44.9737, "longitude": -93.2348 }
+  },
+  {
+    "id": "northeast-riverfront",
+    "label": "Northeast to Riverfront",
+    "category": "river-open",
+    "origin": { "latitude": 45.0002, "longitude": -93.2662 },
+    "destination": { "latitude": 44.9815, "longitude": -93.2512 }
+  },
+  {
+    "id": "powderhorn-whittier",
+    "label": "Powderhorn to Whittier",
+    "category": "residential",
+    "origin": { "latitude": 44.9403, "longitude": -93.2532 },
+    "destination": { "latitude": 44.9590, "longitude": -93.2798 }
+  },
+  {
+    "id": "longfellow-west-bank",
+    "label": "Longfellow to West Bank",
+    "category": "longer",
+    "origin": { "latitude": 44.9488, "longitude": -93.2228 },
+    "destination": { "latitude": 44.9701, "longitude": -93.2425 }
+  },
+  {
+    "id": "bde-maka-ska-uptown",
+    "label": "Bde Maka Ska to Uptown",
+    "category": "open-short",
+    "origin": { "latitude": 44.9487, "longitude": -93.3149 },
+    "destination": { "latitude": 44.9483, "longitude": -93.2981 }
+  },
+  {
+    "id": "north-minneapolis-downtown",
+    "label": "North Minneapolis to Downtown",
+    "category": "longer",
+    "origin": { "latitude": 45.0055, "longitude": -93.2951 },
+    "destination": { "latitude": 44.9778, "longitude": -93.2650 }
+  },
+  {
+    "id": "dinkytown-downtown",
+    "label": "Dinkytown to Downtown",
+    "category": "medium",
+    "origin": { "latitude": 44.9817, "longitude": -93.2361 },
+    "destination": { "latitude": 44.9778, "longitude": -93.2650 }
+  },
+  {
+    "id": "river-bridge-loop",
+    "label": "River Bridge Loop",
+    "category": "bridge-open",
+    "origin": { "latitude": 44.9872, "longitude": -93.2607 },
+    "destination": { "latitude": 44.9819, "longitude": -93.2566 }
+  }
+]

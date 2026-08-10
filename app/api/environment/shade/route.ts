@@ -1,11 +1,9 @@
 import { NextResponse } from "next/server";
-import { OverpassBuildingProvider } from "@/lib/environment/buildings/providers/overpassBuildingProvider";
+import { createConfiguredBuildingProvider } from "@/lib/environment/buildings/providers/configuredBuildingProvider";
 import { ShadeAnalysisService } from "@/lib/environment/shade/service";
 import type { ShadeAnalysisRequest } from "@/lib/environment/shade/types";
 
-const buildingProvider = new OverpassBuildingProvider({
-  baseUrl: process.env.BUILDING_OVERPASS_BASE_URL,
-});
+const { provider: buildingProvider } = createConfiguredBuildingProvider();
 const shadeService = new ShadeAnalysisService(buildingProvider);
 
 export async function POST(request: Request) {

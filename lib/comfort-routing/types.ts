@@ -68,6 +68,14 @@ export type ComfortRouteComparisonDebug = {
     reranking: number;
     total: number;
   };
+  buildings?: {
+    providerMode: string;
+    loadedBuildings: number;
+    explicitHeightBuildings: number;
+    floorDerivedHeightBuildings: number;
+    unknownHeightBuildings: number;
+    querySucceeded: boolean;
+  };
   candidates: Array<{
     id: string;
     durationSeconds: number;

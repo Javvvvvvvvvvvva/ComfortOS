@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { ComfortRouteComparisonService } from "@/lib/comfort-routing/service";
 import type { ComfortRouteComparisonRequest } from "@/lib/comfort-routing/service";
-import { OverpassBuildingProvider } from "@/lib/environment/buildings/providers/overpassBuildingProvider";
+import { createConfiguredBuildingProvider } from "@/lib/environment/buildings/providers/configuredBuildingProvider";
 import { ShadeAnalysisService } from "@/lib/environment/shade/service";
 import { WindAnalysisService } from "@/lib/environment/wind/windService";
 import { CompositeCandidateGenerator } from "@/lib/routing/generators/compositeCandidateGenerator";
@@ -20,9 +20,8 @@ const routingProvider = new OsrmWalkingProvider({
     process.env.ROUTING_BASE_URL ??
     DEFAULT_OSRM_BASE_URL,
 });
-const buildingProvider = new OverpassBuildingProvider({
-  baseUrl: process.env.BUILDING_OVERPASS_BASE_URL,
-});
+const { provider: buildingProvider, mode: buildingProviderMode } =
+  createConfiguredBuildingProvider();
 const weatherProvider = new NwsWeatherProvider({
   baseUrl: process.env.WEATHER_BASE_URL,
   userAgent: process.env.WEATHER_USER_AGENT,
@@ -40,6 +39,8 @@ const comparisonService = new ComfortRouteComparisonService(
   buildingProvider,
   new ShadeAnalysisService(buildingProvider),
   new WindAnalysisService(buildingProvider, weatherService),
+  undefined,
+  buildingProviderMode,
 );
 
 export async function POST(request: Request) {

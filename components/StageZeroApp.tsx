@@ -610,6 +610,16 @@ export function StageZeroApp() {
                 {routeComparison.debug.generation.diversityFilteredCandidates}
               </small>
             ) : null}
+            {routeComparison.debug.buildings ? (
+              <small>
+                buildings {routeComparison.debug.buildings.providerMode} · loaded{" "}
+                {routeComparison.debug.buildings.loadedBuildings} · explicit{" "}
+                {routeComparison.debug.buildings.explicitHeightBuildings} · floors{" "}
+                {routeComparison.debug.buildings.floorDerivedHeightBuildings} · unknown{" "}
+                {routeComparison.debug.buildings.unknownHeightBuildings} · query{" "}
+                {formatBoolean(routeComparison.debug.buildings.querySucceeded)}
+              </small>
+            ) : null}
             <div className="shade-debug-grid">
               {routeComparison.debug.candidates.map((candidate) => (
                 <small key={candidate.id}>

@@ -27,4 +27,15 @@ Status: Proposed | Accepted | Superseded
 ## Alternatives Considered
 ```
 
-No ADRs are accepted in this documentation setup task beyond the principles already established in `docs/architecture/ARCHITECTURE_SPEC_V1.md` and `docs/design/DESIGN_GUIDELINES.md`.
+Accepted ADRs:
+
+- `ADR-001-stage-0-map-and-routing-providers.md`
+- `ADR-002-geocoding-provider.md`
+- `ADR-003-weather-provider.md`
+- `ADR-004-building-data-provider.md`
+- `ADR-005-shadow-geometry-engine.md`
+- `ADR-006-urban-wind-model.md`
+- `ADR-007-comfort-engine-v1.md`
+- `ADR-008-comfort-route-reranking-v1.md`
+- `ADR-009-candidate-generation-v1.md`
+- `ADR-010-building-ingestion-and-provider-strategy.md`

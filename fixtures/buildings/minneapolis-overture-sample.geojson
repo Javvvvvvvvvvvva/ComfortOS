@@ -1,0 +1,94 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "downtown-explicit-height",
+      "properties": {
+        "id": "downtown-explicit-height",
+        "height": 38
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-93.2661, 44.9774],
+          [-93.2656, 44.9774],
+          [-93.2656, 44.9778],
+          [-93.2661, 44.9778],
+          [-93.2661, 44.9774]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "downtown-floor-derived",
+      "properties": {
+        "id": "downtown-floor-derived",
+        "num_floors": 6
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-93.2648, 44.9770],
+          [-93.2642, 44.9770],
+          [-93.2642, 44.9775],
+          [-93.2648, 44.9775],
+          [-93.2648, 44.9770]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "river-unknown-height",
+      "properties": {
+        "id": "river-unknown-height"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-93.2515, 44.9812],
+          [-93.2509, 44.9812],
+          [-93.2509, 44.9817],
+          [-93.2515, 44.9817],
+          [-93.2515, 44.9812]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "university-explicit-height",
+      "properties": {
+        "id": "university-explicit-height",
+        "height_meters": 22
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-93.2350, 44.9735],
+          [-93.2344, 44.9735],
+          [-93.2344, 44.9741],
+          [-93.2350, 44.9741],
+          [-93.2350, 44.9735]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "residential-floor-derived",
+      "properties": {
+        "id": "residential-floor-derived",
+        "floors": 2
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-93.2890, 44.9582],
+          [-93.2885, 44.9582],
+          [-93.2885, 44.9587],
+          [-93.2890, 44.9587],
+          [-93.2890, 44.9582]
+        ]]
+      }
+    }
+  ]
+}

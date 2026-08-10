@@ -1,13 +1,11 @@
 import { NextResponse } from "next/server";
-import { OverpassBuildingProvider } from "@/lib/environment/buildings/providers/overpassBuildingProvider";
+import { createConfiguredBuildingProvider } from "@/lib/environment/buildings/providers/configuredBuildingProvider";
 import { WindAnalysisService } from "@/lib/environment/wind/windService";
 import type { WindAnalysisRequest } from "@/lib/environment/wind/types";
 import { NwsWeatherProvider } from "@/lib/weather/providers/nwsWeatherProvider";
 import { WeatherService } from "@/lib/weather/service";
 
-const buildingProvider = new OverpassBuildingProvider({
-  baseUrl: process.env.BUILDING_OVERPASS_BASE_URL,
-});
+const { provider: buildingProvider } = createConfiguredBuildingProvider();
 const weatherProvider = new NwsWeatherProvider({
   baseUrl: process.env.WEATHER_BASE_URL,
   userAgent: process.env.WEATHER_USER_AGENT,
