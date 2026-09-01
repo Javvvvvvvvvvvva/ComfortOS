@@ -8,9 +8,15 @@ import type { ShadeAnalysisRequest } from "@/lib/environment/shade/types";
 import type { WindAnalysisService } from "@/lib/environment/wind/windService";
 import type { WindAnalysisRequest } from "@/lib/environment/wind/types";
 import { calculateCandidateDiversity } from "@/lib/routing/candidates";
-import { CorridorWaypointGenerator, generateCorridorWaypointAttempts } from "@/lib/routing/generators/corridorWaypointGenerator";
+import {
+  CorridorWaypointGenerator,
+  generateCorridorWaypointAttempts,
+  resolveAdaptiveCandidateAttemptLimit,
+  routeRequestCacheKey,
+} from "@/lib/routing/generators/corridorWaypointGenerator";
 import { CompositeCandidateGenerator } from "@/lib/routing/generators/compositeCandidateGenerator";
-import { OsrmAlternativeGenerator } from "@/lib/routing/generators/osrmAlternativeGenerator";
+import { ProviderAlternativeGenerator } from "@/lib/routing/generators/providerAlternativeGenerator";
+import { MapboxWalkingRoutingProvider } from "@/lib/routing/providers/mapboxWalkingRoutingProvider";
 import { RoutingService } from "@/lib/routing/service";
 import type { RouteCandidate, RouteRequest, RoutingProvider } from "@/lib/routing/types";
 import type { WeatherService } from "@/lib/weather/service";
@@ -56,20 +62,121 @@ test("corridor waypoint generator normalizes routed waypoint candidates and tole
   assert.ok(result.candidates[0].generation?.waypoint);
 });
 
-test("composite generator can run OSRM-only baseline mode", async () => {
+test("corridor waypoint generator respects bounded concurrency", async () => {
+  const provider = concurrentProvider();
+  const routingService = new RoutingService(provider);
+  const generator = new CorridorWaypointGenerator(routingService);
+
+  await generator.generateCandidates(request, {
+    fastestRoute,
+    policy: {
+      offsetDistancesMeters: [80, 120],
+      routeSampleRatios: [0.33, 0.5, 0.67],
+      maxCandidateAttempts: 6,
+      maxConcurrentCandidateRequests: 2,
+    },
+  });
+
+  assert.ok(provider.maxObservedConcurrentCalls <= 2);
+});
+
+test("corridor waypoint generation remains compatible with normalized Mapbox walking routes", async () => {
+  let calls = 0;
+  const provider = new MapboxWalkingRoutingProvider({
+    accessToken: "pk.test.signature",
+    fetcher: (async (input) => {
+      calls += 1;
+      const url = new URL(String(input));
+      const coordinates = decodeURIComponent(url.pathname.split("/walking/")[1])
+        .split(";")
+        .map((value) => value.split(",").map(Number) as [number, number]);
+      return new Response(
+        JSON.stringify({
+          code: "Ok",
+          routes: [
+            {
+              geometry: { type: "LineString", coordinates },
+              distance: 980,
+              duration: 660,
+            },
+          ],
+          waypoints: coordinates.map((location) => ({ location })),
+        }),
+        { status: 200, headers: { "content-type": "application/json" } },
+      );
+    }) as typeof fetch,
+  });
+  const generator = new CorridorWaypointGenerator(new RoutingService(provider));
+
+  const result = await generator.generateCandidates(request, {
+    fastestRoute,
+    policy: {
+      offsetDistancesMeters: [120],
+      routeSampleRatios: [0.5],
+      maxCandidateAttempts: 2,
+      maxConcurrentCandidateRequests: 2,
+    },
+  });
+
+  assert.equal(result.candidates.length, 2);
+  assert.equal(calls, 2);
+  assert.equal(result.provider?.id, "mapbox-directions-walking");
+  assert.equal(result.candidates[0].generation?.generator, "corridor-waypoint");
+});
+
+test("adaptive candidate attempt policy is distance based and capped", () => {
+  assert.equal(resolveAdaptiveCandidateAttemptLimit(500, adaptivePolicy(4)), 2);
+  assert.equal(resolveAdaptiveCandidateAttemptLimit(1200, adaptivePolicy(4)), 3);
+  assert.equal(resolveAdaptiveCandidateAttemptLimit(2400, adaptivePolicy(4)), 4);
+});
+
+test("candidate route cache key includes origin destination waypoint and profile", () => {
+  const withWaypoint = routeRequestCacheKey({
+    ...request,
+    waypoints: [{ latitude: 44.98123456, longitude: -93.26123456 }],
+  });
+  const withoutWaypoint = routeRequestCacheKey(request);
+
+  assert.notEqual(withWaypoint, withoutWaypoint);
+  assert.ok(withWaypoint.includes("-93.261235,44.981235"));
+  assert.ok(withWaypoint.endsWith("|walking"));
+});
+
+test("corridor waypoint generator can early-stop after enough diverse candidates", async () => {
+  const provider = concurrentProvider();
+  const routingService = new RoutingService(provider);
+  const generator = new CorridorWaypointGenerator(routingService);
+
+  const result = await generator.generateCandidates(request, {
+    fastestRoute,
+    policy: {
+      offsetDistancesMeters: [80, 120],
+      routeSampleRatios: [0.33, 0.5, 0.67],
+      maxCandidateAttempts: 6,
+      maxConcurrentCandidateRequests: 1,
+      earlyStopDiverseCandidateCount: 2,
+      minUniqueMeters: 1,
+    },
+  });
+
+  assert.equal(result.candidates.length, 2);
+  assert.equal(provider.calls, 2);
+});
+
+test("composite generator can run provider-alternatives-only baseline mode", async () => {
   const routingService = new RoutingService(fakeProvider());
   const generator = new CompositeCandidateGenerator([
-    new OsrmAlternativeGenerator(routingService),
+    new ProviderAlternativeGenerator(routingService),
     new CorridorWaypointGenerator(routingService),
   ]);
   const result = await generator.generateCandidates(
-    { ...request, generationMode: "osrm-only" } as RouteRequest,
+    { ...request, generationMode: "provider-only" } as RouteRequest,
     { fastestRoute },
   );
 
   assert.equal(
     result.candidates.every(
-      (candidate) => candidate.generation?.generator === "osrm-alternative",
+      (candidate) => candidate.generation?.generator === "provider-alternative",
     ),
     true,
   );
@@ -138,7 +245,7 @@ const fastestRoute: RouteCandidate = {
       [-93.25, 44.99],
     ],
   },
-  generation: { generator: "osrm-alternative" },
+  generation: { generator: "provider-alternative" },
 };
 
 const offsetCandidate: RouteCandidate = {
@@ -191,6 +298,59 @@ function fakeProvider(options: { failWaypointLongitudeBelow?: number } = {}): Ro
   };
 }
 
+function concurrentProvider(): RoutingProvider & {
+  calls: number;
+  activeCalls: number;
+  maxObservedConcurrentCalls: number;
+} {
+  return {
+    calls: 0,
+    activeCalls: 0,
+    maxObservedConcurrentCalls: 0,
+    async getWalkingRoute(routeRequest) {
+      this.calls += 1;
+      this.activeCalls += 1;
+      this.maxObservedConcurrentCalls = Math.max(
+        this.maxObservedConcurrentCalls,
+        this.activeCalls,
+      );
+      await new Promise((resolve) => setTimeout(resolve, 1));
+      this.activeCalls -= 1;
+      const waypoint = routeRequest.waypoints?.[0];
+
+      return waypoint
+        ? {
+            ...offsetCandidate,
+            geometry: {
+              type: "LineString",
+              coordinates: [
+                [routeRequest.origin.longitude, routeRequest.origin.latitude],
+                [waypoint.longitude, waypoint.latitude],
+                [routeRequest.destination.longitude, routeRequest.destination.latitude],
+              ],
+            },
+          }
+        : fastestRoute;
+    },
+  };
+}
+
+function adaptivePolicy(maxCandidateAttempts: number) {
+  return {
+    corridorWidthMeters: 260,
+    offsetDistancesMeters: [120, 220],
+    routeSampleRatios: [0.5, 0.33, 0.67],
+    maxCandidateAttempts,
+    maxConcurrentCandidateRequests: 1,
+    earlyStopDiverseCandidateCount: Number.POSITIVE_INFINITY,
+    adaptiveAttempts: true,
+    maxEnvironmentAnalyzedCandidates: 5,
+    minUniqueMeters: 40,
+    maxPreAnalysisDurationRatio: 0.45,
+    maxPreAnalysisDistanceRatio: 0.45,
+  };
+}
+
 function countingBuildingProvider(): BuildingProvider & { calls: number } {
   return {
     calls: 0,
@@ -214,7 +374,7 @@ function failingBuildingProvider(): BuildingProvider & { calls: number } {
 function makeComparisonService(buildingProvider: BuildingProvider) {
   const routingService = new RoutingService(fakeProvider());
   const candidateGenerator = new CompositeCandidateGenerator([
-    new OsrmAlternativeGenerator(routingService),
+    new ProviderAlternativeGenerator(routingService),
     new CorridorWaypointGenerator(routingService),
   ]);
 

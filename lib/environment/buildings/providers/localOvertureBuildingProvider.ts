@@ -4,12 +4,23 @@ import type { MultiPolygon, Polygon } from "geojson";
 import type {
   BoundingBox,
   Building,
+  BuildingProviderMetadata,
   BuildingProvider,
 } from "@/lib/environment/buildings/types";
 
 export type LocalOvertureStoreManifest = {
   format: "comfortos-local-building-store-v1";
   source: "overture-buildings";
+  provider?: "Overture Maps";
+  release?: string;
+  theme?: "buildings";
+  type?: "building";
+  bbox?: [number, number, number, number];
+  license?: string;
+  sourceUrl?: string;
+  sourceAccessMethod?: string;
+  buildingPartCount?: number;
+  invalidGeometryCount?: number;
   createdAt: string;
   region: string;
   tileSizeDegrees: number;
@@ -66,6 +77,17 @@ export class LocalOvertureBuildingProvider implements BuildingProvider {
 
   async getManifest() {
     return (await this.loadStore()).manifest;
+  }
+
+  async getMetadata(): Promise<BuildingProviderMetadata> {
+    const manifest = await this.getManifest();
+    return {
+      provider: manifest.provider,
+      datasetVersion: manifest.release,
+      generatedAt: manifest.createdAt,
+      region: manifest.region,
+      source: manifest.source,
+    };
   }
 
   private async loadStore() {

@@ -13,7 +13,7 @@ export async function POST(request: Request) {
       { comfort },
       {
         headers: {
-          "Cache-Control": "public, s-maxage=300, stale-while-revalidate=900",
+          "Cache-Control": "private, no-store",
         },
       },
     );

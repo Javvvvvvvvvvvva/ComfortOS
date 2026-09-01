@@ -87,6 +87,12 @@ export class PhotonGeocodingProvider implements GeocodingProvider {
     return places[0] ?? null;
   }
 
+  async retrieve(suggestionId: string): Promise<PlaceResult> {
+    throw new Error(
+      `Photon suggestions already contain coordinates and cannot be retrieved (${suggestionId}).`,
+    );
+  }
+
   private async fetchPlaces(url: URL): Promise<PlaceResult[]> {
     const response = await this.fetcher(url, {
       headers: {

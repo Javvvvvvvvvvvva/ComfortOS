@@ -48,6 +48,11 @@ export function selectComfortWeatherForTime(
             after.precipitationProbability,
             ratio,
           ),
+          precipitationMmPerHour: interpolateNullable(
+            before.precipitationMmPerHour,
+            after.precipitationMmPerHour,
+            ratio,
+          ),
           condition: before.shortCondition ?? after.shortCondition ?? null,
           confidence: 0.7,
           selectionMethod: "interpolated-hourly",
@@ -69,7 +74,9 @@ export function selectComfortWeatherForTime(
       apparentTemperatureC: nearestForecast.apparentTemperatureC,
       relativeHumidity: nearestForecast.relativeHumidity,
       regionalWindSpeedMps: nearestForecast.windSpeedMps,
+      regionalWindDirectionDeg: nearestForecast.windDirectionDeg,
       precipitationProbability: nearestForecast.precipitationProbability,
+      precipitationMmPerHour: nearestForecast.precipitationMmPerHour,
       condition: nearestForecast.shortCondition ?? null,
       confidence: 0.62,
       selectionMethod: "nearest-hour",
@@ -82,7 +89,9 @@ export function selectComfortWeatherForTime(
       apparentTemperatureC: weatherBundle.current.apparentTemperatureC,
       relativeHumidity: weatherBundle.current.relativeHumidity,
       regionalWindSpeedMps: weatherBundle.current.windSpeedMps,
+      regionalWindDirectionDeg: weatherBundle.current.windDirectionDeg,
       precipitationProbability: weatherBundle.current.precipitationProbability,
+      precipitationMmPerHour: weatherBundle.current.precipitationMmPerHour,
       condition: weatherBundle.current.shortCondition ?? null,
       confidence: weatherBundle.current.confidence ?? 0.6,
       selectionMethod: "current",
@@ -98,7 +107,9 @@ function hasComfortWeather(point: WeatherForecastPoint) {
     (point.apparentTemperatureC !== null && point.apparentTemperatureC !== undefined) ||
     (point.windSpeedMps !== null && point.windSpeedMps !== undefined) ||
     (point.precipitationProbability !== null &&
-      point.precipitationProbability !== undefined)
+      point.precipitationProbability !== undefined) ||
+    (point.precipitationMmPerHour !== null &&
+      point.precipitationMmPerHour !== undefined)
   );
 }
 

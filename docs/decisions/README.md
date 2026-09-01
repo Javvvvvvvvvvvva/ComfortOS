@@ -39,3 +39,15 @@ Accepted ADRs:
 - `ADR-008-comfort-route-reranking-v1.md`
 - `ADR-009-candidate-generation-v1.md`
 - `ADR-010-building-ingestion-and-provider-strategy.md`
+- `ADR-011-production-building-data-runtime.md`
+- `ADR-012-real-overture-ingestion-and-query-service.md`
+- `ADR-013-edge-level-environmental-routing-research.md`
+- `ADR-014-mvp-routing-and-progressive-comfort-ux.md`
+- `ADR-015-mvp-environment-analysis-performance.md`
+- `ADR-016-rain-engine-and-contextual-routing.md`
+- `ADR-017-covered-pedestrian-data-strategy.md`
+- `ADR-018-heat-engine-and-stay-cool-routing.md`
+- `ADR-019-mvp-routing-provider-strategy.md`
+- `ADR-020-mvp-managed-routing-provider.md`
+- `ADR-021-stage-10-limited-beta-gate.md`
+- `ADR-022-managed-poi-geocoding-provider.md`

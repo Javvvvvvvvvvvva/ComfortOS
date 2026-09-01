@@ -16,6 +16,11 @@ export function selectComfortRouteComparison({
   performanceMs,
   generation,
   buildings,
+  coveredFeatures,
+  routingProvider,
+  routingUsage,
+  capabilities,
+  context,
 }: {
   candidates: Omit<AnalyzedRouteCandidate, "role" | "metrics">[];
   policy?: ComfortRouteRerankingPolicy;
@@ -23,6 +28,11 @@ export function selectComfortRouteComparison({
   performanceMs?: ComfortRouteComparisonDebug["performanceMs"];
   generation?: ComfortRouteComparisonDebug["generation"];
   buildings?: ComfortRouteComparisonDebug["buildings"];
+  coveredFeatures?: ComfortRouteComparisonDebug["coveredFeatures"];
+  routingProvider?: ComfortRouteComparisonDebug["routingProvider"];
+  routingUsage?: ComfortRouteComparisonDebug["routingUsage"];
+  capabilities?: ComfortRouteComparisonDebug["capabilities"];
+  context?: ComfortRouteComparisonDebug["context"];
 }): ComfortRouteComparisonResult {
   if (candidates.length === 0) {
     throw new Error("Route comparison requires at least one candidate.");
@@ -71,7 +81,17 @@ export function selectComfortRouteComparison({
     candidates: analyzed,
     policy,
     provider,
-    debug: buildDebug(analyzed, performanceMs, generation, buildings),
+    debug: buildDebug(
+      analyzed,
+      performanceMs,
+      generation,
+      buildings,
+      coveredFeatures,
+      routingProvider,
+      routingUsage,
+      capabilities,
+      context,
+    ),
   };
 }
 
@@ -154,18 +174,30 @@ function buildDebug(
   performanceMs?: ComfortRouteComparisonDebug["performanceMs"],
   generation?: ComfortRouteComparisonDebug["generation"],
   buildings?: ComfortRouteComparisonDebug["buildings"],
+  coveredFeatures?: ComfortRouteComparisonDebug["coveredFeatures"],
+  routingProvider?: ComfortRouteComparisonDebug["routingProvider"],
+  routingUsage?: ComfortRouteComparisonDebug["routingUsage"],
+  capabilities?: ComfortRouteComparisonDebug["capabilities"],
+  context?: ComfortRouteComparisonDebug["context"],
 ): ComfortRouteComparisonDebug {
   return {
     note:
-      "Stage 4.5 reranks OSRM walking-route alternatives with audited raw Comfort Cost. Rounded Comfort Score never drives route selection.",
+      "Stage 5 reranks normalized walking-route candidates with audited raw Comfort Cost. Rounded Comfort Score never drives route selection.",
     deduplication: {
       overlapRatioThreshold: ROUTE_CANDIDATE_DEDUPLICATION.overlapRatioThreshold,
     },
     ...(generation ? { generation } : {}),
     ...(performanceMs ? { performanceMs } : {}),
     ...(buildings ? { buildings } : {}),
+    ...(coveredFeatures ? { coveredFeatures } : {}),
+    ...(routingProvider ? { routingProvider } : {}),
+    ...(routingUsage ? { routingUsage } : {}),
+    ...(capabilities ? { capabilities } : {}),
+    ...(context ? { context } : {}),
     candidates: candidates.map((candidate) => {
       const cost = candidate.comfortAnalysis?.routeComfortCost;
+      const rainSummary = candidate.rainAnalysis?.summary;
+      const heatSummary = candidate.heatAnalysis?.summary;
 
       return {
         id: candidate.id,
@@ -179,6 +211,21 @@ function buildDebug(
         waypoint: candidate.route.generation?.waypoint,
         rawEnvironmentalCost: cost?.environmentalExposureCost ?? null,
         comfortScore: candidate.comfortAnalysis?.summary.comfortScore ?? null,
+        rainExposure: rainSummary?.averageRainExposure ?? null,
+        coveredMeters: rainSummary?.coveredMeters ?? null,
+        coveredRatio:
+          rainSummary && rainSummary.analyzedMeters > 0
+            ? rainSummary.coveredMeters / rainSummary.analyzedMeters
+            : null,
+        longestContinuousCoveredMeters:
+          rainSummary?.longestContinuousCoveredMeters ?? null,
+        coveredSegmentCount: rainSummary?.coveredSegmentCount ?? null,
+        rainConfidence: rainSummary?.confidence ?? null,
+        heatExposure: heatSummary?.averageHeatExposure ?? null,
+        directSunRatio: heatSummary?.directSunRatio ?? null,
+        longestContinuousSunMeters: heatSummary?.longestContinuousSunMeters ?? null,
+        longestContinuousSunSeconds: heatSummary?.longestContinuousSunSeconds ?? null,
+        heatConfidence: heatSummary?.confidence ?? null,
         confidence: cost?.confidence ?? 0,
         completeness: cost?.completeness ?? 0,
         comparable: cost?.comparable ?? false,

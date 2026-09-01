@@ -12,6 +12,7 @@ export async function requestComfortAnalysis(
     headers: { "content-type": "application/json" },
     body: JSON.stringify(request),
     signal,
+    cache: "no-store",
   });
   const payload = (await response.json()) as {
     comfort?: ComfortAnalysisResult;

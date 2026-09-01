@@ -75,6 +75,7 @@ export type ShadeAnalysisRequest = {
   route: RouteResult;
   departureTime: string;
   buildings?: Building[];
+  includeDebug?: boolean;
 };
 
 export type ShadeAnalysisResult = {

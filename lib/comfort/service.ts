@@ -46,8 +46,13 @@ export class ComfortAnalysisService {
       routeMeters,
       hasShadeAnalysis: Boolean(request.shadeAnalysis),
       hasWindAnalysis: Boolean(request.windAnalysis),
+      hasRainAnalysis: Boolean(request.rainAnalysis),
+      hasHeatAnalysis: Boolean(request.heatAnalysis),
       shadeAnalyzedMeters: request.shadeAnalysis?.summary.analyzedMeters ?? 0,
       windAnalyzedMeters: request.windAnalysis?.summary.analyzedMeters ?? 0,
+      rainAnalyzedMeters: request.rainAnalysis?.summary.analyzedMeters ?? 0,
+      heatAnalyzedMeters: request.heatAnalysis?.summary.analyzedMeters ?? 0,
+      profile,
     });
     const summary = summarizeComfort({
       segmentComfort,
@@ -58,29 +63,38 @@ export class ComfortAnalysisService {
     });
     const quality = {
       weatherConfidence: weightedInputAverage(inputs, (input) =>
-        input.weather.temperatureC === null || input.weather.temperatureC === undefined
-          ? 0
-          : input.weather.confidence,
+        profile === "rain"
+          ? input.weather.precipitationMmPerHour === null ||
+            input.weather.precipitationMmPerHour === undefined
+            ? 0
+            : input.weather.confidence
+          : input.weather.temperatureC === null || input.weather.temperatureC === undefined
+            ? 0
+            : input.weather.confidence,
       ),
       shadeConfidence: request.shadeAnalysis?.summary.confidence ?? 0,
       windConfidence: request.windAnalysis?.summary.confidence ?? 0,
       routeAnalysisCoverage:
-        routeMeters > 0
-          ? clamp01(
-              Math.min(
-                request.shadeAnalysis
-                  ? request.shadeAnalysis.summary.analyzedMeters / routeMeters
-                  : routeMeters > 0
-                    ? 0.72
-                    : 0,
-                request.windAnalysis
-                  ? request.windAnalysis.summary.analyzedMeters / routeMeters
-                  : routeMeters > 0
-                    ? 0.72
-                    : 0,
-              ),
-            )
-          : 0,
+        profile === "rain"
+          ? request.rainAnalysis?.summary.completeness ?? 0
+          : profile === "heat"
+            ? request.heatAnalysis?.summary.completeness ?? 0
+          : routeMeters > 0
+            ? clamp01(
+                Math.min(
+                  request.shadeAnalysis
+                    ? request.shadeAnalysis.summary.analyzedMeters / routeMeters
+                    : routeMeters > 0
+                      ? 0.72
+                      : 0,
+                  request.windAnalysis
+                    ? request.windAnalysis.summary.analyzedMeters / routeMeters
+                    : routeMeters > 0
+                      ? 0.72
+                      : 0,
+                ),
+              )
+            : 0,
       overallConfidence: summary.confidence,
     };
     const routeComfortCost = buildRouteComfortCost({
@@ -102,7 +116,11 @@ export class ComfortAnalysisService {
       debug: {
         segments: comfortSegmentsToFeatureCollection(timedSegments, segmentComfort),
         note:
-          "Stage 4 Comfort Cost is a deterministic cold-profile estimate for one existing route. It is not route optimization and not a measured physiological value.",
+          profile === "heat"
+            ? "Stage 9 Heat Comfort Cost is a deterministic Stay Cool estimate from normalized weather, estimated building shade, solar elevation, route timing, and bounded ventilation. It is not a medical heat-risk or WBGT value."
+            : profile === "rain"
+              ? "Stage 8 Rain Comfort Cost is a deterministic Stay Dry estimate from normalized precipitation and covered-network exposure. It is not a safety guarantee."
+              : "Stage 4 Comfort Cost is a deterministic cold-profile estimate for one existing route. It is not route optimization and not a measured physiological value.",
       },
     };
   }
@@ -120,6 +138,12 @@ function buildSegmentComfortInputs(
       (value) => value.segmentId === segment.id,
     );
     const wind = request.windAnalysis?.segmentWind.find(
+      (value) => value.segmentId === segment.id,
+    );
+    const rain = request.rainAnalysis?.segmentRain.find(
+      (value) => value.segmentId === segment.id,
+    );
+    const heat = request.heatAnalysis?.segmentHeat.find(
       (value) => value.segmentId === segment.id,
     );
     const durationSeconds =
@@ -150,6 +174,29 @@ function buildSegmentComfortInputs(
             crosswindComponentMps: wind.crosswindComponentMps,
             shelterFactor: wind.shelterFactor,
             confidence: wind.confidence,
+        }
+        : undefined,
+      rain: rain
+        ? {
+            estimatedRainExposure: rain.estimatedRainExposure,
+            precipitationIntensityMmPerHour: rain.precipitationIntensityMmPerHour,
+            precipitationProbability: rain.precipitationProbability,
+            coveredRatio: rain.coveredRatio,
+            windDrivenExposureFactor: rain.windDrivenExposureFactor,
+            confidence: rain.confidence,
+          }
+        : undefined,
+      heat: heat
+        ? {
+            totalHeatExposureCost: heat.totalHeatExposureCost,
+            totalHeatExposureMinutesCost: heat.totalHeatExposureMinutesCost,
+            ambientHeatCost: heat.ambientHeatCost,
+            humidityCost: heat.humidityCost,
+            solarExposureCost: heat.solarExposureCost,
+            ventilationModifier: heat.ventilationModifier,
+            shadeRatio: heat.shadeRatio,
+            directSunRatio: heat.directSunRatio,
+            confidence: heat.confidence,
           }
         : undefined,
     };
@@ -184,6 +231,8 @@ function summarizeComfort({
   const thermalExposure = timeWeightedAverage(segmentComfort, (segment) => segment.thermalCost);
   const windExposure = timeWeightedAverage(segmentComfort, (segment) => segment.windCost);
   const solarExposure = timeWeightedAverage(segmentComfort, (segment) => segment.solarCost);
+  const rainExposure = timeWeightedAverage(segmentComfort, (segment) => segment.rainCost);
+  const heatExposure = timeWeightedAverage(segmentComfort, (segment) => segment.heatCost);
   const confidence = clamp01(
     timeWeightedAverage(segmentComfort, (segment) => segment.confidence),
   );
@@ -196,6 +245,8 @@ function summarizeComfort({
     thermalExposure,
     windExposure,
     solarExposure,
+    rainExposure,
+    heatExposure,
     analyzedMeters: routeMeters,
     unknownMeters: Math.max(0, routeMeters * (1 - confidence)),
     confidence,
@@ -208,43 +259,79 @@ function calculateCompleteness({
   routeMeters,
   hasShadeAnalysis,
   hasWindAnalysis,
+  hasRainAnalysis,
+  hasHeatAnalysis,
   shadeAnalyzedMeters,
   windAnalyzedMeters,
+  rainAnalyzedMeters,
+  heatAnalyzedMeters,
+  profile,
 }: {
   inputs: SegmentComfortInput[];
   routeMeters: number;
   hasShadeAnalysis: boolean;
   hasWindAnalysis: boolean;
+  hasRainAnalysis: boolean;
+  hasHeatAnalysis: boolean;
   shadeAnalyzedMeters: number;
   windAnalyzedMeters: number;
+  rainAnalyzedMeters: number;
+  heatAnalyzedMeters: number;
+  profile: string;
 }): ComfortAnalysisCompleteness {
   const weatherWeight = 0.5;
   const windWeight = 0.35;
   const shadeWeight = 0.15;
+  const rainWeight = 0.5;
+  const heatWeight = 0.45;
   const weatherAvailable =
     weightedInputAverage(inputs, (input) =>
-      input.weather.temperatureC === null || input.weather.temperatureC === undefined
-        ? 0
-        : 1,
+      profile === "rain"
+        ? input.weather.precipitationMmPerHour === null ||
+          input.weather.precipitationMmPerHour === undefined
+          ? 0
+          : 1
+        : input.weather.temperatureC === null || input.weather.temperatureC === undefined
+          ? 0
+          : 1,
     ) >= 0.95;
   const windCoverage = routeMeters > 0 ? clamp01(windAnalyzedMeters / routeMeters) : 0;
   const shadeCoverage = routeMeters > 0 ? clamp01(shadeAnalyzedMeters / routeMeters) : 0;
+  const rainCoverage = routeMeters > 0 ? clamp01(rainAnalyzedMeters / routeMeters) : 0;
+  const heatCoverage = routeMeters > 0 ? clamp01(heatAnalyzedMeters / routeMeters) : 0;
   const windAvailable = hasWindAnalysis && windCoverage > 0;
   const shadeAvailable = hasShadeAnalysis && shadeCoverage > 0;
+  const rainAvailable = hasRainAnalysis && rainCoverage > 0;
+  const heatAvailable = hasHeatAnalysis && heatCoverage > 0;
   const analyzedWeight =
-    (weatherAvailable ? weatherWeight : 0) +
-    windCoverage * windWeight +
-    shadeCoverage * shadeWeight;
+    profile === "rain"
+      ? (weatherAvailable ? weatherWeight : 0) + rainCoverage * rainWeight
+      : profile === "heat"
+        ? (weatherAvailable ? 0.4 : 0) +
+          heatCoverage * heatWeight +
+          shadeCoverage * 0.12 +
+          windCoverage * 0.03
+      : (weatherAvailable ? weatherWeight : 0) +
+        windCoverage * windWeight +
+        shadeCoverage * shadeWeight;
   const comparable =
-    weatherAvailable && windAvailable && shadeAvailable && analyzedWeight >= 0.75;
+    profile === "rain"
+      ? weatherAvailable && rainAvailable && analyzedWeight >= 0.75
+      : profile === "heat"
+        ? weatherAvailable && heatAvailable && shadeAvailable && analyzedWeight >= 0.75
+      : weatherAvailable && windAvailable && shadeAvailable && analyzedWeight >= 0.75;
 
   return {
     weatherAvailable,
     windAvailable,
     shadeAvailable,
+    rainAvailable,
+    heatAvailable,
     weatherWeight,
     windWeight,
     shadeWeight,
+    rainWeight,
+    heatWeight,
     analyzedWeight: clamp01(analyzedWeight),
     comparable,
   };
@@ -280,6 +367,10 @@ function dominantFactors(
     add(totals, "headwind", segment.contributions.headwind ?? 0, segment.durationSeconds);
     add(totals, "crosswind", segment.contributions.crosswind ?? 0, segment.durationSeconds);
     add(totals, "shade", segment.contributions.solarExposure ?? 0, segment.durationSeconds);
+    add(totals, "rain", segment.contributions.rainExposure ?? 0, segment.durationSeconds);
+    add(totals, "heat", segment.contributions.heatAmbient ?? 0, segment.durationSeconds);
+    add(totals, "heat", segment.contributions.humidity ?? 0, segment.durationSeconds);
+    add(totals, "sun", segment.contributions.sunExposure ?? 0, segment.durationSeconds);
   }
 
   const total = Array.from(totals.values()).reduce((sum, value) => sum + value, 0);
@@ -306,6 +397,10 @@ function comfortSegmentsToFeatureCollection(
         thermalCost: segmentComfort?.thermalCost ?? 0,
         windCost: segmentComfort?.windCost ?? 0,
         solarCost: segmentComfort?.solarCost ?? 0,
+        rainCost: segmentComfort?.rainCost ?? 0,
+        heatCost: segmentComfort?.heatCost ?? 0,
+        estimatedHeatExposure: segmentComfort?.estimatedHeatExposure ?? null,
+        estimatedRainExposure: segmentComfort?.estimatedRainExposure ?? null,
         confidence: segmentComfort?.confidence ?? 0,
         estimatedMidpointTime: segment.estimatedMidpointTime,
       });

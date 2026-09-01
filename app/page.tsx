@@ -1,5 +1,5 @@
-import { StageZeroApp } from "@/components/StageZeroApp";
+import { ComfortOSApp } from "@/components/ComfortOSApp";
 
 export default function Home() {
-  return <StageZeroApp />;
+  return <ComfortOSApp />;
 }

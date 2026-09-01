@@ -24,7 +24,7 @@ export async function POST(request: Request) {
       { wind },
       {
         headers: {
-          "Cache-Control": "public, s-maxage=900, stale-while-revalidate=1800",
+          "Cache-Control": "private, no-store",
         },
       },
     );

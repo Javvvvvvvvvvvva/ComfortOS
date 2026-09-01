@@ -36,6 +36,18 @@ async function main() {
   const manifest: LocalOvertureStoreManifest = {
     format: "comfortos-local-building-store-v1",
     source: "overture-buildings",
+    provider: "Overture Maps",
+    release: options.release,
+    theme: "buildings",
+    type: "building",
+    bbox: bounds ? [bounds.west, bounds.south, bounds.east, bounds.north] : undefined,
+    license: options.license,
+    sourceUrl: options.sourceUrl,
+    sourceAccessMethod: options.sourceAccessMethod,
+    buildingPartCount: options.buildingPartCount ? Number(options.buildingPartCount) : undefined,
+    invalidGeometryCount: options.invalidGeometryCount
+      ? Number(options.invalidGeometryCount)
+      : undefined,
     createdAt: new Date().toISOString(),
     region,
     tileSizeDegrees,
@@ -123,16 +135,20 @@ async function readFeatures(inputPath: string): Promise<Feature[]> {
   if (!trimmed) return [];
 
   if (trimmed.startsWith("{")) {
-    const parsed = JSON.parse(trimmed) as unknown;
-    const root = asRecord(parsed);
-    if (root.type === "FeatureCollection" && Array.isArray(root.features)) {
-      return root.features.flatMap((feature) => {
-        const normalized = asFeature(feature);
-        return normalized ? [normalized] : [];
-      });
+    try {
+      const parsed = JSON.parse(trimmed) as unknown;
+      const root = asRecord(parsed);
+      if (root.type === "FeatureCollection" && Array.isArray(root.features)) {
+        return root.features.flatMap((feature) => {
+          const normalized = asFeature(feature);
+          return normalized ? [normalized] : [];
+        });
+      }
+      const feature = asFeature(parsed);
+      return feature ? [feature] : [];
+    } catch {
+      // GeoJSONSeq/NDJSON also starts with "{", but contains one feature per line.
     }
-    const feature = asFeature(parsed);
-    return feature ? [feature] : [];
   }
 
   return trimmed.split("\n").flatMap((line) => {

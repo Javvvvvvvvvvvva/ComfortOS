@@ -13,10 +13,25 @@ export class CompositeCandidateGenerator implements CandidateGenerator {
     request: RouteRequest,
     context?: CandidateGenerationContext,
   ): Promise<RouteCandidateSet> {
-    const mode = (request as { generationMode?: "osrm-only" | "enhanced" }).generationMode;
-    const generators = mode === "osrm-only" ? this.generators.slice(0, 1) : this.generators;
+    const mode = (
+      request as { generationMode?: "provider-only" | "osrm-only" | "enhanced" }
+    ).generationMode;
+    const generators =
+      mode === "provider-only" || mode === "osrm-only"
+        ? this.generators.slice(0, 1)
+        : this.generators;
     const results = await Promise.allSettled(
-      generators.map((generator) => generator.generateCandidates(request, context)),
+      generators.map(async (generator) => {
+        const startedAt = performance.now();
+        try {
+          return await generator.generateCandidates(request, context);
+        } finally {
+          context?.diagnostics?.recordStage?.(
+            `candidateGeneration.${generator.id}`,
+            performance.now() - startedAt,
+          );
+        }
+      }),
     );
     const fulfilled = results.flatMap((result) =>
       result.status === "fulfilled" ? [result.value] : [],

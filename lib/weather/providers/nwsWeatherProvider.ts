@@ -2,6 +2,8 @@ import type { Coordinate } from "@/lib/geo/types";
 import {
   fahrenheitToCelsius,
   directionToDegrees,
+  kmhToMps,
+  mphToMps,
   parseSpeedToMps,
 } from "@/lib/weather/units";
 import type {
@@ -154,9 +156,9 @@ export function normalizeNwsObservationResponse(response: unknown): WeatherSnaps
     apparentTemperatureC:
       quantityValue(properties.heatIndex) ?? quantityValue(properties.windChill),
     relativeHumidity: quantityValue(properties.relativeHumidity),
-    windSpeedMps: quantityValue(properties.windSpeed),
+    windSpeedMps: quantitySpeedToMps(properties.windSpeed),
     windDirectionDeg: normalizeDegrees(quantityValue(properties.windDirection)),
-    windGustMps: quantityValue(properties.windGust),
+    windGustMps: quantitySpeedToMps(properties.windGust),
     precipitationProbability: null,
     precipitationMmPerHour: quantityValueToMillimeters(properties.precipitationLastHour),
     visibilityMeters: quantityValue(properties.visibility),
@@ -184,6 +186,7 @@ export function normalizeNwsHourlyForecastResponse(
       windSpeedMps: parseSpeedToMps(item.windSpeed),
       windDirectionDeg: directionToDegrees(item.windDirection),
       precipitationProbability: quantityValue(item.probabilityOfPrecipitation),
+      precipitationMmPerHour: quantityValueToMillimeters(item.quantitativePrecipitation),
       shortCondition: asString(item.shortForecast) ?? undefined,
     };
   });
@@ -240,6 +243,18 @@ function quantityValueToMillimeters(value: unknown) {
   if (!unit) return numericValue;
   if (unit.endsWith(":m")) return numericValue * 1000;
   if (unit.endsWith(":mm")) return numericValue;
+  return numericValue;
+}
+
+function quantitySpeedToMps(value: unknown) {
+  const record = getRecordOrNull(value);
+  const numericValue = record ? asNumber(record.value) : asNumber(value);
+  if (numericValue === null) return null;
+
+  const unit = record ? asString(record.unitCode)?.toLowerCase() : undefined;
+  if (!unit || /m_s-1|m\/s/.test(unit)) return numericValue;
+  if (/km_h-1|km\/h|kph/.test(unit)) return kmhToMps(numericValue);
+  if (/mi_h-1|mph/.test(unit)) return mphToMps(numericValue);
   return numericValue;
 }
 

@@ -1,0 +1,110 @@
+[
+  {
+    "id": "phx-01-asu-downtown-to-footprint-center",
+    "label": "ASU Downtown to Footprint Center",
+    "origin": { "latitude": 33.4533, "longitude": -112.0738 },
+    "destination": { "latitude": 33.4458, "longitude": -112.0712 }
+  },
+  {
+    "id": "phx-02-roosevelt-row-to-cityscape",
+    "label": "Roosevelt Row to CityScape",
+    "origin": { "latitude": 33.4595, "longitude": -112.0706 },
+    "destination": { "latitude": 33.4475, "longitude": -112.0732 }
+  },
+  {
+    "id": "phx-03-heard-museum-to-phoenix-art-museum",
+    "label": "Heard Museum to Phoenix Art Museum",
+    "origin": { "latitude": 33.4729, "longitude": -112.0724 },
+    "destination": { "latitude": 33.4662, "longitude": -112.0726 }
+  },
+  {
+    "id": "phx-04-central-midtown-to-encanto",
+    "label": "Central Midtown to Encanto",
+    "origin": { "latitude": 33.485, "longitude": -112.073 },
+    "destination": { "latitude": 33.473, "longitude": -112.073 }
+  },
+  {
+    "id": "phx-05-civic-space-to-convention-center",
+    "label": "Civic Space Park to Convention Center",
+    "origin": { "latitude": 33.4536, "longitude": -112.0745 },
+    "destination": { "latitude": 33.448, "longitude": -112.0707 }
+  },
+  {
+    "id": "phx-06-hance-park-to-roosevelt-row",
+    "label": "Margaret T. Hance Park to Roosevelt Row",
+    "origin": { "latitude": 33.4618, "longitude": -112.0739 },
+    "destination": { "latitude": 33.4587, "longitude": -112.0672 }
+  },
+  {
+    "id": "phx-07-arizona-center-to-heritage-square",
+    "label": "Arizona Center to Heritage Square",
+    "origin": { "latitude": 33.4529, "longitude": -112.0699 },
+    "destination": { "latitude": 33.4502, "longitude": -112.0662 }
+  },
+  {
+    "id": "phx-08-midtown-light-rail-to-phoenix-college",
+    "label": "Midtown light rail to Phoenix College",
+    "origin": { "latitude": 33.4775, "longitude": -112.0731 },
+    "destination": { "latitude": 33.4823, "longitude": -112.0883 }
+  },
+  {
+    "id": "phx-09-central-station-to-state-capitol",
+    "label": "Central Station to Arizona State Capitol",
+    "origin": { "latitude": 33.4489, "longitude": -112.074 },
+    "destination": { "latitude": 33.4482, "longitude": -112.0963 }
+  },
+  {
+    "id": "phx-10-willoughby-to-chase-field",
+    "label": "Willoughby Corner to Chase Field",
+    "origin": { "latitude": 33.4554, "longitude": -112.0826 },
+    "destination": { "latitude": 33.4455, "longitude": -112.0667 }
+  },
+  {
+    "id": "phx-11-library-to-burton-barr",
+    "label": "Civic Space to Burton Barr Library",
+    "origin": { "latitude": 33.4536, "longitude": -112.0745 },
+    "destination": { "latitude": 33.4616, "longitude": -112.0732 }
+  },
+  {
+    "id": "phx-12-garfield-to-downtown",
+    "label": "Garfield to Downtown Core",
+    "origin": { "latitude": 33.4564, "longitude": -112.0597 },
+    "destination": { "latitude": 33.4484, "longitude": -112.074 }
+  },
+  {
+    "id": "phx-13-evans-churchill-to-warehouse",
+    "label": "Evans Churchill to Warehouse District",
+    "origin": { "latitude": 33.4586, "longitude": -112.0665 },
+    "destination": { "latitude": 33.4395, "longitude": -112.0731 }
+  },
+  {
+    "id": "phx-14-mckinley-to-van-buren",
+    "label": "McKinley Street to Van Buren",
+    "origin": { "latitude": 33.4569, "longitude": -112.078 },
+    "destination": { "latitude": 33.4513, "longitude": -112.0678 }
+  },
+  {
+    "id": "phx-15-central-highrise-canyon",
+    "label": "Central Avenue high-rise corridor",
+    "origin": { "latitude": 33.451, "longitude": -112.074 },
+    "destination": { "latitude": 33.4417, "longitude": -112.0718 }
+  },
+  {
+    "id": "phx-16-midtown-open-corridor",
+    "label": "Midtown open corridor",
+    "origin": { "latitude": 33.491, "longitude": -112.0732 },
+    "destination": { "latitude": 33.4773, "longitude": -112.0658 }
+  },
+  {
+    "id": "phx-17-grand-avenue-to-roosevelt",
+    "label": "Grand Avenue to Roosevelt Row",
+    "origin": { "latitude": 33.4599, "longitude": -112.088 },
+    "destination": { "latitude": 33.4586, "longitude": -112.0672 }
+  },
+  {
+    "id": "phx-18-heritage-square-to-jefferson",
+    "label": "Heritage Square to Jefferson Street",
+    "origin": { "latitude": 33.4502, "longitude": -112.0662 },
+    "destination": { "latitude": 33.446, "longitude": -112.0784 }
+  }
+]

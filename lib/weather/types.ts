@@ -25,6 +25,7 @@ export type WeatherForecastPoint = {
   windSpeedMps?: number | null;
   windDirectionDeg?: number | null;
   precipitationProbability?: number | null;
+  precipitationMmPerHour?: number | null;
   shortCondition?: string;
 };
 

@@ -1,10 +1,15 @@
 import { NextResponse } from "next/server";
-import { PhotonGeocodingProvider } from "@/lib/geocoding/providers/photonProvider";
+import { createConfiguredGeocodingProvider } from "@/lib/geocoding/providers/configuredGeocodingProvider";
 import { assertValidCoordinate } from "@/lib/geo/validation";
-
-const DEFAULT_PHOTON_BASE_URL = "https://photon.komoot.io";
+import { createRequestId, logServerEvent } from "@/lib/observability/serverLog";
 
 export async function GET(request: Request) {
+  const requestId = createRequestId(request);
+  const startedAt = performance.now();
+  const headers = {
+    "Cache-Control": "private, no-store",
+    "X-Request-Id": requestId,
+  };
   try {
     const url = new URL(request.url);
     const coordinate = {
@@ -13,16 +18,29 @@ export async function GET(request: Request) {
     };
     assertValidCoordinate(coordinate, "Reverse geocode coordinate");
 
-    const provider = new PhotonGeocodingProvider({
-      baseUrl: process.env.GEOCODING_BASE_URL ?? DEFAULT_PHOTON_BASE_URL,
-      countryCode: process.env.GEOCODING_COUNTRY_CODE ?? "US",
+    const configured = createConfiguredGeocodingProvider();
+    const place = await configured.provider.reverseGeocode(coordinate, {
+      signal: request.signal,
     });
-    const place = await provider.reverseGeocode(coordinate);
 
-    return NextResponse.json({ place });
-  } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Unable to identify this location.";
-    return NextResponse.json({ error: message }, { status: 400 });
+    logServerEvent("info", "reverse_geocoding_complete", {
+      requestId,
+      provider: configured.metadata.id,
+      providerMode: configured.metadata.mode,
+      latencyMs: Math.round(performance.now() - startedAt),
+      found: place !== null,
+    });
+
+    return NextResponse.json({ place }, { headers });
+  } catch {
+    logServerEvent("warn", "reverse_geocoding_failed", {
+      requestId,
+      failureCategory: "geocoding_provider",
+      latencyMs: Math.round(performance.now() - startedAt),
+    });
+    return NextResponse.json(
+      { error: "Unable to identify this location." },
+      { status: 503, headers },
+    );
   }
 }

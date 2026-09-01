@@ -18,6 +18,8 @@ import type { Coordinate, LineStringGeometry } from "@/lib/geo/types";
 import { MINNEAPOLIS_CENTER } from "@/lib/geo/types";
 import type { ShadeAnalysisResult } from "@/lib/environment/shade/types";
 import type { WindAnalysisResult } from "@/lib/environment/wind/types";
+import type { RainAnalysisResult } from "@/lib/environment/rain/types";
+import type { HeatAnalysisResult } from "@/lib/environment/heat/types";
 import type { ComfortAnalysisResult } from "@/lib/comfort/types";
 
 type SelectionMode = "origin" | "destination";
@@ -34,13 +36,18 @@ type ComfortMapProps = {
   }>;
   shadeAnalysis?: ShadeAnalysisResult | null;
   windAnalysis?: WindAnalysisResult | null;
+  rainAnalysis?: RainAnalysisResult | null;
+  heatAnalysis?: HeatAnalysisResult | null;
   comfortAnalysis?: ComfortAnalysisResult | null;
   showShadeDebug?: boolean;
   showWindDebug?: boolean;
+  showRainDebug?: boolean;
+  showHeatDebug?: boolean;
   showComfortDebug?: boolean;
   selectionMode: SelectionMode;
   focusCoordinate?: Coordinate | null;
   onMapSelect: (coordinate: Coordinate) => void;
+  onViewportCenterChange?: (coordinate: Coordinate) => void;
 };
 
 const routeSourceId = "comfortos-route";
@@ -51,6 +58,8 @@ const shadeShadowsSourceId = "comfortos-debug-shadows";
 const shadeSegmentsSourceId = "comfortos-debug-shade-segments";
 const windSegmentsSourceId = "comfortos-debug-wind-segments";
 const windVectorsSourceId = "comfortos-debug-wind-vectors";
+const rainSegmentsSourceId = "comfortos-debug-rain-segments";
+const heatSegmentsSourceId = "comfortos-debug-heat-segments";
 const comfortSegmentsSourceId = "comfortos-debug-comfort-segments";
 const emptyPolygonCollection: FeatureCollection<Polygon | MultiPolygon> = {
   type: "FeatureCollection",
@@ -89,23 +98,33 @@ export function ComfortMap({
   comparisonRouteGeometries = [],
   shadeAnalysis,
   windAnalysis,
+  rainAnalysis,
+  heatAnalysis,
   comfortAnalysis,
   showShadeDebug = false,
   showWindDebug = false,
+  showRainDebug = false,
+  showHeatDebug = false,
   showComfortDebug = false,
   selectionMode,
   focusCoordinate,
   onMapSelect,
+  onViewportCenterChange,
 }: ComfortMapProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<Map | null>(null);
   const originMarkerRef = useRef<Marker | null>(null);
   const destinationMarkerRef = useRef<Marker | null>(null);
   const onMapSelectRef = useRef(onMapSelect);
+  const onViewportCenterChangeRef = useRef(onViewportCenterChange);
 
   useEffect(() => {
     onMapSelectRef.current = onMapSelect;
   }, [onMapSelect]);
+
+  useEffect(() => {
+    onViewportCenterChangeRef.current = onViewportCenterChange;
+  }, [onViewportCenterChange]);
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
@@ -126,10 +145,20 @@ export function ComfortMap({
         longitude: event.lngLat.lng,
       });
     });
+    const reportViewportCenter = () => {
+      const center = map.getCenter();
+      onViewportCenterChangeRef.current?.({
+        latitude: center.lat,
+        longitude: center.lng,
+      });
+    };
+    map.on("moveend", reportViewportCenter);
+    reportViewportCenter();
 
     mapRef.current = map;
 
     return () => {
+      map.off("moveend", reportViewportCenter);
       map.remove();
       mapRef.current = null;
     };
@@ -466,6 +495,116 @@ export function ComfortMap({
     const map = mapRef.current;
     if (!map) return;
 
+    const drawRainDebug = () => {
+      const segmentData =
+        showRainDebug && rainAnalysis?.debug?.segments
+          ? rainAnalysis.debug.segments
+          : emptyLineCollection;
+
+      upsertGeoJsonSource(map, rainSegmentsSourceId, segmentData);
+
+      if (!map.getLayer("comfortos-debug-rain-segment-line")) {
+        map.addLayer({
+          id: "comfortos-debug-rain-segment-line",
+          type: "line",
+          source: rainSegmentsSourceId,
+          paint: {
+            "line-color": [
+              "interpolate",
+              ["linear"],
+              ["get", "estimatedRainExposure"],
+              0,
+              "#4f8b85",
+              0.45,
+              "#4f73a7",
+              1,
+              "#304766",
+            ],
+            "line-width": [
+              "interpolate",
+              ["linear"],
+              ["get", "coveredRatio"],
+              0,
+              8,
+              1,
+              5,
+            ],
+            "line-opacity": 0.82,
+          },
+          layout: {
+            "line-cap": "round",
+            "line-join": "round",
+          },
+        });
+      }
+    };
+
+    if (map.isStyleLoaded()) {
+      drawRainDebug();
+    } else {
+      map.once("load", drawRainDebug);
+    }
+  }, [rainAnalysis, showRainDebug]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+
+    const drawHeatDebug = () => {
+      const segmentData =
+        showHeatDebug && heatAnalysis?.debug?.segments
+          ? heatAnalysis.debug.segments
+          : emptyLineCollection;
+
+      upsertGeoJsonSource(map, heatSegmentsSourceId, segmentData);
+
+      if (!map.getLayer("comfortos-debug-heat-segment-line")) {
+        map.addLayer({
+          id: "comfortos-debug-heat-segment-line",
+          type: "line",
+          source: heatSegmentsSourceId,
+          paint: {
+            "line-color": [
+              "interpolate",
+              ["linear"],
+              ["get", "totalHeatExposureCost"],
+              0,
+              "#4f8b85",
+              1.6,
+              "#d2a43b",
+              3.8,
+              "#b84d3d",
+            ],
+            "line-width": [
+              "interpolate",
+              ["linear"],
+              ["coalesce", ["get", "directSunRatio"], 0],
+              0,
+              5,
+              1,
+              9,
+            ],
+            "line-opacity": 0.82,
+          },
+          layout: {
+            "line-cap": "round",
+            "line-join": "round",
+          },
+        });
+      }
+    };
+
+    if (map.isStyleLoaded()) {
+      drawHeatDebug();
+    } else {
+      map.once("load", drawHeatDebug);
+    }
+  }, [heatAnalysis, showHeatDebug]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+
     const drawComfortDebug = () => {
       const segmentData =
         showComfortDebug && comfortAnalysis?.debug?.segments
@@ -525,7 +664,7 @@ export function ComfortMap({
       <div
         ref={containerRef}
         className="map-canvas"
-        aria-label="Interactive Minneapolis walking map"
+        aria-label="Interactive ComfortOS walking map"
       />
       <div className="map-instruction" aria-live="polite">
         Tap the map to set {selectionMode === "origin" ? "an origin" : "a destination"}.

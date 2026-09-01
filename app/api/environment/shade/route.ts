@@ -15,7 +15,7 @@ export async function POST(request: Request) {
       { shade },
       {
         headers: {
-          "Cache-Control": "public, s-maxage=1800, stale-while-revalidate=3600",
+          "Cache-Control": "private, no-store",
         },
       },
     );

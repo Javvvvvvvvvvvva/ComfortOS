@@ -22,7 +22,12 @@ import type {
   WindCoverage,
   WindQuality,
 } from "@/lib/environment/wind/types";
-import { HeuristicUrbanWindModel, WIND_MODEL_CONFIG, calculateUnknownHeightInfluence } from "@/lib/environment/wind/urbanWindModel";
+import {
+  HeuristicUrbanWindModel,
+  WIND_MODEL_CONFIG,
+  calculateUnknownHeightInfluenceFromPreparedContext,
+  prepareWindBuildingContext,
+} from "@/lib/environment/wind/urbanWindModel";
 import { bearingVector, selectWindStateForTime } from "@/lib/environment/wind/windVector";
 import type { Coordinate } from "@/lib/geo/types";
 import type { WeatherService } from "@/lib/weather/service";
@@ -60,6 +65,7 @@ export class WindAnalysisService {
       type: "LineString",
       coordinates: routeGeometry.coordinates,
     });
+    const preparedBuildingContext = prepareWindBuildingContext(buildings, projectionOrigin);
 
     const segmentWind = segments.map((segment) => {
       const windState = selectWindStateForTime(weatherBundle, segment.estimatedMidpointTime);
@@ -68,8 +74,12 @@ export class WindAnalysisService {
       const estimated = this.urbanWindModel.estimateSegmentWind(segment, windState, {
         buildings,
         projectionOrigin,
+        preparedBuildingContext,
       });
-      const unknownMeters = calculateUnknownHeightInfluence(segment, buildings);
+      const unknownMeters = calculateUnknownHeightInfluenceFromPreparedContext(
+        segment,
+        preparedBuildingContext,
+      );
 
       return {
         ...estimated,
@@ -86,6 +96,16 @@ export class WindAnalysisService {
       unknownMeters,
     });
 
+    const debug = request.includeDebug === false
+      ? undefined
+      : {
+          buildings: buildingsToFeatureCollection(buildings),
+          segments: windSegmentsToFeatureCollection(segments, segmentWind),
+          windVectors: windVectorsToFeatureCollection(segments, segmentWind, projectionOrigin),
+          note:
+            "Wind direction is meteorological FROM direction. Exposure is a deterministic heuristic estimate, not measured street wind.",
+        };
+
     return {
       status: "available",
       routeGeometry,
@@ -95,13 +115,7 @@ export class WindAnalysisService {
       summary,
       coverage,
       quality,
-      debug: {
-        buildings: buildingsToFeatureCollection(buildings),
-        segments: windSegmentsToFeatureCollection(segments, segmentWind),
-        windVectors: windVectorsToFeatureCollection(segments, segmentWind, projectionOrigin),
-        note:
-          "Wind direction is meteorological FROM direction. Exposure is a deterministic heuristic estimate, not measured street wind.",
-      },
+      ...(debug ? { debug } : {}),
     };
   }
 

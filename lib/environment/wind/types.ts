@@ -74,6 +74,7 @@ export type WindAnalysisRequest = {
   weatherCoordinate?: Coordinate;
   weatherBundle?: WeatherBundle;
   buildings?: Building[];
+  includeDebug?: boolean;
 };
 
 export type WindAnalysisResult = {
@@ -104,4 +105,5 @@ export type UrbanWindModel = {
 export type UrbanWindContext = {
   buildings: import("@/lib/environment/buildings/types").Building[];
   projectionOrigin: Coordinate;
+  preparedBuildingContext?: unknown;
 };

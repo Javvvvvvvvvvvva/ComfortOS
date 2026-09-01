@@ -1,7 +1,7 @@
 # ADR-002 — Stage 0.5 Geocoding Provider
 
 Date: 2026-08-08
-Status: Accepted
+Status: Accepted for Stage 0.5; superseded for production by ADR-022
 
 ## Context
 

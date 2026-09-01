@@ -82,6 +82,14 @@ export class ShadeAnalysisService {
         unknownMeters: 0,
       });
 
+      const debug = request.includeDebug === false
+        ? undefined
+        : {
+            buildings: buildingsToFeatureCollection(buildings),
+            shadows: shadowsToFeatureCollection([]),
+            segments: segmentsToFeatureCollection(segments, segmentShade),
+          };
+
       return {
         status: "night",
         routeGeometry,
@@ -92,15 +100,11 @@ export class ShadeAnalysisService {
         summary: { ...summary, confidence: 1 },
         coverage,
         quality: { ...quality, routeAnalysisCoverage: 1, overallConfidence: 1 },
-        debug: {
-          buildings: buildingsToFeatureCollection(buildings),
-          shadows: shadowsToFeatureCollection([]),
-          segments: segmentsToFeatureCollection(segments, segmentShade),
-        },
+        ...(debug ? { debug } : {}),
       };
     }
 
-    const allShadows: BuildingShadow[] = [];
+    const allShadows: BuildingShadow[] | null = request.includeDebug === false ? null : [];
     const segmentShade = segments.flatMap((segment) => {
       const segmentSolarPosition = calculateSolarPosition({
         latitude: projectionOrigin.latitude,
@@ -112,7 +116,7 @@ export class ShadeAnalysisService {
         segmentSolarPosition,
         projectionOrigin,
       );
-      allShadows.push(...shadowResult.shadows);
+      allShadows?.push(...shadowResult.shadows);
       const [shade] = calculateSegmentShade(
         [segment],
         shadowResult.shadows,
@@ -127,7 +131,6 @@ export class ShadeAnalysisService {
         },
       ];
     });
-    const uniqueShadows = uniqueBuildingShadows(allShadows);
     const unknownMeters = calculateUnknownHeightMeters({
       segments,
       buildings,
@@ -140,6 +143,20 @@ export class ShadeAnalysisService {
       unknownMeters,
     });
 
+    const debug = allShadows
+      ? {
+          buildings: buildingsToFeatureCollection(buildings),
+          shadows: shadowsToFeatureCollection(uniqueBuildingShadows(allShadows)),
+          segments: segmentsToFeatureCollection(segments, segmentShade),
+          sourceComparison: {
+            defaultProvider: "OpenStreetMap via Overpass",
+            alternateProvider: "Overture Maps Buildings",
+            note:
+              "Overture remains behind the provider boundary; Stage 2.5 benchmark documentation records current feasibility and production recommendation.",
+          },
+        }
+      : undefined;
+
     return {
       status: "available",
       routeGeometry,
@@ -150,17 +167,7 @@ export class ShadeAnalysisService {
       summary,
       coverage,
       quality,
-      debug: {
-        buildings: buildingsToFeatureCollection(buildings),
-        shadows: shadowsToFeatureCollection(uniqueShadows),
-        segments: segmentsToFeatureCollection(segments, segmentShade),
-        sourceComparison: {
-          defaultProvider: "OpenStreetMap via Overpass",
-          alternateProvider: "Overture Maps Buildings",
-          note:
-            "Overture remains behind the provider boundary; Stage 2.5 benchmark documentation records current feasibility and production recommendation.",
-        },
-      },
+      ...(debug ? { debug } : {}),
     };
   }
 

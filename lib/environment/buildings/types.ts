@@ -25,7 +25,17 @@ export type Building = {
 };
 
 export type BuildingProvider = {
-  getBuildings(bounds: BoundingBox): Promise<Building[]>;
+  getBuildings(bounds: BoundingBox, options?: { signal?: AbortSignal }): Promise<Building[]>;
+  getMetadata?(): Promise<BuildingProviderMetadata | null>;
+};
+
+export type BuildingProviderMetadata = {
+  provider?: string;
+  datasetVersion?: string;
+  generatedAt?: string;
+  region?: string;
+  source?: string;
+  queryLatencyMs?: number;
 };
 
 export type BuildingCoverage = {

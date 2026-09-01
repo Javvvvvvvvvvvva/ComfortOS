@@ -23,6 +23,27 @@ const eslintConfig = defineConfig([
   jsxA11y.flatConfigs.recommended,
   next.configs["core-web-vitals"],
   {
+    files: ["app/**/*.{ts,tsx}", "components/**/*.{ts,tsx}", "lib/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            "@/fixtures/*",
+            "@/tests/*",
+            "@/docs/design/baseline/*",
+            "../fixtures/*",
+            "../../fixtures/*",
+            "../tests/*",
+            "../../tests/*",
+            "../docs/design/baseline/*",
+            "../../docs/design/baseline/*",
+          ],
+        },
+      ],
+    },
+  },
+  {
     languageOptions: {
       globals: {
         ...globals.browser,

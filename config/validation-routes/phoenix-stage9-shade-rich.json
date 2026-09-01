@@ -1,0 +1,50 @@
+[
+  {
+    "id": "phx-shade-01-central-canyon",
+    "label": "Central Avenue canyon sample",
+    "origin": { "latitude": 33.4512, "longitude": -112.0742 },
+    "destination": { "latitude": 33.4454, "longitude": -112.0711 }
+  },
+  {
+    "id": "phx-shade-02-arizona-center",
+    "label": "Arizona Center to Downtown Core",
+    "origin": { "latitude": 33.4529, "longitude": -112.0699 },
+    "destination": { "latitude": 33.4484, "longitude": -112.074 }
+  },
+  {
+    "id": "phx-shade-03-civic-space-short",
+    "label": "Civic Space short downtown sample",
+    "origin": { "latitude": 33.4536, "longitude": -112.0745 },
+    "destination": { "latitude": 33.4491, "longitude": -112.0735 }
+  },
+  {
+    "id": "phx-shade-04-midtown-central",
+    "label": "Midtown Central shaded blocks",
+    "origin": { "latitude": 33.4752, "longitude": -112.073 },
+    "destination": { "latitude": 33.4686, "longitude": -112.0725 }
+  },
+  {
+    "id": "phx-shade-05-convention-center",
+    "label": "Convention Center to Heritage Square",
+    "origin": { "latitude": 33.448, "longitude": -112.0707 },
+    "destination": { "latitude": 33.4502, "longitude": -112.0662 }
+  },
+  {
+    "id": "phx-shade-06-hance-park-edge",
+    "label": "Hance Park urban edge",
+    "origin": { "latitude": 33.4618, "longitude": -112.0739 },
+    "destination": { "latitude": 33.4591, "longitude": -112.0675 }
+  },
+  {
+    "id": "phx-shade-07-footprint-to-chase",
+    "label": "Footprint Center to Chase Field",
+    "origin": { "latitude": 33.4458, "longitude": -112.0712 },
+    "destination": { "latitude": 33.4455, "longitude": -112.0667 }
+  },
+  {
+    "id": "phx-shade-08-roosevelt-short",
+    "label": "Roosevelt Row short sample",
+    "origin": { "latitude": 33.4595, "longitude": -112.0706 },
+    "destination": { "latitude": 33.4586, "longitude": -112.0648 }
+  }
+]

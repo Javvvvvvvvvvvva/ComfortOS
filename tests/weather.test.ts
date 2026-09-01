@@ -65,6 +65,27 @@ test("normalizes latest station observations with nullable fields", () => {
   assert.equal(snapshot.source, "National Weather Service");
 });
 
+test("normalizes NWS observation wind quantities to meters per second", () => {
+  const snapshot = normalizeNwsObservationResponse({
+    properties: {
+      timestamp: "2026-08-08T12:10:00-05:00",
+      temperature: { value: 23.2, unitCode: "wmoUnit:degC" },
+      heatIndex: { value: null, unitCode: "wmoUnit:degC" },
+      windChill: { value: null, unitCode: "wmoUnit:degC" },
+      relativeHumidity: { value: 54 },
+      windSpeed: { value: 18, unitCode: "wmoUnit:km_h-1" },
+      windDirection: { value: 270, unitCode: "wmoUnit:degree_(angle)" },
+      windGust: { value: 20, unitCode: "wmoUnit:mi_h-1" },
+      precipitationLastHour: { value: null, unitCode: "wmoUnit:m" },
+      visibility: { value: 16093, unitCode: "wmoUnit:m" },
+      textDescription: "Partly Cloudy",
+    },
+  });
+
+  assert.equal(snapshot.windSpeedMps, 5);
+  assert.equal(Math.round((snapshot.windGustMps ?? 0) * 100) / 100, 8.94);
+});
+
 test("normalizes NWS hourly forecast periods", () => {
   const forecast = normalizeNwsHourlyForecastResponse({
     properties: {
@@ -77,6 +98,7 @@ test("normalizes NWS hourly forecast periods", () => {
           windSpeed: "6 mph",
           windDirection: "NW",
           probabilityOfPrecipitation: { value: 20 },
+          quantitativePrecipitation: { value: 0.002, unitCode: "wmoUnit:m" },
           shortForecast: "Mostly Sunny",
         },
       ],
@@ -88,6 +110,7 @@ test("normalizes NWS hourly forecast periods", () => {
   assert.equal(forecast[0].windDirectionDeg, 315);
   assert.equal(Math.round((forecast[0].windSpeedMps ?? 0) * 100) / 100, 2.68);
   assert.equal(forecast[0].precipitationProbability, 20);
+  assert.equal(forecast[0].precipitationMmPerHour, 2);
 });
 
 test("normalizes active alerts", () => {
@@ -116,20 +139,16 @@ test("normalizes active alerts", () => {
   assert.equal(alerts[0].source, "National Weather Service");
 });
 
-test("selects weather location by origin, current location, then fallback", () => {
+test("selects weather location by origin, current location, then no location", () => {
   const origin = { latitude: 47.6062, longitude: -122.3321 };
   const currentLocation = { latitude: 33.4484, longitude: -112.074 };
-  const fallback = { latitude: 44.9778, longitude: -93.265 };
 
   assert.deepEqual(
-    selectWeatherCoordinate({ selectedOrigin: origin, currentLocation, fallback }),
+    selectWeatherCoordinate({ selectedOrigin: origin, currentLocation }),
     origin,
   );
-  assert.deepEqual(
-    selectWeatherCoordinate({ currentLocation, fallback }),
-    currentLocation,
-  );
-  assert.deepEqual(selectWeatherCoordinate({ fallback }), fallback);
+  assert.deepEqual(selectWeatherCoordinate({ currentLocation }), currentLocation);
+  assert.equal(selectWeatherCoordinate({}), null);
 });
 
 test("rejects malformed provider responses", () => {

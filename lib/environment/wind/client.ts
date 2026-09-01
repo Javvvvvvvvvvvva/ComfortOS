@@ -9,6 +9,7 @@ export async function requestWindAnalysis(
     headers: { "content-type": "application/json" },
     body: JSON.stringify(request),
     signal,
+    cache: "no-store",
   });
 
   if (!response.ok) throw new Error("Wind estimate unavailable.");

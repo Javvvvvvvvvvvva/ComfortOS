@@ -1,0 +1,58 @@
+[
+  {
+    "id": "pike-street-covered-core",
+    "label": "Pike Street covered commercial core",
+    "area": "Downtown",
+    "origin": { "latitude": 47.6117, "longitude": -122.3333 },
+    "destination": { "latitude": 47.6124, "longitude": -122.3315 }
+  },
+  {
+    "id": "north-arcade-retail-core",
+    "label": "North Arcade retail connector",
+    "area": "Downtown",
+    "origin": { "latitude": 47.6087, "longitude": -122.3407 },
+    "destination": { "latitude": 47.6099, "longitude": -122.3429 }
+  },
+  {
+    "id": "weller-street-overpass",
+    "label": "South Weller Street covered overpass",
+    "area": "Downtown",
+    "origin": { "latitude": 47.5976, "longitude": -122.3303 },
+    "destination": { "latitude": 47.5976, "longitude": -122.3292 }
+  },
+  {
+    "id": "seattle-center-covered-footways",
+    "label": "Seattle Center covered footways",
+    "area": "Belltown",
+    "origin": { "latitude": 47.6212, "longitude": -122.3501 },
+    "destination": { "latitude": 47.6232, "longitude": -122.3535 }
+  },
+  {
+    "id": "third-avenue-north-covered",
+    "label": "3rd Avenue North covered pedestrian way",
+    "area": "Belltown",
+    "origin": { "latitude": 47.6231, "longitude": -122.3514 },
+    "destination": { "latitude": 47.6223, "longitude": -122.3514 }
+  },
+  {
+    "id": "convention-center-tunnel",
+    "label": "Convention Center pedestrian tunnel",
+    "area": "Downtown",
+    "origin": { "latitude": 47.6076, "longitude": -122.3369 },
+    "destination": { "latitude": 47.6078, "longitude": -122.3365 }
+  },
+  {
+    "id": "pioneer-square-tunnel",
+    "label": "Pioneer Square pedestrian tunnel",
+    "area": "Waterfront",
+    "origin": { "latitude": 47.6026, "longitude": -122.3319 },
+    "destination": { "latitude": 47.6028, "longitude": -122.3318 }
+  },
+  {
+    "id": "belltown-covered-stairs",
+    "label": "Belltown covered stair connection",
+    "area": "Belltown",
+    "origin": { "latitude": 47.6230, "longitude": -122.3540 },
+    "destination": { "latitude": 47.6230, "longitude": -122.3535 }
+  }
+]

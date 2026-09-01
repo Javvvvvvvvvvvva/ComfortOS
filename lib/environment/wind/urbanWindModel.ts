@@ -34,11 +34,18 @@ export const WIND_MODEL_CONFIG = {
   shelterModelBaseConfidence: 0.68,
 } as const;
 
-type BuildingShape = {
+export type BuildingShape = {
   building: Building;
   centroid: ProjectedPoint;
   points: ProjectedPoint[];
   heightMeters: number | null;
+};
+
+export type PreparedWindBuildingContext = {
+  projectionOrigin: import("@/lib/geo/types").Coordinate;
+  shapes: BuildingShape[];
+  index: Map<string, BuildingShape[]>;
+  cellSizeMeters: number;
 };
 
 export class HeuristicUrbanWindModel implements UrbanWindModel {
@@ -47,7 +54,10 @@ export class HeuristicUrbanWindModel implements UrbanWindModel {
     regionalWind: WindState,
     context: UrbanWindContext,
   ): SegmentWind {
-    const projection = createLocalProjection(context.projectionOrigin);
+    const prepared = isPreparedWindBuildingContext(context.preparedBuildingContext)
+      ? context.preparedBuildingContext
+      : prepareWindBuildingContext(context.buildings, context.projectionOrigin);
+    const projection = createLocalProjection(prepared.projectionOrigin);
     const segmentStart = segment.geometry.coordinates[0] as [number, number];
     const segmentEnd = segment.geometry.coordinates[1] as [number, number];
     const start = projection.project({ longitude: segmentStart[0], latitude: segmentStart[1] });
@@ -56,11 +66,10 @@ export class HeuristicUrbanWindModel implements UrbanWindModel {
     const segmentVector = normalizeVector([end[0] - start[0], end[1] - start[1]]);
     const leftNormal: ProjectedPoint = [-segmentVector[1], segmentVector[0]];
     const windFromVector = bearingVector(regionalWind.directionFromDeg);
-    const buildingShapes = context.buildings.flatMap((building) =>
-      projectBuilding(building, context.projectionOrigin),
-    );
-    const nearbyBuildings = buildingShapes.filter(
-      (shape) => distance(midpoint, shape.centroid) <= WIND_MODEL_CONFIG.nearbyBuildingRadiusMeters,
+    const nearbyBuildings = queryPreparedWindBuildings(
+      prepared,
+      midpoint,
+      WIND_MODEL_CONFIG.nearbyBuildingRadiusMeters,
     );
     const components = calculateWindComponents({
       pedestrianBearingDeg: segment.bearingDegrees,
@@ -120,6 +129,53 @@ export class HeuristicUrbanWindModel implements UrbanWindModel {
       estimatedExitTime: segment.estimatedExitTime,
     };
   }
+}
+
+export function prepareWindBuildingContext(
+  buildings: Building[],
+  projectionOrigin: import("@/lib/geo/types").Coordinate,
+): PreparedWindBuildingContext {
+  const shapes = buildings.flatMap((building) => projectBuilding(building, projectionOrigin));
+  const cellSizeMeters = Math.max(
+    WIND_MODEL_CONFIG.nearbyBuildingRadiusMeters,
+    WIND_MODEL_CONFIG.unknownHeightInfluenceMeters,
+  );
+  const index = new Map<string, BuildingShape[]>();
+
+  for (const shape of shapes) {
+    const key = gridKey(shape.centroid, cellSizeMeters);
+    const bucket = index.get(key);
+    if (bucket) {
+      bucket.push(shape);
+    } else {
+      index.set(key, [shape]);
+    }
+  }
+
+  return {
+    projectionOrigin,
+    shapes,
+    index,
+    cellSizeMeters,
+  };
+}
+
+export function queryPreparedWindBuildings(
+  context: PreparedWindBuildingContext,
+  point: ProjectedPoint,
+  radiusMeters: number,
+) {
+  const radiusCells = Math.ceil(radiusMeters / context.cellSizeMeters);
+  const centerCell = gridCell(point, context.cellSizeMeters);
+  const nearby: BuildingShape[] = [];
+
+  for (let x = centerCell[0] - radiusCells; x <= centerCell[0] + radiusCells; x += 1) {
+    for (let y = centerCell[1] - radiusCells; y <= centerCell[1] + radiusCells; y += 1) {
+      nearby.push(...(context.index.get(`${x}:${y}`) ?? []));
+    }
+  }
+
+  return nearby.filter((shape) => distance(point, shape.centroid) <= radiusMeters);
 }
 
 export function calculateShelterFactor({
@@ -190,6 +246,54 @@ export function calculateUnknownHeightInfluence(segment: TimedRouteSegment, buil
   }, 0);
 
   return segment.distanceMeters * strongestInfluence;
+}
+
+export function calculateUnknownHeightInfluenceFromPreparedContext(
+  segment: TimedRouteSegment,
+  context: PreparedWindBuildingContext,
+) {
+  const projection = createLocalProjection(context.projectionOrigin);
+  const segmentStart = projection.project({
+    longitude: segment.geometry.coordinates[0][0],
+    latitude: segment.geometry.coordinates[0][1],
+  });
+  const segmentEnd = projection.project({
+    longitude: segment.geometry.coordinates[1][0],
+    latitude: segment.geometry.coordinates[1][1],
+  });
+  const midpoint: ProjectedPoint = [
+    (segmentStart[0] + segmentEnd[0]) / 2,
+    (segmentStart[1] + segmentEnd[1]) / 2,
+  ];
+  const nearbyUnknownBuildings = queryPreparedWindBuildings(
+    context,
+    midpoint,
+    WIND_MODEL_CONFIG.unknownHeightInfluenceMeters,
+  ).filter((shape) => !shape.heightMeters);
+
+  const strongestInfluence = nearbyUnknownBuildings.reduce((strongest, shape) => {
+    const distanceToSegment = pointToSegmentDistance(shape.centroid, segmentStart, segmentEnd);
+    if (distanceToSegment > WIND_MODEL_CONFIG.unknownHeightInfluenceMeters) return strongest;
+
+    const distanceWeight = clamp01(
+      1 - distanceToSegment / WIND_MODEL_CONFIG.unknownHeightInfluenceMeters,
+    );
+    return Math.max(
+      strongest,
+      distanceWeight * WIND_MODEL_CONFIG.unknownHeightMaxSegmentPenalty,
+    );
+  }, 0);
+
+  return segment.distanceMeters * strongestInfluence;
+}
+
+function isPreparedWindBuildingContext(value: unknown): value is PreparedWindBuildingContext {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    Array.isArray((value as PreparedWindBuildingContext).shapes) &&
+    (value as PreparedWindBuildingContext).index instanceof Map
+  );
 }
 
 function calculateOpennessFactor({
@@ -316,6 +420,18 @@ function projectedWidth(points: ProjectedPoint[], axis: ProjectedPoint) {
   if (!points.length) return 0;
   const projections = points.map((point) => dot(point, axis));
   return Math.max(...projections) - Math.min(...projections);
+}
+
+function gridCell(point: ProjectedPoint, cellSizeMeters: number): [number, number] {
+  return [
+    Math.floor(point[0] / cellSizeMeters),
+    Math.floor(point[1] / cellSizeMeters),
+  ];
+}
+
+function gridKey(point: ProjectedPoint, cellSizeMeters: number) {
+  const [x, y] = gridCell(point, cellSizeMeters);
+  return `${x}:${y}`;
 }
 
 function normalizeVector(point: ProjectedPoint): ProjectedPoint {

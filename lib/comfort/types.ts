@@ -1,6 +1,8 @@
 import type { FeatureCollection, LineString } from "geojson";
 import type { ShadeAnalysisResult } from "@/lib/environment/shade/types";
 import type { WindAnalysisResult } from "@/lib/environment/wind/types";
+import type { RainAnalysisResult } from "@/lib/environment/rain/types";
+import type { HeatAnalysisResult } from "@/lib/environment/heat/types";
 import type { LineStringGeometry } from "@/lib/geo/types";
 import type { RouteResult } from "@/lib/routing/types";
 import type { WeatherBundle } from "@/lib/weather/types";
@@ -13,14 +15,18 @@ export type ComfortFactorType =
   | "headwind"
   | "crosswind"
   | "shade"
-  | "sun";
+  | "sun"
+  | "heat"
+  | "rain";
 
 export type SegmentComfortWeather = {
   temperatureC?: number | null;
   apparentTemperatureC?: number | null;
   relativeHumidity?: number | null;
   regionalWindSpeedMps?: number | null;
+  regionalWindDirectionDeg?: number | null;
   precipitationProbability?: number | null;
+  precipitationMmPerHour?: number | null;
   condition?: string | null;
   confidence: number;
   selectionMethod: "interpolated-hourly" | "nearest-hour" | "current" | "missing";
@@ -44,6 +50,25 @@ export type SegmentComfortInput = {
     shelterFactor: number;
     confidence: number;
   };
+  rain?: {
+    estimatedRainExposure: number;
+    precipitationIntensityMmPerHour?: number | null;
+    precipitationProbability?: number | null;
+    coveredRatio: number;
+    windDrivenExposureFactor: number;
+    confidence: number;
+  };
+  heat?: {
+    totalHeatExposureCost: number;
+    totalHeatExposureMinutesCost: number;
+    ambientHeatCost: number;
+    humidityCost: number;
+    solarExposureCost: number;
+    ventilationModifier: number;
+    shadeRatio: number | null;
+    directSunRatio: number | null;
+    confidence: number;
+  };
 };
 
 export type SegmentComfortResult = {
@@ -55,9 +80,13 @@ export type SegmentComfortResult = {
   estimatedPedestrianWindChillC: number | null;
   shadeRatio: number | null;
   estimatedWindExposureMps: number | null;
+  estimatedRainExposure: number | null;
+  estimatedHeatExposure: number | null;
   thermalCost: number;
   windCost: number;
   solarCost: number;
+  rainCost: number;
+  heatCost: number;
   comfortCostRate: number;
   totalComfortCost: number;
   contributions: {
@@ -68,6 +97,13 @@ export type SegmentComfortResult = {
     crosswind?: number;
     solarExposure?: number;
     winterSunBenefit?: number;
+    rainExposure?: number;
+    uncoveredRainExposure?: number;
+    windDrivenRain?: number;
+    heatAmbient?: number;
+    humidity?: number;
+    sunExposure?: number;
+    ventilationBenefit?: number;
   };
   confidence: number;
 };
@@ -85,6 +121,8 @@ export type RouteComfortSummary = {
   thermalExposure: number;
   windExposure: number;
   solarExposure: number;
+  rainExposure: number;
+  heatExposure: number;
   analyzedMeters: number;
   unknownMeters: number;
   confidence: number;
@@ -95,9 +133,13 @@ export type ComfortAnalysisCompleteness = {
   weatherAvailable: boolean;
   windAvailable: boolean;
   shadeAvailable: boolean;
+  rainAvailable: boolean;
+  heatAvailable: boolean;
   weatherWeight: number;
   windWeight: number;
   shadeWeight: number;
+  rainWeight: number;
+  heatWeight: number;
   analyzedWeight: number;
   comparable: boolean;
 };
@@ -125,6 +167,8 @@ export type ComfortAnalysisRequest = {
   weatherBundle?: WeatherBundle | null;
   shadeAnalysis?: ShadeAnalysisResult | null;
   windAnalysis?: WindAnalysisResult | null;
+  rainAnalysis?: RainAnalysisResult | null;
+  heatAnalysis?: HeatAnalysisResult | null;
   profile?: ComfortProfileId;
 };
 

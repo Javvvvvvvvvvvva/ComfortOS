@@ -16,9 +16,9 @@ const newsreader = Newsreader({
 });
 
 export const metadata: Metadata = {
-  title: "ComfortOS Stage 5",
+  title: "ComfortOS",
   description:
-    "A Minneapolis-first walking navigation foundation with real weather, building shade, estimated wind exposure, and bounded comfort-aware candidate generation.",
+    "Walking routes informed by current outdoor conditions, estimated exposure, and location capabilities.",
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg",

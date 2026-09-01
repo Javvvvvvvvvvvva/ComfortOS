@@ -1,0 +1,7 @@
+{
+  "id": "minneapolis-validation",
+  "label": "Minneapolis validation region",
+  "bbox": [-93.33, 44.93, -93.2, 45.02],
+  "description": "Covers the Stage 5.5 18-route validation suite, including downtown Minneapolis, University of Minnesota, Mississippi river corridors, residential routes, and bridge/open route samples.",
+  "paddingDegrees": 0.003
+}

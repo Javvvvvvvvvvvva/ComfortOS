@@ -9,7 +9,7 @@ export async function requestWeatherBundle(
   url.searchParams.set("lat", String(coordinate.latitude));
   url.searchParams.set("lon", String(coordinate.longitude));
 
-  const response = await fetch(url, { signal });
+  const response = await fetch(url, { signal, cache: "no-store" });
   const payload = (await response.json()) as {
     weather?: WeatherBundle;
     error?: string;

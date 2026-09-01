@@ -1,0 +1,110 @@
+[
+  {
+    "id": "pike-place-slu",
+    "label": "Pike Place to South Lake Union",
+    "origin": { "latitude": 47.6097, "longitude": -122.3425 },
+    "destination": { "latitude": 47.6231, "longitude": -122.3384 }
+  },
+  {
+    "id": "waterfront-pioneer-square",
+    "label": "Waterfront to Pioneer Square",
+    "origin": { "latitude": 47.6062, "longitude": -122.3402 },
+    "destination": { "latitude": 47.6017, "longitude": -122.3343 }
+  },
+  {
+    "id": "belltown-westlake",
+    "label": "Belltown to Westlake",
+    "origin": { "latitude": 47.6159, "longitude": -122.3468 },
+    "destination": { "latitude": 47.6117, "longitude": -122.3371 }
+  },
+  {
+    "id": "capitol-hill-downtown",
+    "label": "Capitol Hill to downtown",
+    "origin": { "latitude": 47.6146, "longitude": -122.3196 },
+    "destination": { "latitude": 47.609, "longitude": -122.3352 }
+  },
+  {
+    "id": "cal-anderson-convention-center",
+    "label": "Cal Anderson to Convention Center",
+    "origin": { "latitude": 47.617, "longitude": -122.3192 },
+    "destination": { "latitude": 47.6116, "longitude": -122.3319 }
+  },
+  {
+    "id": "slu-capitol-hill",
+    "label": "South Lake Union to Capitol Hill",
+    "origin": { "latitude": 47.6232, "longitude": -122.3382 },
+    "destination": { "latitude": 47.6183, "longitude": -122.3214 }
+  },
+  {
+    "id": "uw-quad-udistrict",
+    "label": "University of Washington Quad to U District",
+    "origin": { "latitude": 47.6576, "longitude": -122.3078 },
+    "destination": { "latitude": 47.6613, "longitude": -122.3132 }
+  },
+  {
+    "id": "udistrict-ravenna-edge",
+    "label": "University District to Ravenna edge",
+    "origin": { "latitude": 47.6606, "longitude": -122.3135 },
+    "destination": { "latitude": 47.6672, "longitude": -122.3045 }
+  },
+  {
+    "id": "seattle-center-belltown",
+    "label": "Seattle Center to Belltown",
+    "origin": { "latitude": 47.6205, "longitude": -122.3493 },
+    "destination": { "latitude": 47.6136, "longitude": -122.345 }
+  },
+  {
+    "id": "olympic-sculpture-pike",
+    "label": "Olympic Sculpture Park to Pike Place",
+    "origin": { "latitude": 47.6166, "longitude": -122.3554 },
+    "destination": { "latitude": 47.6095, "longitude": -122.3422 }
+  },
+  {
+    "id": "pioneer-square-downtown-library",
+    "label": "Pioneer Square to Central Library",
+    "origin": { "latitude": 47.6019, "longitude": -122.3334 },
+    "destination": { "latitude": 47.6067, "longitude": -122.3325 }
+  },
+  {
+    "id": "ferry-terminal-retail-core",
+    "label": "Ferry terminal to retail core",
+    "origin": { "latitude": 47.6028, "longitude": -122.3392 },
+    "destination": { "latitude": 47.6119, "longitude": -122.3367 }
+  },
+  {
+    "id": "first-hill-westlake",
+    "label": "First Hill to Westlake",
+    "origin": { "latitude": 47.6085, "longitude": -122.3247 },
+    "destination": { "latitude": 47.6119, "longitude": -122.3372 }
+  },
+  {
+    "id": "slu-waterfront",
+    "label": "South Lake Union to waterfront",
+    "origin": { "latitude": 47.623, "longitude": -122.3346 },
+    "destination": { "latitude": 47.6099, "longitude": -122.3465 }
+  },
+  {
+    "id": "capitol-hill-belltown",
+    "label": "Capitol Hill to Belltown",
+    "origin": { "latitude": 47.6184, "longitude": -122.3214 },
+    "destination": { "latitude": 47.6154, "longitude": -122.3468 }
+  },
+  {
+    "id": "downtown-grid-short",
+    "label": "Downtown dense grid short route",
+    "origin": { "latitude": 47.6074, "longitude": -122.3362 },
+    "destination": { "latitude": 47.6134, "longitude": -122.3338 }
+  },
+  {
+    "id": "waterfront-open-short",
+    "label": "Waterfront open exposure short route",
+    "origin": { "latitude": 47.6047, "longitude": -122.3393 },
+    "destination": { "latitude": 47.6104, "longitude": -122.3443 }
+  },
+  {
+    "id": "commercial-core-covered-audit",
+    "label": "Commercial core covered-feature audit",
+    "origin": { "latitude": 47.6109, "longitude": -122.3371 },
+    "destination": { "latitude": 47.6087, "longitude": -122.3336 }
+  }
+]

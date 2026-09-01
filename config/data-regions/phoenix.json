@@ -1,0 +1,9 @@
+{
+  "id": "phoenix",
+  "label": "Phoenix validation region",
+  "bbox": [-112.115, 33.425, -112.045, 33.535],
+  "notes": [
+    "Covers Downtown Phoenix, ASU Downtown, Roosevelt Row, Midtown, Central Avenue corridor, and representative open/low-shade corridors.",
+    "Intentionally bounded for Stage 9 validation; does not ingest all Arizona."
+  ]
+}

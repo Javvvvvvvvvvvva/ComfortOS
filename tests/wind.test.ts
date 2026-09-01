@@ -4,7 +4,11 @@ import type { Polygon } from "geojson";
 import type { Building, BuildingProvider } from "@/lib/environment/buildings/types";
 import { createLocalProjection } from "@/lib/environment/shade/projection";
 import type { TimedRouteSegment } from "@/lib/environment/shade/types";
-import { HeuristicUrbanWindModel } from "@/lib/environment/wind/urbanWindModel";
+import {
+  HeuristicUrbanWindModel,
+  prepareWindBuildingContext,
+  queryPreparedWindBuildings,
+} from "@/lib/environment/wind/urbanWindModel";
 import { WindAnalysisService } from "@/lib/environment/wind/windService";
 import {
   calculateWindComponents,
@@ -185,6 +189,41 @@ test("street canyon aligned with wind applies capped channeling", () => {
   assert.ok(wind.opennessFactor < 0.5);
   assert.ok(wind.channelingFactor > 1);
   assert.ok(wind.channelingFactor <= 1.12);
+});
+
+test("prepared wind building context returns only nearby indexed buildings", () => {
+  const projection = createLocalProjection(ORIGIN);
+  const context = prepareWindBuildingContext(
+    [
+      makeBuilding("near", -8, 18, 8, 30, 18),
+      makeBuilding("far", 500, 500, 530, 530, 18),
+    ],
+    ORIGIN,
+  );
+  const nearby = queryPreparedWindBuildings(context, projection.project(ORIGIN), 60);
+
+  assert.deepEqual(
+    nearby.map((shape) => shape.building.id),
+    ["near"],
+  );
+});
+
+test("prepared wind building context preserves shelter estimate", () => {
+  const model = new HeuristicUrbanWindModel();
+  const segment = makeSegment(-20, 0, 20, 0, 40, 90);
+  const buildings = [makeBuilding("upwind", -8, 18, 8, 30, 18)];
+  const direct = model.estimateSegmentWind(segment, northWind(), {
+    buildings,
+    projectionOrigin: ORIGIN,
+  });
+  const prepared = model.estimateSegmentWind(segment, northWind(), {
+    buildings,
+    projectionOrigin: ORIGIN,
+    preparedBuildingContext: prepareWindBuildingContext(buildings, ORIGIN),
+  });
+
+  assert.equal(prepared.shelterFactor, direct.shelterFactor);
+  assert.equal(prepared.estimatedExposureMps, direct.estimatedExposureMps);
 });
 
 test("channeling only applies for aligned canyon conditions", () => {

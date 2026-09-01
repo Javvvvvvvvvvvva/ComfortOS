@@ -6,6 +6,7 @@ import type { ComfortRouteComparisonResult } from "@/lib/comfort-routing/types";
 
 export async function requestFastestWalkingRoute(
   request: RouteRequest,
+  signal?: AbortSignal,
 ): Promise<RouteResult> {
   const response = await fetch("/api/routes/walking", {
     method: "POST",
@@ -13,6 +14,8 @@ export async function requestFastestWalkingRoute(
       "content-type": "application/json",
     },
     body: JSON.stringify(request),
+    signal,
+    cache: "no-store",
   });
 
   const payload = (await response.json()) as { route?: RouteResult; error?: string };
@@ -26,6 +29,7 @@ export async function requestFastestWalkingRoute(
 
 export async function requestComfortRouteComparison(
   request: ComfortRouteComparisonRequest,
+  signal?: AbortSignal,
 ): Promise<ComfortRouteComparisonResult> {
   const response = await fetch("/api/routes/comfort-comparison", {
     method: "POST",
@@ -33,6 +37,8 @@ export async function requestComfortRouteComparison(
       "content-type": "application/json",
     },
     body: JSON.stringify(request),
+    signal,
+    cache: "no-store",
   });
 
   const payload = (await response.json()) as {

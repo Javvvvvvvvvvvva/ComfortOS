@@ -24,7 +24,9 @@ export function EnvironmentSummary({ weather, state }: EnvironmentSummaryProps) 
   return (
     <div className="weather-summary" aria-live="polite">
       <p className="eyebrow">Live weather</p>
-      {state === "error" ? (
+      {state === "idle" && !weather ? (
+        <strong>Select an origin</strong>
+      ) : state === "error" ? (
         <strong>Live conditions unavailable</strong>
       ) : (
         <>

@@ -7,7 +7,8 @@
   --text-primary: #14181c;
   --text-secondary: #6b665c;
   --divider: #e4dfd6;
-  --route-comfort: #4f8b85;
+  --route-comfort: #427670;
+  --focus-ring: #174f78;
   --route-fastest: #6b665c;
   --route-origin: #e8a33d;
   --route-destination: #d97757;
@@ -36,6 +37,13 @@ body {
 
 button {
   font: inherit;
+}
+
+button:focus-visible,
+input:focus-visible,
+[role="option"]:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
 }
 
 .app-shell {
@@ -194,7 +202,7 @@ button {
 }
 
 .search-row input:focus {
-  outline-color: rgba(79, 139, 133, 0.38);
+  outline-color: var(--focus-ring);
 }
 
 .location-action {
@@ -246,7 +254,8 @@ button {
 
 .place-result:focus,
 .place-result:hover {
-  outline: 2px solid rgba(79, 139, 133, 0.38);
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
 }
 
 .place-result span {
@@ -466,6 +475,38 @@ button {
   line-height: 1.28;
 }
 
+.comfort-progress {
+  display: grid;
+  gap: 4px;
+  border-left: 3px solid var(--route-comfort);
+  border-radius: 10px;
+  background: rgba(79, 139, 133, 0.1);
+  padding: 10px 12px;
+}
+
+.comfort-progress.limited {
+  border-left-color: #b87936;
+  background: rgba(184, 121, 54, 0.12);
+}
+
+.comfort-progress.complete {
+  background: rgba(79, 139, 133, 0.14);
+}
+
+.comfort-progress strong {
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.comfort-progress span {
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.32;
+}
+
 .error-message {
   margin: 10px 0 0;
   border-radius: 10px;
@@ -501,6 +542,19 @@ button {
   -webkit-line-clamp: 2;
 }
 
+.weather-alert .eyebrow {
+  color: #8f3429;
+  -webkit-line-clamp: initial;
+}
+
+.environment-disclaimer {
+  margin: 10px 2px 0;
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
 .shade-estimate {
   display: grid;
   gap: 4px;
@@ -534,7 +588,7 @@ button {
 
 .action-row {
   display: grid;
-  grid-template-columns: minmax(84px, 0.34fr) 1fr;
+  grid-template-columns: minmax(74px, 0.32fr) 1fr;
   gap: 10px;
   margin-top: 14px;
 }

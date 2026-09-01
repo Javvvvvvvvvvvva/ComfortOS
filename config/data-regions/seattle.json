@@ -1,0 +1,9 @@
+{
+  "id": "seattle",
+  "label": "Seattle validation region",
+  "bbox": [-122.42, 47.58, -122.27, 47.68],
+  "notes": [
+    "Covers downtown Seattle, Belltown, Capitol Hill, South Lake Union, University District, and central waterfront pedestrian corridors.",
+    "Intentionally bounded for Stage 8 validation; does not ingest all Washington state."
+  ]
+}
