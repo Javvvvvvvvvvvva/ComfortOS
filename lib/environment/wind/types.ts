@@ -74,6 +74,8 @@ export type WindAnalysisRequest = {
   weatherCoordinate?: Coordinate;
   weatherBundle?: WeatherBundle;
   buildings?: Building[];
+  projectionOrigin?: Coordinate;
+  preparedBuildingContext?: unknown;
   includeDebug?: boolean;
 };
 

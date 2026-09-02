@@ -26,6 +26,7 @@ import {
   HeuristicUrbanWindModel,
   WIND_MODEL_CONFIG,
   calculateUnknownHeightInfluenceFromPreparedContext,
+  isPreparedWindBuildingContext,
   prepareWindBuildingContext,
 } from "@/lib/environment/wind/urbanWindModel";
 import { bearingVector, selectWindStateForTime } from "@/lib/environment/wind/windVector";
@@ -50,7 +51,7 @@ export class WindAnalysisService {
 
     const routeGeometry = request.route.geometry;
     const bounds = boundsForLineString(routeGeometry);
-    const projectionOrigin = boundsCenter(bounds);
+    const projectionOrigin = request.projectionOrigin ?? boundsCenter(bounds);
     const weatherCoordinate = request.weatherCoordinate ?? projectionOrigin;
     const [buildings, weatherBundle] = await Promise.all([
       request.buildings ?? this.getBuildings(bounds),
@@ -65,7 +66,11 @@ export class WindAnalysisService {
       type: "LineString",
       coordinates: routeGeometry.coordinates,
     });
-    const preparedBuildingContext = prepareWindBuildingContext(buildings, projectionOrigin);
+    const preparedBuildingContext = isPreparedWindBuildingContext(
+      request.preparedBuildingContext,
+    )
+      ? request.preparedBuildingContext
+      : prepareWindBuildingContext(buildings, projectionOrigin);
 
     const segmentWind = segments.map((segment) => {
       const windState = selectWindStateForTime(weatherBundle, segment.estimatedMidpointTime);
@@ -158,29 +163,30 @@ export function summarizeRouteWind({
   buildings: Building[];
   unknownMeters: number;
 }): { summary: RouteWindSummary; coverage: WindCoverage; quality: WindQuality } {
+  const routeSegmentById = new Map(segments.map((segment) => [segment.id, segment]));
   const distanceWeighted = (selector: (segment: SegmentWind) => number) =>
     segmentWind.reduce((sum, segment) => {
-      const routeSegment = segments.find((item) => item.id === segment.segmentId);
+      const routeSegment = routeSegmentById.get(segment.segmentId);
       return sum + selector(segment) * (routeSegment?.distanceMeters ?? 0);
     }, 0) / Math.max(1, routeMeters);
   const knownSegmentMeters = (segment: SegmentWind, routeSegment?: TimedRouteSegment) =>
     Math.max(0, (routeSegment?.distanceMeters ?? 0) - segment.unknownMeters);
   const shelteredMeters = segmentWind.reduce((sum, segment) => {
-    const routeSegment = segments.find((item) => item.id === segment.segmentId);
+    const routeSegment = routeSegmentById.get(segment.segmentId);
     return (
       sum +
       (segment.classification === "sheltered" ? knownSegmentMeters(segment, routeSegment) : 0)
     );
   }, 0);
   const neutralMeters = segmentWind.reduce((sum, segment) => {
-    const routeSegment = segments.find((item) => item.id === segment.segmentId);
+    const routeSegment = routeSegmentById.get(segment.segmentId);
     return (
       sum +
       (segment.classification === "neutral" ? knownSegmentMeters(segment, routeSegment) : 0)
     );
   }, 0);
   const exposedMeters = segmentWind.reduce((sum, segment) => {
-    const routeSegment = segments.find((item) => item.id === segment.segmentId);
+    const routeSegment = routeSegmentById.get(segment.segmentId);
     return (
       sum +
       (segment.classification === "exposed" ? knownSegmentMeters(segment, routeSegment) : 0)

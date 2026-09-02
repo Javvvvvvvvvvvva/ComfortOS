@@ -8,7 +8,11 @@ import {
 } from "@/lib/environment/buildings/providers/overpassBuildingProvider";
 import { calculateSolarPosition } from "@/lib/environment/solar/solarPositionEngine";
 import { createLocalProjection } from "@/lib/environment/shade/projection";
-import { calculateBuildingShadow } from "@/lib/environment/shade/shadowEngine";
+import {
+  BuildingShadowEngine,
+  calculateBuildingShadow,
+  prepareShadowBuildingContext,
+} from "@/lib/environment/shade/shadowEngine";
 import {
   calculateSegmentShade,
   calculateUnknownHeightMeters,
@@ -103,6 +107,71 @@ test("generates longer building shadows for taller buildings and lower sun", () 
 
   assert.ok(shadowWidthMeters(tallShadow.geometry as Polygon) > shadowWidthMeters(shortShadow.geometry as Polygon));
   assert.ok(shadowWidthMeters(highSunShadow.geometry as Polygon) < shadowWidthMeters(tallShadow.geometry as Polygon));
+});
+
+test("prepared shadow building context preserves exact shadow geometry", () => {
+  const buildings = [makeFixtureBuilding(10), makeFixtureBuilding(20)];
+  const solar: SolarPosition = {
+    azimuthDeg: 246,
+    elevationDeg: 38,
+    timestamp: "2026-08-08T23:00:00.000Z",
+    sunAboveHorizon: true,
+  };
+  const engine = new BuildingShadowEngine();
+
+  const direct = engine.calculateBuildingShadows(buildings, solar, ORIGIN);
+  const prepared = engine.calculateBuildingShadows(
+    buildings,
+    solar,
+    ORIGIN,
+    prepareShadowBuildingContext(buildings, ORIGIN),
+  );
+
+  assert.deepEqual(prepared, direct);
+});
+
+test("targeted shadow generation preserves intersecting results and skips distant buildings", () => {
+  const near = makeFixtureBuildingAt("near", 20, 0, 0);
+  const far = makeFixtureBuildingAt("far", 20, 2_000, 2_000);
+  const buildings = [near, far];
+  const solar: SolarPosition = {
+    azimuthDeg: 270,
+    elevationDeg: 45,
+    timestamp: "2026-08-08T23:00:00.000Z",
+    sunAboveHorizon: true,
+  };
+  const target = makeSegment(-10, 5, 40, 5, 50).geometry;
+  const engine = new BuildingShadowEngine();
+  const prepared = prepareShadowBuildingContext(buildings, ORIGIN);
+
+  const all = engine.calculateBuildingShadows(buildings, solar, ORIGIN, prepared);
+  const targeted = engine.calculateBuildingShadows(
+    buildings,
+    solar,
+    ORIGIN,
+    prepared,
+    target,
+  );
+
+  assert.deepEqual(
+    targeted.shadows,
+    all.shadows.filter((shadow) => shadow.buildingId === "near"),
+  );
+});
+
+test("shade bbox prefilter preserves exact results with distant shadows", () => {
+  const segment = makeSegment(0, 5, 100, 5, 100);
+  const intersecting = makeShadow("near", makeRectangle(20, 0, 60, 10));
+  const distant = makeShadow("far", makeRectangle(2_000, 2_000, 2_050, 2_050));
+
+  const [withDistantShadow] = calculateSegmentShade(
+    [segment],
+    [intersecting, distant],
+    ORIGIN,
+  );
+  const [withoutDistantShadow] = calculateSegmentShade([segment], [intersecting], ORIGIN);
+
+  assert.deepEqual(withDistantShadow, withoutDistantShadow);
 });
 
 test("calculates segment shade from shadow geometry", () => {
@@ -318,20 +387,29 @@ test("sun below horizon is explicit", () => {
 });
 
 function makeFixtureBuilding(heightMeters: number | null): Building {
+  return makeFixtureBuildingAt(`building-${heightMeters ?? "unknown"}`, heightMeters, 0, 0);
+}
+
+function makeFixtureBuildingAt(
+  id: string,
+  heightMeters: number | null,
+  offsetX: number,
+  offsetY: number,
+): Building {
   const projection = createLocalProjection(ORIGIN);
   const ring = [
-    [0, 0],
-    [10, 0],
-    [10, 10],
-    [0, 10],
-    [0, 0],
+    [offsetX, offsetY],
+    [offsetX + 10, offsetY],
+    [offsetX + 10, offsetY + 10],
+    [offsetX, offsetY + 10],
+    [offsetX, offsetY],
   ].map(([x, y]) => {
     const coordinate = projection.unproject([x, y]);
     return [coordinate.longitude, coordinate.latitude] as [number, number];
   });
 
   return {
-    id: `building-${heightMeters ?? "unknown"}`,
+    id,
     footprint: { type: "Polygon", coordinates: [ring] },
     heightMeters,
     minHeightMeters: null,

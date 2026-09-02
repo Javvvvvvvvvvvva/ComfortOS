@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { ComfortMap } from "./ComfortMap";
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import type { Coordinate } from "@/lib/geo/types";
 import type { RouteResult } from "@/lib/routing/types";
 import { formatCoordinate, formatDistance, formatDuration } from "@/lib/geo/format";
@@ -41,6 +41,11 @@ import { EnvironmentSummary } from "./EnvironmentSummary";
 import { decideRoutingContext } from "@/lib/comfort-routing/contextualMode";
 import { explainComfortRoute } from "@/lib/comfort-routing/explanations";
 import { createRouteEvent, type ComfortRouteEvent } from "@/lib/comfort-routing/events";
+
+const ComfortMap = lazy(async () => {
+  const loaded = await import("./ComfortMap");
+  return { default: loaded.ComfortMap };
+});
 
 type SelectionMode = "origin" | "destination";
 type RouteState = "idle" | "loading" | "success" | "error";
@@ -593,26 +598,30 @@ export function ComfortOSApp() {
 
   return (
     <main className="app-shell">
-      <ComfortMap
-        origin={originCoordinate}
-        destination={destinationCoordinate}
-        routeGeometry={route?.geometry ?? null}
-        comparisonRouteGeometries={comparisonRouteGeometries}
-        shadeAnalysis={shadeAnalysis}
-        windAnalysis={windAnalysis}
-        rainAnalysis={rainAnalysis}
-        heatAnalysis={heatAnalysis}
-        comfortAnalysis={comfortAnalysis}
-        showShadeDebug={showShadeDebug}
-        showWindDebug={showWindDebug}
-        showRainDebug={showRainDebug}
-        showHeatDebug={showHeatDebug}
-        showComfortDebug={showComfortDebug}
-        selectionMode={selectionMode}
-        focusCoordinate={focusCoordinate}
-        onMapSelect={handleMapSelect}
-        onViewportCenterChange={setMapViewportCenter}
-      />
+      <Suspense
+        fallback={<div className="map-shell map-loading" role="status" aria-label="Loading map" />}
+      >
+        <ComfortMap
+          origin={originCoordinate}
+          destination={destinationCoordinate}
+          routeGeometry={route?.geometry ?? null}
+          comparisonRouteGeometries={comparisonRouteGeometries}
+          shadeAnalysis={shadeAnalysis}
+          windAnalysis={windAnalysis}
+          rainAnalysis={rainAnalysis}
+          heatAnalysis={heatAnalysis}
+          comfortAnalysis={comfortAnalysis}
+          showShadeDebug={showShadeDebug}
+          showWindDebug={showWindDebug}
+          showRainDebug={showRainDebug}
+          showHeatDebug={showHeatDebug}
+          showComfortDebug={showComfortDebug}
+          selectionMode={selectionMode}
+          focusCoordinate={focusCoordinate}
+          onMapSelect={handleMapSelect}
+          onViewportCenterChange={setMapViewportCenter}
+        />
+      </Suspense>
 
       <section className="top-chrome" aria-label="Current map context">
         <div className="top-title">
@@ -782,6 +791,13 @@ export function ComfortOSApp() {
             Outdoor conditions are estimates and can change. Official weather alerts take priority.
           </p>
         ) : null}
+
+        <nav className="product-links" aria-label="Privacy, terms, data sources, and support">
+          <Link href="/privacy">Privacy</Link>
+          <Link href="/terms">Terms</Link>
+          <Link href="/data-sources">Data</Link>
+          <Link href="/support">Support</Link>
+        </nav>
 
         {showRoutingDebug && routeComparison ? (
           <div className="shade-estimate">

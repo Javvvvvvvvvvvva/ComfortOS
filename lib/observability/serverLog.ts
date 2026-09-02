@@ -29,6 +29,9 @@ export function logServerEvent(
     timestamp: new Date().toISOString(),
     level,
     event,
+    service: "comfortos-web",
+    environment: process.env.COMFORTOS_ENVIRONMENT ?? process.env.NODE_ENV ?? "unknown",
+    release: process.env.APP_VERSION ?? "development",
     ...sanitizeServerLogFields(fields),
   });
 

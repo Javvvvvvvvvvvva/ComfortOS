@@ -4,6 +4,7 @@ import { createConfiguredGeocodingProvider } from "@/lib/geocoding/providers/con
 export type ReadinessSubsystem = {
   configured: boolean;
   productionReady: boolean;
+  required: boolean;
   mode: string;
 };
 
@@ -17,6 +18,8 @@ export type MvpReadiness = {
     coveredFeatures: ReadinessSubsystem;
     geocoding: ReadinessSubsystem;
     basemap: ReadinessSubsystem;
+    legal: ReadinessSubsystem;
+    observability: ReadinessSubsystem;
   };
 };
 
@@ -29,7 +32,9 @@ export function evaluateMvpReadiness(
     configured: weatherUserAgent.length > 0,
     productionReady:
       weatherUserAgent.length > 0 &&
-      !/replace-with|example\.com|stage 1/i.test(weatherUserAgent),
+      !/replace-with|example\.com|stage 1/i.test(weatherUserAgent) &&
+      /https?:\/\/|[^\s@]+@[^\s@]+\.[^\s@]+/.test(weatherUserAgent),
+    required: true,
     mode: "nws",
   };
   const buildingMode = env.BUILDING_PROVIDER ?? "overpass";
@@ -40,24 +45,60 @@ export function evaluateMvpReadiness(
       isHttpUrl(buildingServiceUrl),
     productionReady:
       (buildingMode === "http-overture" || buildingMode === "building-query-service") &&
-      isProductionUrl(buildingServiceUrl),
+      isProductionUrl(buildingServiceUrl) &&
+      Boolean(env.BUILDING_QUERY_SERVICE_TOKEN?.trim()),
+    required: true,
     mode: buildingMode,
   };
   const coveredMode = env.COVERED_FEATURE_PROVIDER ?? "disabled";
+  const rainCoverRequired = env.REQUIRE_RAIN_COVER === "true";
+  const coveredServiceReady =
+    coveredMode === "covered-query-service" &&
+    isProductionUrl(env.COVERED_FEATURE_QUERY_SERVICE_URL ?? "") &&
+    Boolean(env.COVERED_FEATURE_QUERY_SERVICE_TOKEN?.trim());
   const coveredFeatures = {
     configured:
-      coveredMode === "static-osm" && Boolean(env.COVERED_FEATURE_STATIC_GEOJSON),
-    productionReady: false,
+      (coveredMode === "static-osm" && Boolean(env.COVERED_FEATURE_STATIC_GEOJSON)) ||
+      coveredServiceReady,
+    productionReady: !rainCoverRequired || coveredServiceReady,
+    required: rainCoverRequired,
     mode: coveredMode,
   };
   const geocoding = evaluateGeocoding(env);
+  const basemapMode = env.NEXT_PUBLIC_BASEMAP_PROVIDER ?? "osm-community";
   const tileUrl = env.NEXT_PUBLIC_MAP_TILE_URL_TEMPLATE ??
     "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
+  const managedMapboxReady =
+    basemapMode === "mapbox-managed" && Boolean(env.MAPBOX_ACCESS_TOKEN?.trim());
+  const customBasemapReady =
+    basemapMode === "custom" &&
+    isProductionUrl(tileUrl) &&
+    !/tile\.openstreetmap\.org/i.test(tileUrl);
   const basemap = {
-    configured: isHttpUrl(tileUrl),
-    productionReady:
-      isProductionUrl(tileUrl) && !/tile\.openstreetmap\.org/i.test(tileUrl),
-    mode: /tile\.openstreetmap\.org/i.test(tileUrl) ? "public-community" : "configured",
+    configured: managedMapboxReady || isHttpUrl(tileUrl),
+    productionReady: managedMapboxReady || customBasemapReady,
+    required: true,
+    mode: managedMapboxReady
+      ? "mapbox-managed"
+      : /tile\.openstreetmap\.org/i.test(tileUrl)
+        ? "public-community"
+        : basemapMode,
+  };
+  const supportUrl = env.NEXT_PUBLIC_SUPPORT_URL?.trim() ?? "";
+  const legalReviewApproved = env.LEGAL_REVIEW_APPROVED === "true";
+  const legal = {
+    configured: Boolean(supportUrl) && env.LEGAL_REVIEW_APPROVED !== undefined,
+    productionReady: isProductionUrl(supportUrl) && legalReviewApproved,
+    required: true,
+    mode: legalReviewApproved ? "review-approved" : "review-pending",
+  };
+  const observabilityProvider = env.OBSERVABILITY_PROVIDER?.trim() ?? "console";
+  const alertsConfigured = env.OBSERVABILITY_ALERTS_CONFIGURED === "true";
+  const observability = {
+    configured: observabilityProvider !== "console",
+    productionReady: observabilityProvider !== "console" && alertsConfigured,
+    required: true,
+    mode: observabilityProvider,
   };
 
   const subsystems = {
@@ -67,6 +108,8 @@ export function evaluateMvpReadiness(
     coveredFeatures,
     geocoding,
     basemap,
+    legal,
+    observability,
   };
   const ready = Object.values(subsystems).every((subsystem) => subsystem.productionReady);
 
@@ -85,12 +128,14 @@ function evaluateGeocoding(env: NodeJS.ProcessEnv): ReadinessSubsystem {
       productionReady:
         configured.metadata.productionEligible &&
         configured.metadata.mode !== "public-demo",
+      required: true,
       mode: configured.mode,
     };
   } catch {
     return {
       configured: false,
       productionReady: false,
+      required: true,
       mode: env.GEOCODING_PROVIDER ?? "unconfigured",
     };
   }
@@ -104,12 +149,14 @@ function evaluateRouting(env: NodeJS.ProcessEnv): ReadinessSubsystem {
       productionReady:
         configured.metadata.productionEligible &&
         configured.metadata.mode !== "public-demo",
+      required: true,
       mode: configured.mode,
     };
   } catch {
     return {
       configured: false,
       productionReady: false,
+      required: true,
       mode: env.ROUTING_PROVIDER ?? "unconfigured",
     };
   }

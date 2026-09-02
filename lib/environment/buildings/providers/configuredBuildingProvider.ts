@@ -34,7 +34,24 @@ export function createConfiguredBuildingProvider(): ConfiguredBuildingProvider {
     }
 
     return {
-      provider: new CachedBuildingProvider(new HttpBuildingProvider({ baseUrl: serviceUrl })),
+      provider: new CachedBuildingProvider(
+        new HttpBuildingProvider({
+          baseUrl: serviceUrl,
+          authToken: process.env.BUILDING_QUERY_SERVICE_TOKEN,
+          requestTimeoutMs: parsePositiveInteger(
+            process.env.BUILDING_QUERY_SERVICE_TIMEOUT_MS,
+            6_000,
+          ),
+          maxResponseBytes: parsePositiveInteger(
+            process.env.BUILDING_QUERY_SERVICE_MAX_RESPONSE_BYTES,
+            8 * 1024 * 1024,
+          ),
+          maxBuildings: parsePositiveInteger(
+            process.env.BUILDING_QUERY_SERVICE_MAX_BUILDINGS,
+            25_000,
+          ),
+        }),
+      ),
       mode: requestedMode === "http-overture" ? "http-overture" : "building-query-service",
     };
   }
@@ -97,4 +114,9 @@ export function assertNoFixtureBuildingProviderInProduction({
 
 function isFixtureStorePath(value: string) {
   return /(^|\/)(fixtures|test-fixtures|tests)(\/|$)/.test(value);
+}
+
+function parsePositiveInteger(value: string | undefined, fallback: number) {
+  const parsed = Number(value);
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : fallback;
 }

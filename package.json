@@ -1,5 +1,5 @@
 {
-  "name": "comfortos-stage-5",
+  "name": "comfortos",
   "version": "0.1.0",
   "private": true,
   "engines": {
@@ -20,6 +20,8 @@
     "data:buildings:phoenix": "node --import tsx scripts/build-overture-buildings.ts --region phoenix",
     "data:covered-features:overpass": "node --import tsx scripts/extract-covered-features-overpass.ts",
     "buildings:serve": "node --import tsx scripts/serve-building-query-service.ts",
+    "environment:serve": "node --import tsx scripts/serve-building-query-service.ts",
+    "environment:build": "esbuild scripts/serve-building-query-service.ts --bundle --platform=node --format=esm --target=node22 --tsconfig=tsconfig.json --outfile=dist-environment/service.mjs",
     "buildings:benchmark": "node --import tsx scripts/benchmark-building-providers.ts",
     "routes:validate:comfort": "node --import tsx scripts/validate-comfort-routes.ts",
     "routes:validate:comfort:local": "node --import tsx scripts/validate-comfort-routes-local.ts",
@@ -39,12 +41,12 @@
     "@types/suncalc": "^1.9.2",
     "drizzle-orm": "0.45.2",
     "maplibre-gl": "^6.2.0",
-    "react": "19.2.6",
-    "react-dom": "19.2.6",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
     "suncalc": "^2.0.1"
   },
   "devDependencies": {
-    "@cloudflare/vite-plugin": "1.37.1",
+    "@cloudflare/vite-plugin": "1.54.3",
     "@eslint/js": "9.39.4",
     "@next/eslint-plugin-next": "16.2.6",
     "@tailwindcss/postcss": "4.2.1",
@@ -52,20 +54,21 @@
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
     "@vitejs/plugin-react": "6.0.2",
-    "@vitejs/plugin-rsc": "0.5.26",
+    "@vitejs/plugin-rsc": "0.5.34",
     "drizzle-kit": "0.31.10",
     "eslint": "9.39.4",
     "eslint-plugin-jsx-a11y": "6.10.2",
     "eslint-plugin-react": "7.37.5",
     "eslint-plugin-react-hooks": "7.1.1",
     "globals": "16.4.0",
-    "react-server-dom-webpack": "19.2.6",
+    "react-server-dom-webpack": "19.2.8",
     "tailwindcss": "4.2.1",
+    "tsx": "^4.22.1",
     "typescript": "5.9.3",
     "typescript-eslint": "8.59.3",
-    "vinext": "1.0.0-beta.2",
-    "vite": "8.0.13",
-    "wrangler": "4.92.0"
+    "vinext": "1.0.0-beta.9",
+    "vite": "8.2.2",
+    "wrangler": "4.128.0"
   },
   "type": "module"
 }

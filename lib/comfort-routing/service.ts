@@ -1,6 +1,6 @@
 import { ComfortAnalysisService } from "@/lib/comfort/service";
 import type { ComfortAnalysisResult } from "@/lib/comfort/types";
-import { boundsForLineString } from "@/lib/environment/buildings/bounds";
+import { boundsCenter, boundsForLineString } from "@/lib/environment/buildings/bounds";
 import type {
   BoundingBox,
   Building,
@@ -18,9 +18,11 @@ import type { RainAnalysisResult } from "@/lib/environment/rain/types";
 import { HeatAnalysisService } from "@/lib/environment/heat/heatExposureEngine";
 import type { HeatAnalysisResult } from "@/lib/environment/heat/types";
 import type { ShadeAnalysisService } from "@/lib/environment/shade/service";
+import { prepareShadowBuildingContext } from "@/lib/environment/shade/shadowEngine";
 import type { ShadeAnalysisResult } from "@/lib/environment/shade/types";
 import type { WindAnalysisResult } from "@/lib/environment/wind/types";
 import type { WindAnalysisService } from "@/lib/environment/wind/windService";
+import { prepareWindBuildingContext } from "@/lib/environment/wind/urbanWindModel";
 import type { Coordinate } from "@/lib/geo/types";
 import {
   calculateCandidateDiversity,
@@ -180,6 +182,13 @@ export class ComfortRouteComparisonService {
     const buildingStartedAt = performance.now();
     const sharedBuildings = await this.getSharedBuildings(candidates, options.signal);
     performanceMs.buildingFetch = Math.round(performance.now() - buildingStartedAt);
+    const sharedProjectionOrigin = boundsCenter(unionRouteBounds(candidates));
+    const preparedShadowBuildingContext = sharedBuildings
+      ? prepareShadowBuildingContext(sharedBuildings, sharedProjectionOrigin)
+      : undefined;
+    const preparedWindBuildingContext = sharedBuildings
+      ? prepareWindBuildingContext(sharedBuildings, sharedProjectionOrigin)
+      : undefined;
     const buildingMetadataStartedAt = performance.now();
     const buildingMetadata = await this.getBuildingMetadata();
     performanceMs.buildingMetadata = Math.round(performance.now() - buildingMetadataStartedAt);
@@ -210,6 +219,9 @@ export class ComfortRouteComparisonService {
           weatherCoordinate: request.weatherCoordinate ?? request.origin,
           includeEnvironmentalDebug: request.includeEnvironmentalDebug ?? false,
           buildings: sharedBuildings,
+          projectionOrigin: sharedProjectionOrigin,
+          preparedShadowBuildingContext,
+          preparedWindBuildingContext,
           coveredFeatures: coveredFeatureResult.features,
           timing,
           signal: options.signal,
@@ -331,6 +343,9 @@ export class ComfortRouteComparisonService {
     weatherCoordinate,
     includeEnvironmentalDebug,
     buildings,
+    projectionOrigin,
+    preparedShadowBuildingContext,
+    preparedWindBuildingContext,
     coveredFeatures,
     timing,
     signal,
@@ -341,6 +356,9 @@ export class ComfortRouteComparisonService {
     weatherCoordinate: Coordinate;
     includeEnvironmentalDebug: boolean;
     buildings: Building[] | null;
+    projectionOrigin: Coordinate;
+    preparedShadowBuildingContext?: unknown;
+    preparedWindBuildingContext?: unknown;
     coveredFeatures: CoveredFeature[] | null;
     timing: CandidateTiming;
     signal?: AbortSignal;
@@ -352,6 +370,8 @@ export class ComfortRouteComparisonService {
             route: candidate,
             departureTime,
             buildings,
+            projectionOrigin,
+            preparedBuildingContext: preparedShadowBuildingContext,
             includeDebug: includeEnvironmentalDebug,
           }),
         )
@@ -364,6 +384,8 @@ export class ComfortRouteComparisonService {
             weatherCoordinate,
             weatherBundle,
             buildings,
+            projectionOrigin,
+            preparedBuildingContext: preparedWindBuildingContext,
             includeDebug: includeEnvironmentalDebug,
           }),
         )

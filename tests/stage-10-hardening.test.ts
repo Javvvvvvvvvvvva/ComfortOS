@@ -152,3 +152,39 @@ test("readiness accepts configured managed POI geocoding", () => {
   assert.equal(readiness.subsystems.geocoding.productionReady, true);
   assert.equal(readiness.subsystems.geocoding.mode, "mapbox-managed");
 });
+
+test("readiness accepts a managed Phoenix-primary provider set without rain-cover claims", () => {
+  const readiness = evaluateMvpReadiness({
+    NODE_ENV: "production",
+    ROUTING_PROVIDER: "mapbox-managed",
+    GEOCODING_PROVIDER: "mapbox-managed",
+    MAPBOX_ACCESS_TOKEN: "pk.test.mapbox-token",
+    NEXT_PUBLIC_BASEMAP_PROVIDER: "mapbox-managed",
+    WEATHER_USER_AGENT: "ComfortOS/1.0 (https://github.com/Javvvvvvvvvvvva/ComfortOS)",
+    BUILDING_PROVIDER: "building-query-service",
+    BUILDING_QUERY_SERVICE_URL: "https://environment.example.com",
+    BUILDING_QUERY_SERVICE_TOKEN: "private-service-token",
+    REQUIRE_RAIN_COVER: "false",
+    COVERED_FEATURE_PROVIDER: "disabled",
+    NEXT_PUBLIC_SUPPORT_URL: "https://github.com/Javvvvvvvvvvvva/ComfortOS/issues",
+    LEGAL_REVIEW_APPROVED: "true",
+    OBSERVABILITY_PROVIDER: "cloudflare",
+    OBSERVABILITY_ALERTS_CONFIGURED: "true",
+  });
+
+  assert.equal(readiness.status, "ready");
+  assert.equal(readiness.subsystems.coveredFeatures.required, false);
+  assert.equal(readiness.subsystems.coveredFeatures.productionReady, true);
+  assert.equal(readiness.subsystems.basemap.mode, "mapbox-managed");
+});
+
+test("readiness requires the HTTP covered-feature service when rain cover is claimed", () => {
+  const readiness = evaluateMvpReadiness({
+    NODE_ENV: "test",
+    REQUIRE_RAIN_COVER: "true",
+    COVERED_FEATURE_PROVIDER: "disabled",
+  });
+
+  assert.equal(readiness.subsystems.coveredFeatures.required, true);
+  assert.equal(readiness.subsystems.coveredFeatures.productionReady, false);
+});

@@ -1,5 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import { createHash } from "node:crypto";
 import type { MultiPolygon, Polygon } from "geojson";
 import type {
   BoundingBox,
@@ -28,6 +29,10 @@ export type LocalOvertureStoreManifest = {
   explicitHeightCount: number;
   floorDerivedHeightCount: number;
   unknownHeightCount: number;
+  checksums?: {
+    buildingsSha256: string;
+    tileIndexSha256: string;
+  };
 };
 
 type TileIndex = Record<string, number[]>;
@@ -102,6 +107,16 @@ export class LocalOvertureBuildingProvider implements BuildingProvider {
     if (manifest.format !== "comfortos-local-building-store-v1") {
       throw new Error("Unsupported local Overture building store.");
     }
+    verifyStoreChecksum(
+      "buildings.jsonl",
+      buildingsText,
+      manifest.checksums?.buildingsSha256,
+    );
+    verifyStoreChecksum(
+      "tile-index.json",
+      tileIndexText,
+      manifest.checksums?.tileIndexSha256,
+    );
 
     this.loaded = {
       manifest,
@@ -113,6 +128,14 @@ export class LocalOvertureBuildingProvider implements BuildingProvider {
     };
 
     return this.loaded;
+  }
+}
+
+function verifyStoreChecksum(name: string, content: string, expected?: string) {
+  if (!expected) return;
+  const actual = createHash("sha256").update(content).digest("hex");
+  if (actual !== expected) {
+    throw new Error(`Overture building store checksum mismatch for ${name}.`);
   }
 }
 

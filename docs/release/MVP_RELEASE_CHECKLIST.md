@@ -1,6 +1,6 @@
 # ComfortOS Limited MVP Release Checklist
 
-Date: 2026-08-16
+Date: 2026-09-02
 Release state: **Blocked pending P0 items**
 Target shape: one primary capability region with Minneapolis, Seattle, and Phoenix presented
 as explicitly limited beta/preview regions according to deployed capabilities.
@@ -42,15 +42,15 @@ from production evidence.
 
 ### Performance And Reliability
 
-- [ ] Bring common Minneapolis full Comfort requests below the 12-second UI timeout, or
+- [x] Bring common Minneapolis full Comfort requests below the 12-second UI timeout, or
   narrow the primary launch geography/routes so no common supported path exceeds it.
-- [ ] Re-run the 18-route Minneapolis profile and record average/p50/p95/max plus stage
+- [x] Re-run the 18-route Minneapolis profile and record average/p50/p95/max plus stage
   breakdown after the result-preserving fix.
 - [ ] Load/capacity test the building service with all active stores and production memory
   limits.
-- [ ] Verify Fastest remains available when weather, buildings, cover, or Comfort analysis
+- [x] Verify Fastest remains available when weather, buildings, cover, or Comfort analysis
   fails or times out.
-- [ ] Verify unsupported regions return zero comparable environmental candidates and never
+- [x] Verify unsupported regions return zero comparable environmental candidates and never
   borrow another region's data.
 - [ ] Run the Stage 10 smoke suite against the release candidate.
 
@@ -109,11 +109,11 @@ from production evidence.
 
 ## Build And Browser Gate
 
-- [ ] `npm run typecheck`
-- [ ] `npm test`
-- [ ] `npm run lint`
-- [ ] `npm run build`
-- [ ] `git diff --check`
+- [x] `npm run typecheck`
+- [x] `npm test`
+- [x] `npm run lint`
+- [x] `npm run build`
+- [x] `git diff --check`
 - [ ] Mobile widths: 320x568, 375x812, 390x844, 430x932, plus desktop.
 - [ ] Chrome/Chromium, Safari/WebKit, and Firefox current versions.
 - [ ] Search results, keyboard-open state, route comparison, alerts, Limited Data, and long
@@ -144,6 +144,29 @@ from production evidence.
 - [x] Stage 10 climate regression suite added.
 - [x] NWS station observation wind units normalized and the full Minneapolis/Phoenix live
   suites rerun after the correction.
+
+## Stage 10.1 Implementation Evidence
+
+These checks describe the repository and local production-like validation. They do not
+replace the unchecked production deployment, legal, security, and monitoring gates above.
+
+- [x] Managed Mapbox basemap uses a same-origin server route and does not expose its token.
+- [x] Production readiness rejects a missing identifying NWS User-Agent.
+- [x] Authenticated building and covered-feature HTTP provider boundaries include TLS URL,
+  timeout, bbox, response-size, and result-count requirements.
+- [x] Overture store manifests record and verify SHA-256 checksums.
+- [x] Local environment-service validation passed health, authentication, and real Overture
+  bbox lookup; a 100-request local burst completed 100/100 with 38 ms p95.
+- [x] Minneapolis optimized 18-route live profile passed 18/18 with Comfort latency
+  average 1,032 ms, p50 634 ms, p95 2,251 ms, and max 2,719 ms.
+- [x] Consumer privacy, terms, data-source attribution, and support routes exist in the
+  release source; legal approval and production publication remain unchecked.
+- [x] Structured redacted logs, security headers, configuration health, protected live
+  health, and an observability runbook exist; centralized alert delivery remains unchecked.
+- [x] Runtime dependency audit reports zero known vulnerabilities. Four moderate findings
+  remain in the local-only Drizzle build tool chain because the audit-suggested fix is a
+  breaking downgrade.
+- [x] Repository tests pass with 203 deterministic/integration checks.
 
 Release approval remains unavailable until every P0 item is checked and the release-candidate
 build/browser gate is rerun in the production-equivalent environment.

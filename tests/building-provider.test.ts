@@ -17,7 +17,12 @@ import {
 } from "@/lib/environment/buildings/providers/localOvertureBuildingProvider";
 import { manifestIntersectsBounds } from "@/lib/environment/buildings/providers/multiRegionOvertureBuildingProvider";
 import { normalizeOvertureFeature } from "@/scripts/ingest-overture-buildings";
-import { parseBuildingServiceBbox } from "@/scripts/serve-building-query-service";
+import {
+  assertEnvironmentServiceAuthentication,
+  assertBboxWithinLimit,
+  isAuthorizedServiceRequest,
+  parseBuildingServiceBbox,
+} from "@/scripts/serve-building-query-service";
 
 test("normalizes Overture-like building features behind the Building model", () => {
   const [building] = normalizeOvertureFeature({
@@ -58,6 +63,32 @@ test("local Overture provider queries bbox through the tile index", async () => 
 
   assert.equal(buildings.length, 1);
   assert.equal(buildings[0].id, "inside");
+});
+
+test("local Overture provider rejects a store with a mismatched checksum", async () => {
+  const storeDir = await writeStore([sampleBuilding("inside", -93.266, 44.977)]);
+  const manifestPath = path.join(storeDir, "manifest.json");
+  const manifest = JSON.parse(await fs.readFile(manifestPath, "utf8")) as Record<
+    string,
+    unknown
+  >;
+  manifest.checksums = {
+    buildingsSha256: "0".repeat(64),
+    tileIndexSha256: "0".repeat(64),
+  };
+  await fs.writeFile(manifestPath, `${JSON.stringify(manifest)}\n`, "utf8");
+
+  const provider = new LocalOvertureBuildingProvider({ storeDir });
+  await assert.rejects(
+    () =>
+      provider.getBuildings({
+        west: -93.267,
+        south: 44.976,
+        east: -93.264,
+        north: 44.979,
+      }),
+    /checksum mismatch/,
+  );
 });
 
 test("cached building provider records hits and does not cache failures", async () => {
@@ -111,8 +142,10 @@ test("explicit local Overture mode requires an explicit real store", () => {
 test("HTTP building provider consumes normalized query-service buildings", async () => {
   const provider = new HttpBuildingProvider({
     baseUrl: "https://buildings.example.test",
-    fetchImpl: async (input) => {
+    authToken: "service-secret",
+    fetchImpl: async (input, init) => {
       const url = new URL(String(input));
+      assert.equal(new Headers(init?.headers).get("authorization"), "Bearer service-secret");
       if (url.pathname === "/metadata") {
         return new Response(
           JSON.stringify({
@@ -186,6 +219,41 @@ test("building query service validates bbox parameters", () => {
   assert.throws(() => parseBuildingServiceBbox(null), /bbox query parameter/);
   assert.throws(() => parseBuildingServiceBbox("-93,45,-94,46"), /min values/);
   assert.throws(() => parseBuildingServiceBbox("-181,45,-94,46"), /valid longitude/);
+  assert.doesNotThrow(() =>
+    assertBboxWithinLimit(
+      { west: -93.27, south: 44.97, east: -93.26, north: 44.98 },
+      0.25,
+    ),
+  );
+  assert.throws(
+    () =>
+      assertBboxWithinLimit(
+        { west: -93.5, south: 44.8, east: -93.1, north: 45.1 },
+        0.25,
+      ),
+    /configured span limit/,
+  );
+});
+
+test("building query service supports private bearer authentication", () => {
+  assert.equal(isAuthorizedServiceRequest(undefined, ""), true);
+  assert.equal(isAuthorizedServiceRequest(undefined, "service-secret"), false);
+  assert.equal(
+    isAuthorizedServiceRequest("Bearer service-secret", "service-secret"),
+    true,
+  );
+  assert.equal(isAuthorizedServiceRequest("Bearer wrong", "service-secret"), false);
+});
+
+test("production environment service refuses to start without authentication", () => {
+  assert.throws(
+    () => assertEnvironmentServiceAuthentication("production", ""),
+    /required in production/,
+  );
+  assert.doesNotThrow(() =>
+    assertEnvironmentServiceAuthentication("production", "service-secret"),
+  );
+  assert.doesNotThrow(() => assertEnvironmentServiceAuthentication("development", ""));
 });
 
 test("multi-region coverage rejects requests outside configured store bounds", () => {

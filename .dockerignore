@@ -1,0 +1,13 @@
+.git
+.next
+.venv
+.vinext
+.wrangler
+dist
+dist-environment
+node_modules
+.env*
+*.log
+*.png
+fixtures
+docs

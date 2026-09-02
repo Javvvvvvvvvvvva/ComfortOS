@@ -11,12 +11,12 @@ flowchart TD
     App --> Geo["Production geocoder"]
     App --> Routing["Mapbox Directions API v5 / walking"]
     App --> NWS["National Weather Service"]
-    App --> Buildings["Building Query Service"]
-    App --> Cover["Covered-feature query service or versioned extract"]
-    Browser --> Tiles["Production basemap tiles/style"]
-    Buildings --> Registry["Active region manifest"]
+    App --> Environment["Private Environment Query Service"]
+    Browser --> AppTiles["Same-origin map tile route"]
+    AppTiles --> Tiles["Managed Mapbox Static Tiles"]
+    Environment --> Registry["Active region manifest"]
     Registry --> Stores["Versioned Overture stores"]
-    Cover --> CoverStores["Versioned, attributed cover datasets"]
+    Environment --> CoverStores["Versioned, attributed cover datasets"]
 ```
 
 The application runtime owns orchestration, normalized provider boundaries, environmental
@@ -29,12 +29,12 @@ adapters. The browser never receives routing credentials or direct building-stor
 | --- | --- | --- |
 | App | Vinext local dev server | versioned app deployment with secrets manager |
 | Routing | managed Mapbox, server-side token | same adapter, dedicated restricted token, quota alerts |
-| Geocoder | Photon public demo | managed geocoder or self-hosted Photon with capacity/SLA |
+| Geocoder | managed Mapbox Search Box | same adapter, dedicated restricted token and quota alerts |
 | Weather | NWS | NWS with identifying contact User-Agent, timeout and cache |
-| Buildings | Node HTTP service over `/tmp` stores | supervised service over immutable durable stores |
+| Buildings | authenticated Node HTTP service over `/tmp` store | supervised private service over immutable durable stores |
 | Covered data | disabled in app; local static extract in validation | worker-compatible query path and versioned source package |
-| Basemap | OSM community raster tiles | contracted/managed production tiles or self-hosted tiles |
-| Logs | structured stdout | centralized logs, alerting, and retention controls |
+| Basemap | server-proxied managed Mapbox Static Tiles | same route with a dedicated restricted token and attribution |
+| Logs | structured redacted stdout and bounded live health | centralized logs, alerting, and retention controls |
 
 `/tmp` is validation storage only. It must never be the source of truth in production.
 
@@ -59,7 +59,7 @@ The current stores are:
 
 | Capability region | Overture release | Buildings | Validation storage |
 | --- | --- | ---: | --- |
-| Minneapolis | `2026-06-17.0` | 97,494 | local `/tmp` store |
+| Minneapolis | `2026-08-19.0` | 97,652 | local `/tmp` store |
 | Seattle | `2026-07-22.0` | 117,331 | local `/tmp` store |
 | Phoenix | `2026-06-17.0` | 51,737 | local `/tmp` store |
 
@@ -136,6 +136,8 @@ No city-name branch is permitted in a core engine or context decision.
 
 - `/api/health` is a cheap configuration readiness check. It does not call paid or slow
   upstream providers.
+- `/api/health/live` is a protected, bounded multi-provider probe for scheduled release and
+  incident checks. Set `HEALTHCHECK_TOKEN` in production.
 - `/api/routes/routing-health` is a live managed-routing probe and should run on a bounded
   schedule, not on every platform health poll.
 - Building `/health` verifies the process and store metadata.
@@ -161,3 +163,6 @@ Centralize the structured events already emitted by the API. Alerts should cover
 Do not log precise origin/destination coordinates, route geometry, access tokens, raw
 authorization headers, or provider error bodies. Set a reviewed operational-log retention
 period before external beta.
+
+See `ENVIRONMENT_QUERY_SERVICE_DEPLOYMENT.md` for the deployable service contract and
+`OBSERVABILITY_RUNBOOK.md` for event, alert, and release-probe guidance.

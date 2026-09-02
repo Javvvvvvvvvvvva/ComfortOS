@@ -8,6 +8,8 @@ import {
 } from "@turf/turf";
 import type { FeatureCollection, LineString, MultiPolygon, Polygon } from "geojson";
 import type { Building } from "@/lib/environment/buildings/types";
+import type { BoundingBox } from "@/lib/environment/buildings/types";
+import { expandBounds } from "@/lib/environment/buildings/bounds";
 import type {
   BuildingShadow,
   RouteSegment,
@@ -41,7 +43,14 @@ export function calculateSegmentShadeExact(
   const projection = createLocalProjection(projectionOrigin);
 
   return segments.map((segment) => {
-    const shadowIntervals = shadows.map((shadow) => ({
+    const segmentBounds = boundsForCoordinatePairs(segment.geometry.coordinates);
+    const possibleShadows = segmentBounds
+      ? shadows.filter((shadow) => {
+          const shadowBounds = boundsForShadowGeometry(shadow.geometry);
+          return shadowBounds ? intersectsBounds(segmentBounds, shadowBounds) : true;
+        })
+      : shadows;
+    const shadowIntervals = possibleShadows.map((shadow) => ({
       confidence: shadow.confidence,
       intervals: safeLineShadowIntervals(segment, shadow, projection),
     }));
@@ -202,8 +211,19 @@ export function calculateUnknownHeightMeters({
   buildings: Building[];
   projectionOrigin: Coordinate;
 }) {
+  const routeBounds = boundsForCoordinatePairs(
+    segments.flatMap((segment) => segment.geometry.coordinates),
+  );
+  const relevantBounds = routeBounds
+    ? expandBounds(routeBounds, UNKNOWN_HEIGHT_INFLUENCE_BUFFER_METERS)
+    : null;
   const uncertaintyAreas = buildings
     .filter((building) => !building.heightMeters)
+    .filter((building) => {
+      if (!relevantBounds) return true;
+      const buildingBounds = boundsForShadowGeometry(building.footprint);
+      return buildingBounds ? intersectsBounds(relevantBounds, buildingBounds) : true;
+    })
     .flatMap((building) => {
       try {
         const buffered = buffer(feature(building.footprint), UNKNOWN_HEIGHT_INFLUENCE_BUFFER_METERS, {
@@ -298,6 +318,45 @@ function interpolateLineCoordinate(
     start[0] + (end[0] - start[0]) * ratio,
     start[1] + (end[1] - start[1]) * ratio,
   ];
+}
+
+function boundsForShadowGeometry(geometry: Polygon | MultiPolygon): BoundingBox | null {
+  const coordinates =
+    geometry.type === "Polygon" ? geometry.coordinates.flat() : geometry.coordinates.flat(2);
+  return boundsForCoordinatePairs(coordinates);
+}
+
+function boundsForCoordinatePairs(coordinates: number[][]): BoundingBox | null {
+  const valid = coordinates.filter(
+    (coordinate): coordinate is [number, number] =>
+      coordinate.length >= 2 &&
+      Number.isFinite(coordinate[0]) &&
+      Number.isFinite(coordinate[1]),
+  );
+  if (valid.length === 0) return null;
+  return valid.reduce<BoundingBox>(
+    (bounds, [longitude, latitude]) => ({
+      west: Math.min(bounds.west, longitude),
+      south: Math.min(bounds.south, latitude),
+      east: Math.max(bounds.east, longitude),
+      north: Math.max(bounds.north, latitude),
+    }),
+    {
+      west: valid[0][0],
+      south: valid[0][1],
+      east: valid[0][0],
+      north: valid[0][1],
+    },
+  );
+}
+
+function intersectsBounds(left: BoundingBox, right: BoundingBox) {
+  return !(
+    left.east < right.west ||
+    left.west > right.east ||
+    left.north < right.south ||
+    left.south > right.north
+  );
 }
 
 function lineShadowIntervals(

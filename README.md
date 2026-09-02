@@ -55,12 +55,12 @@ Provider-specific responses stop at adapter boundaries. Environmental calculatio
 
 | Capability | Current managed path | Development or fallback path |
 | --- | --- | --- |
-| Map rendering | MapLibre GL | OpenStreetMap-compatible raster style |
+| Map rendering | MapLibre GL with server-proxied Mapbox Static Tiles | OpenStreetMap-compatible raster style in explicit development mode |
 | Place search | Mapbox Search Box v1 | Photon, when explicitly configured |
 | Walking routes | Mapbox Directions v5 (`mapbox/walking`) | Public or self-hosted OSRM, when explicitly configured |
 | Weather | National Weather Service | Controlled validation fixtures |
-| Buildings | Overture query service target | Overpass development adapter |
-| Covered features | Configured OSM-derived static data | Unavailable-data degradation |
+| Buildings | Private environment query service over versioned Overture stores | Local Overture or Overpass development adapters |
+| Covered features | Optional private environment query service | Explicit unavailable-data degradation |
 
 Managed routing does not silently fall back to public OSRM. Provider metadata is retained so health checks and validation reports can verify which service answered a request.
 
@@ -89,8 +89,9 @@ At minimum, configure:
 ```dotenv
 ROUTING_PROVIDER=mapbox-managed
 GEOCODING_PROVIDER=mapbox-managed
+NEXT_PUBLIC_BASEMAP_PROVIDER=mapbox-managed
 MAPBOX_ACCESS_TOKEN=your_token_here
-WEATHER_USER_AGENT=ComfortOS (contact@example.com)
+WEATHER_USER_AGENT=ComfortOS/1.0 (https://your-monitored-contact.example)
 ```
 
 Never commit `.env.local` or an access token. Building and covered-feature providers require additional configuration when those datasets are enabled.
@@ -132,11 +133,13 @@ lib/
   environment/        Weather and exposure normalization
   geocoding/          Search provider interfaces and adapters
   routing/            Candidate generation, providers, and selection
-  shade/              Solar and shade analysis
-  wind/               Wind exposure analysis
-  rain/               Rain and cover analysis
-  heat/               Heat exposure analysis
-  winter/             Winter-condition analysis
+    shade/            Solar and shade analysis
+    wind/             Wind exposure analysis
+    rain/             Rain and cover analysis
+    heat/             Heat exposure analysis
+    winter/           Winter-condition analysis
+  health/             Configuration and bounded live readiness
+  map/                Basemap provider configuration
 docs/
   architecture/       Canonical architecture specification
   design/             Product guidelines and approved baseline
@@ -169,9 +172,13 @@ Start with the canonical documents:
 - [ADR-020: Managed Routing Provider](docs/decisions/ADR-020-mvp-managed-routing-provider.md)
 - [ADR-021: Stage 10 Limited-Beta Gate](docs/decisions/ADR-021-stage-10-limited-beta-gate.md)
 - [ADR-022: Managed POI Geocoding Provider](docs/decisions/ADR-022-managed-poi-geocoding-provider.md)
+- [ADR-023: Production Provider Boundaries](docs/decisions/ADR-023-production-provider-boundaries.md)
 - [Stage 9.6 Managed Routing Validation](docs/analysis/STAGE_9_6_MANAGED_ROUTING_VALIDATION.md)
 - [Stage 10 MVP Readiness Audit](docs/analysis/STAGE_10_MVP_READINESS_AUDIT.md)
+- [Stage 10.1 Production Hardening](docs/analysis/STAGE_10_1_PRODUCTION_HARDENING.md)
 - [MVP Release Checklist](docs/release/MVP_RELEASE_CHECKLIST.md)
+- [Environment Query Service Deployment](docs/operations/ENVIRONMENT_QUERY_SERVICE_DEPLOYMENT.md)
+- [Observability Runbook](docs/operations/OBSERVABILITY_RUNBOOK.md)
 
 The source-of-truth order is architecture specification, product and design guidelines, approved design baseline, ADRs, then implementation code.
 
@@ -186,4 +193,4 @@ The source-of-truth order is architecture specification, product and design guid
 
 ## Data Attribution
 
-Map and route data remains subject to the attribution requirements of Mapbox, OpenStreetMap contributors, Overture Maps, and any configured upstream provider. Provider terms must be reviewed before production deployment.
+Map and route data remains subject to the attribution requirements of Mapbox, OpenStreetMap contributors, Overture Maps, and any configured upstream provider. Consumer-facing privacy, terms, data-source, and support routes are included, but final legal review and production publication remain release gates.

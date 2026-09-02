@@ -287,7 +287,7 @@ export function calculateUnknownHeightInfluenceFromPreparedContext(
   return segment.distanceMeters * strongestInfluence;
 }
 
-function isPreparedWindBuildingContext(value: unknown): value is PreparedWindBuildingContext {
+export function isPreparedWindBuildingContext(value: unknown): value is PreparedWindBuildingContext {
   return (
     typeof value === "object" &&
     value !== null &&

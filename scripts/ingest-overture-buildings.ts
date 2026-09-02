@@ -1,5 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import { createHash } from "node:crypto";
 import type { Feature, MultiPolygon, Polygon } from "geojson";
 import { normalizeBuildingHeight } from "@/lib/environment/buildings/height";
 import type { BoundingBox, Building } from "@/lib/environment/buildings/types";
@@ -33,6 +34,8 @@ async function main() {
     .flatMap((feature) => normalizeOvertureFeature(feature))
     .filter((building) => !bounds || intersectsBounds(building.bbox, bounds));
   const tileIndex = buildTileIndex(buildings, tileSizeDegrees);
+  const buildingsText = `${buildings.map((building) => JSON.stringify(building)).join("\n")}\n`;
+  const tileIndexText = `${JSON.stringify(tileIndex)}\n`;
   const manifest: LocalOvertureStoreManifest = {
     format: "comfortos-local-building-store-v1",
     source: "overture-buildings",
@@ -55,26 +58,22 @@ async function main() {
     explicitHeightCount: buildings.filter((building) => building.heightSource === "provider").length,
     floorDerivedHeightCount: buildings.filter((building) => building.heightSource === "floors-derived").length,
     unknownHeightCount: buildings.filter((building) => building.heightSource === "unknown").length,
+    checksums: {
+      buildingsSha256: sha256(buildingsText),
+      tileIndexSha256: sha256(tileIndexText),
+    },
   };
 
   await fs.mkdir(outputDir, { recursive: true });
   await Promise.all([
-    fs.writeFile(
-      path.join(outputDir, "manifest.json"),
-      `${JSON.stringify(manifest, null, 2)}\n`,
-      "utf8",
-    ),
-    fs.writeFile(
-      path.join(outputDir, "buildings.jsonl"),
-      `${buildings.map((building) => JSON.stringify(building)).join("\n")}\n`,
-      "utf8",
-    ),
-    fs.writeFile(
-      path.join(outputDir, "tile-index.json"),
-      `${JSON.stringify(tileIndex)}\n`,
-      "utf8",
-    ),
+    fs.writeFile(path.join(outputDir, "buildings.jsonl"), buildingsText, "utf8"),
+    fs.writeFile(path.join(outputDir, "tile-index.json"), tileIndexText, "utf8"),
   ]);
+  await fs.writeFile(
+    path.join(outputDir, "manifest.json"),
+    `${JSON.stringify(manifest, null, 2)}\n`,
+    "utf8",
+  );
 
   console.log(
     JSON.stringify(
@@ -87,6 +86,10 @@ async function main() {
       2,
     ),
   );
+}
+
+function sha256(value: string) {
+  return createHash("sha256").update(value).digest("hex");
 }
 
 export function normalizeOvertureFeature(feature: Feature): StoredBuilding[] {

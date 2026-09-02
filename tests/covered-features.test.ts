@@ -3,6 +3,7 @@ import test from "node:test";
 import { inferCoveredFeatureSemantics } from "@/lib/environment/coveredFeatures/semantics";
 import { analyzeRouteCoverMetrics } from "@/lib/environment/coveredFeatures/routeCoverMetrics";
 import type { CoveredFeature } from "@/lib/environment/coveredFeatures/types";
+import { HttpCoveredFeatureProvider } from "@/lib/environment/coveredFeatures/providers/httpCoveredFeatureProvider";
 
 test("covered feature semantics classify building passages separately from indoor corridors", () => {
   const passage = inferCoveredFeatureSemantics({
@@ -50,6 +51,41 @@ test("route cover metrics report continuous covered runs without double counting
   assert.ok(metrics.coveredMeters < 85);
   assert.equal(metrics.coveredSegmentCount, 1);
   assert.ok(metrics.longestContinuousCoveredMeters > 55);
+});
+
+test("HTTP covered-feature provider uses the private service boundary", async () => {
+  const provider = new HttpCoveredFeatureProvider({
+    baseUrl: "https://environment.example.test",
+    authToken: "cover-secret",
+    fetchImpl: async (input, init) => {
+      const url = new URL(String(input));
+      assert.equal(url.pathname, "/covered-features");
+      assert.equal(url.searchParams.get("bbox"), "-122.35,47.6,-122.33,47.62");
+      assert.equal(new Headers(init?.headers).get("authorization"), "Bearer cover-secret");
+      return new Response(
+        JSON.stringify({
+          features: [coverLine(0, 45)],
+          metadata: {
+            provider: "ComfortOS environment query service",
+            source: "OSM-derived covered-feature store",
+            mode: "covered-query-service",
+            datasetVersion: "2026-08-16",
+          },
+        }),
+        { status: 200 },
+      );
+    },
+  });
+
+  const result = await provider.getCoveredFeatures({
+    west: -122.35,
+    south: 47.6,
+    east: -122.33,
+    north: 47.62,
+  });
+
+  assert.equal(result.features.length, 1);
+  assert.equal(result.metadata.mode, "covered-query-service");
 });
 
 function coverLine(startMeters: number, endMeters: number): CoveredFeature {

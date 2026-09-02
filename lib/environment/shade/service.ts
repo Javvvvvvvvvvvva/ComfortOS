@@ -5,7 +5,11 @@ import type {
   BuildingProvider,
 } from "@/lib/environment/buildings/types";
 import { calculateSolarPosition } from "@/lib/environment/solar/solarPositionEngine";
-import { BuildingShadowEngine } from "@/lib/environment/shade/shadowEngine";
+import {
+  BuildingShadowEngine,
+  isPreparedShadowBuildingContext,
+  prepareShadowBuildingContext,
+} from "@/lib/environment/shade/shadowEngine";
 import {
   buildingsToFeatureCollection,
   calculateSegmentShade,
@@ -44,13 +48,18 @@ export class ShadeAnalysisService {
 
     const routeGeometry = request.route.geometry;
     const bounds = boundsForLineString(routeGeometry);
-    const projectionOrigin = boundsCenter(bounds);
+    const projectionOrigin = request.projectionOrigin ?? boundsCenter(bounds);
     const solarPosition = calculateSolarPosition({
       latitude: projectionOrigin.latitude,
       longitude: projectionOrigin.longitude,
       timestamp: departureDate.toISOString(),
     });
     const buildings = request.buildings ?? (await this.getBuildings(bounds));
+    const preparedBuildingContext = isPreparedShadowBuildingContext(
+      request.preparedBuildingContext,
+    )
+      ? request.preparedBuildingContext
+      : prepareShadowBuildingContext(buildings, projectionOrigin);
     const segments = assignSegmentTraversalTimes({
       segments: segmentRouteGeometry(routeGeometry),
       departureTime: departureDate.toISOString(),
@@ -115,6 +124,8 @@ export class ShadeAnalysisService {
         buildings,
         segmentSolarPosition,
         projectionOrigin,
+        preparedBuildingContext,
+        segment.geometry,
       );
       allShadows?.push(...shadowResult.shadows);
       const [shade] = calculateSegmentShade(

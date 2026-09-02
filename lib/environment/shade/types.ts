@@ -2,7 +2,7 @@ import type { FeatureCollection, LineString, MultiPolygon, Polygon } from "geojs
 import type { BuildingCoverage } from "@/lib/environment/buildings/types";
 import type { Building } from "@/lib/environment/buildings/types";
 import type { SolarPosition } from "@/lib/environment/solar/solarPositionEngine";
-import type { LineStringGeometry } from "@/lib/geo/types";
+import type { Coordinate, LineStringGeometry } from "@/lib/geo/types";
 import type { RouteResult } from "@/lib/routing/types";
 
 export type RouteSegment = {
@@ -75,6 +75,8 @@ export type ShadeAnalysisRequest = {
   route: RouteResult;
   departureTime: string;
   buildings?: Building[];
+  projectionOrigin?: Coordinate;
+  preparedBuildingContext?: unknown;
   includeDebug?: boolean;
 };
 

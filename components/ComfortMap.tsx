@@ -11,7 +11,6 @@ import {
   type LngLatBoundsLike,
   type Map,
   type MapMouseEvent,
-  type StyleSpecification,
 } from "maplibre-gl";
 import type { FeatureCollection, LineString, MultiPolygon, Polygon } from "geojson";
 import type { Coordinate, LineStringGeometry } from "@/lib/geo/types";
@@ -21,6 +20,7 @@ import type { WindAnalysisResult } from "@/lib/environment/wind/types";
 import type { RainAnalysisResult } from "@/lib/environment/rain/types";
 import type { HeatAnalysisResult } from "@/lib/environment/heat/types";
 import type { ComfortAnalysisResult } from "@/lib/comfort/types";
+import { createBasemapStyle } from "@/lib/map/basemap";
 
 type SelectionMode = "origin" | "destination";
 
@@ -69,27 +69,11 @@ const emptyLineCollection: FeatureCollection<LineString> = {
   type: "FeatureCollection",
   features: [],
 };
-const mapStyle: StyleSpecification = {
-  version: 8,
-  sources: {
-    osm: {
-      type: "raster",
-      tiles: [
-        process.env.NEXT_PUBLIC_MAP_TILE_URL_TEMPLATE ??
-          "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-      ],
-      tileSize: 256,
-      attribution: "© OpenStreetMap contributors",
-    },
-  },
-  layers: [
-    {
-      id: "osm",
-      type: "raster",
-      source: "osm",
-    },
-  ],
-};
+const mapStyle = createBasemapStyle({
+  provider: process.env.NEXT_PUBLIC_BASEMAP_PROVIDER,
+  tileUrlTemplate: process.env.NEXT_PUBLIC_MAP_TILE_URL_TEMPLATE,
+  attribution: process.env.NEXT_PUBLIC_MAP_ATTRIBUTION,
+});
 
 export function ComfortMap({
   origin,
