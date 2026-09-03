@@ -18,6 +18,8 @@
     "data:buildings:minneapolis": "node --import tsx scripts/build-minneapolis-overture-buildings.ts",
     "data:buildings:seattle": "node --import tsx scripts/build-overture-buildings.ts --region seattle",
     "data:buildings:phoenix": "node --import tsx scripts/build-overture-buildings.ts --region phoenix",
+    "data:buildings:plan:states": ".venv/bin/python scripts/plan-us-state-building-partitions.py",
+    "data:buildings:state": "node --import tsx scripts/build-us-state-overture-buildings.ts",
     "data:covered-features:overpass": "node --import tsx scripts/extract-covered-features-overpass.ts",
     "buildings:serve": "node --import tsx scripts/serve-building-query-service.ts",
     "environment:serve": "node --import tsx scripts/serve-building-query-service.ts",

@@ -51,6 +51,7 @@ async function main() {
   }
 
   const metadata = JSON.parse(await fs.readFile(metadataPath, "utf8")) as {
+    region: string;
     release: string;
     bbox: [number, number, number, number];
     license: string;
@@ -70,7 +71,7 @@ async function main() {
       "--output",
       outputDir,
       "--region",
-      `${region}-validation`,
+      metadata.region,
       "--bounds",
       metadata.bbox.join(","),
       "--release",

@@ -1,14 +1,20 @@
 import http from "node:http";
 import { timingSafeEqual } from "node:crypto";
+import { readdirSync, realpathSync } from "node:fs";
+import path from "node:path";
 import { LocalOvertureBuildingProvider } from "@/lib/environment/buildings/providers/localOvertureBuildingProvider";
 import { MultiRegionOvertureBuildingProvider } from "@/lib/environment/buildings/providers/multiRegionOvertureBuildingProvider";
 import type { BoundingBox } from "@/lib/environment/buildings/types";
 import { StaticCoveredFeatureProvider } from "@/lib/environment/coveredFeatures/providers/staticCoveredFeatureProvider";
 
-const storeDirs =
+const explicitStoreDirs = splitConfiguredPaths(
   process.env.BUILDING_LOCAL_OVERTURE_STORE_DIRS ??
-  process.env.BUILDING_LOCAL_OVERTURE_STORE_DIR ??
-  process.argv[2];
+    process.env.BUILDING_LOCAL_OVERTURE_STORE_DIR ??
+    process.argv[2],
+);
+const storeRoots = splitConfiguredPaths(
+  process.env.BUILDING_LOCAL_OVERTURE_STORE_ROOTS,
+);
 const port = Number(process.env.BUILDING_QUERY_SERVICE_PORT ?? process.env.PORT ?? 8787);
 const serviceToken =
   process.env.ENVIRONMENT_QUERY_SERVICE_TOKEN ??
@@ -30,22 +36,37 @@ const queryTimeoutMs = parsePositiveInteger(
   process.env.ENVIRONMENT_QUERY_SERVICE_TIMEOUT_MS,
   8_000,
 );
+const maxLoadedStores = parsePositiveInteger(
+  process.env.ENVIRONMENT_QUERY_SERVICE_MAX_LOADED_STORES,
+  8,
+);
 
 if (
   process.argv[1]?.endsWith("serve-building-query-service.ts") ||
   process.argv[1]?.endsWith("service.mjs")
 ) {
-  if (!storeDirs) {
+  if (!explicitStoreDirs.length && !storeRoots.length) {
     throw new Error(
-      "Pass a store directory, set BUILDING_LOCAL_OVERTURE_STORE_DIR, or set BUILDING_LOCAL_OVERTURE_STORE_DIRS.",
+      "Pass a store directory or configure BUILDING_LOCAL_OVERTURE_STORE_DIRS or BUILDING_LOCAL_OVERTURE_STORE_ROOTS.",
     );
   }
   assertEnvironmentServiceAuthentication(process.env.NODE_ENV, serviceToken);
 
-  const configuredStoreDirs = storeDirs.split(",").map((value) => value.trim()).filter(Boolean);
+  const configuredStoreDirs = Array.from(
+    new Set([
+      ...explicitStoreDirs.map((storeDir) => path.resolve(storeDir)),
+      ...discoverBuildingStoreDirs(storeRoots),
+    ]),
+  );
+  if (!configuredStoreDirs.length) {
+    throw new Error("No Overture building stores were found in the configured roots.");
+  }
   const provider =
     configuredStoreDirs.length > 1
-      ? new MultiRegionOvertureBuildingProvider(configuredStoreDirs)
+      ? new MultiRegionOvertureBuildingProvider({
+          storeDirs: configuredStoreDirs,
+          maxLoadedStores,
+        })
       : new LocalOvertureBuildingProvider({ storeDir: configuredStoreDirs[0] });
   const coveredFeatureProvider = process.env.COVERED_FEATURE_STATIC_GEOJSON
     ? new StaticCoveredFeatureProvider({
@@ -238,6 +259,38 @@ export function assertEnvironmentServiceAuthentication(
       "ENVIRONMENT_QUERY_SERVICE_TOKEN is required in production.",
     );
   }
+}
+
+export function discoverBuildingStoreDirs(roots: string[]) {
+  const stores: string[] = [];
+  const pending = roots.map((root) => path.resolve(root));
+  const visited = new Set<string>();
+
+  while (pending.length) {
+    const candidate = pending.pop();
+    if (!candidate) continue;
+    const directory = realpathSync(candidate);
+    if (visited.has(directory)) continue;
+    visited.add(directory);
+
+    const entries = readdirSync(directory, { withFileTypes: true });
+    if (entries.some((entry) => entry.isFile() && entry.name === "manifest.json")) {
+      stores.push(directory);
+      continue;
+    }
+
+    for (const entry of entries) {
+      if (entry.isDirectory() || entry.isSymbolicLink()) {
+        pending.push(path.join(directory, entry.name));
+      }
+    }
+  }
+
+  return stores.sort();
+}
+
+function splitConfiguredPaths(value: string | undefined) {
+  return (value ?? "").split(",").map((item) => item.trim()).filter(Boolean);
 }
 
 function sendJson(

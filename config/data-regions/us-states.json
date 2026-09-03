@@ -1,0 +1,759 @@
+{
+  "schemaVersion": 1,
+  "scope": "50 states and the District of Columbia",
+  "baselineEligibility": {
+    "placeSearch": true,
+    "walkingRouting": true,
+    "nwsWeather": true
+  },
+  "source": {
+    "publisher": "United States Census Bureau",
+    "dataset": "2025 Cartographic Boundary File - States, 1:500,000",
+    "url": "https://www2.census.gov/geo/tiger/GENZ2025/shp/cb_2025_us_state_500k.zip",
+    "retrievedAt": "2026-09-03"
+  },
+  "jurisdictions": [
+    {
+      "fips": "01",
+      "code": "AL",
+      "name": "Alabama",
+      "bbox": [
+        -88.473227,
+        30.223334,
+        -84.88908,
+        35.008028
+      ],
+      "landAreaSquareMeters": 131186429591,
+      "waterAreaSquareMeters": 4580729056,
+      "validationRegions": []
+    },
+    {
+      "fips": "02",
+      "code": "AK",
+      "name": "Alaska",
+      "bbox": [
+        -179.146711,
+        51.215567,
+        179.77847,
+        71.387815
+      ],
+      "landAreaSquareMeters": 1479893380150,
+      "waterAreaSquareMeters": 244326118163,
+      "validationRegions": []
+    },
+    {
+      "fips": "04",
+      "code": "AZ",
+      "name": "Arizona",
+      "bbox": [
+        -114.81651,
+        31.332177,
+        -109.045223,
+        37.00426
+      ],
+      "landAreaSquareMeters": 294366238828,
+      "waterAreaSquareMeters": 853868947,
+      "validationRegions": [
+        {
+          "id": "phoenix",
+          "label": "Phoenix",
+          "profiles": [
+            "heat",
+            "shade"
+          ]
+        }
+      ]
+    },
+    {
+      "fips": "05",
+      "code": "AR",
+      "name": "Arkansas",
+      "bbox": [
+        -94.617919,
+        33.004291,
+        -89.641003,
+        36.4996
+      ],
+      "landAreaSquareMeters": 134658642291,
+      "waterAreaSquareMeters": 3122591253,
+      "validationRegions": []
+    },
+    {
+      "fips": "06",
+      "code": "CA",
+      "name": "California",
+      "bbox": [
+        -124.409591,
+        32.534435,
+        -114.131211,
+        42.009485
+      ],
+      "landAreaSquareMeters": 403676564152,
+      "waterAreaSquareMeters": 20288505023,
+      "validationRegions": []
+    },
+    {
+      "fips": "08",
+      "code": "CO",
+      "name": "Colorado",
+      "bbox": [
+        -109.060253,
+        36.992426,
+        -102.041524,
+        41.003444
+      ],
+      "landAreaSquareMeters": 268419398775,
+      "waterAreaSquareMeters": 1185110804,
+      "validationRegions": []
+    },
+    {
+      "fips": "09",
+      "code": "CT",
+      "name": "Connecticut",
+      "bbox": [
+        -73.727775,
+        40.980144,
+        -71.786994,
+        42.050587
+      ],
+      "landAreaSquareMeters": 12542101087,
+      "waterAreaSquareMeters": 1816013585,
+      "validationRegions": []
+    },
+    {
+      "fips": "10",
+      "code": "DE",
+      "name": "Delaware",
+      "bbox": [
+        -75.788658,
+        38.451196,
+        -75.048939,
+        39.839007
+      ],
+      "landAreaSquareMeters": 5046707808,
+      "waterAreaSquareMeters": 1399203452,
+      "validationRegions": []
+    },
+    {
+      "fips": "11",
+      "code": "DC",
+      "name": "District of Columbia",
+      "bbox": [
+        -77.119759,
+        38.791645,
+        -76.909395,
+        38.99511
+      ],
+      "landAreaSquareMeters": 158318961,
+      "waterAreaSquareMeters": 18706999,
+      "validationRegions": []
+    },
+    {
+      "fips": "12",
+      "code": "FL",
+      "name": "Florida",
+      "bbox": [
+        -87.634938,
+        24.521304,
+        -80.031362,
+        31.000888
+      ],
+      "landAreaSquareMeters": 138973813223,
+      "waterAreaSquareMeters": 45960479273,
+      "validationRegions": []
+    },
+    {
+      "fips": "13",
+      "code": "GA",
+      "name": "Georgia",
+      "bbox": [
+        -85.605165,
+        30.357851,
+        -80.840378,
+        35.001244
+      ],
+      "landAreaSquareMeters": 149487720450,
+      "waterAreaSquareMeters": 4417264043,
+      "validationRegions": []
+    },
+    {
+      "fips": "15",
+      "code": "HI",
+      "name": "Hawaii",
+      "bbox": [
+        -178.334698,
+        18.910361,
+        -154.806773,
+        28.402123
+      ],
+      "landAreaSquareMeters": 16634436568,
+      "waterAreaSquareMeters": 11777362694,
+      "validationRegions": []
+    },
+    {
+      "fips": "16",
+      "code": "ID",
+      "name": "Idaho",
+      "bbox": [
+        -117.243027,
+        41.988209,
+        -111.043564,
+        49.000911
+      ],
+      "landAreaSquareMeters": 214050683201,
+      "waterAreaSquareMeters": 2390817981,
+      "validationRegions": []
+    },
+    {
+      "fips": "17",
+      "code": "IL",
+      "name": "Illinois",
+      "bbox": [
+        -91.513079,
+        36.970298,
+        -87.495199,
+        42.508481
+      ],
+      "landAreaSquareMeters": 143779367883,
+      "waterAreaSquareMeters": 6215353468,
+      "validationRegions": []
+    },
+    {
+      "fips": "18",
+      "code": "IN",
+      "name": "Indiana",
+      "bbox": [
+        -88.097892,
+        37.771742,
+        -84.784579,
+        41.760592
+      ],
+      "landAreaSquareMeters": 92786782808,
+      "waterAreaSquareMeters": 1543815569,
+      "validationRegions": []
+    },
+    {
+      "fips": "19",
+      "code": "IA",
+      "name": "Iowa",
+      "bbox": [
+        -96.638621,
+        40.375659,
+        -90.140061,
+        43.501196
+      ],
+      "landAreaSquareMeters": 144660389024,
+      "waterAreaSquareMeters": 1085298995,
+      "validationRegions": []
+    },
+    {
+      "fips": "20",
+      "code": "KS",
+      "name": "Kansas",
+      "bbox": [
+        -102.051744,
+        36.993016,
+        -94.588413,
+        40.003162
+      ],
+      "landAreaSquareMeters": 211754288230,
+      "waterAreaSquareMeters": 1345197050,
+      "validationRegions": []
+    },
+    {
+      "fips": "21",
+      "code": "KY",
+      "name": "Kentucky",
+      "bbox": [
+        -89.571509,
+        36.497129,
+        -81.964971,
+        39.147458
+      ],
+      "landAreaSquareMeters": 102267794436,
+      "waterAreaSquareMeters": 2383097595,
+      "validationRegions": []
+    },
+    {
+      "fips": "22",
+      "code": "LA",
+      "name": "Louisiana",
+      "bbox": [
+        -94.043147,
+        28.928609,
+        -88.817017,
+        33.019457
+      ],
+      "landAreaSquareMeters": 111927154861,
+      "waterAreaSquareMeters": 23724485446,
+      "validationRegions": []
+    },
+    {
+      "fips": "23",
+      "code": "ME",
+      "name": "Maine",
+      "bbox": [
+        -71.083924,
+        42.977764,
+        -66.949895,
+        47.459686
+      ],
+      "landAreaSquareMeters": 79888899089,
+      "waterAreaSquareMeters": 11744562992,
+      "validationRegions": []
+    },
+    {
+      "fips": "24",
+      "code": "MD",
+      "name": "Maryland",
+      "bbox": [
+        -79.487651,
+        37.911717,
+        -75.048939,
+        39.723043
+      ],
+      "landAreaSquareMeters": 25151298706,
+      "waterAreaSquareMeters": 6979771758,
+      "validationRegions": []
+    },
+    {
+      "fips": "25",
+      "code": "MA",
+      "name": "Massachusetts",
+      "bbox": [
+        -73.508142,
+        41.237964,
+        -69.928393,
+        42.886589
+      ],
+      "landAreaSquareMeters": 20204475228,
+      "waterAreaSquareMeters": 7130575380,
+      "validationRegions": []
+    },
+    {
+      "fips": "26",
+      "code": "MI",
+      "name": "Michigan",
+      "bbox": [
+        -90.418136,
+        41.696118,
+        -82.413474,
+        48.2388
+      ],
+      "landAreaSquareMeters": 146625947203,
+      "waterAreaSquareMeters": 103860207077,
+      "validationRegions": []
+    },
+    {
+      "fips": "27",
+      "code": "MN",
+      "name": "Minnesota",
+      "bbox": [
+        -97.239209,
+        43.499369,
+        -89.493977,
+        49.384358
+      ],
+      "landAreaSquareMeters": 206245435043,
+      "waterAreaSquareMeters": 18936592419,
+      "validationRegions": [
+        {
+          "id": "minneapolis-validation",
+          "label": "Minneapolis",
+          "profiles": [
+            "cold",
+            "wind",
+            "shade"
+          ]
+        }
+      ]
+    },
+    {
+      "fips": "28",
+      "code": "MS",
+      "name": "Mississippi",
+      "bbox": [
+        -91.655009,
+        30.175372,
+        -88.097888,
+        34.996052
+      ],
+      "landAreaSquareMeters": 121534611855,
+      "waterAreaSquareMeters": 3914024462,
+      "validationRegions": []
+    },
+    {
+      "fips": "29",
+      "code": "MO",
+      "name": "Missouri",
+      "bbox": [
+        -95.774704,
+        35.995683,
+        -89.098843,
+        40.61364
+      ],
+      "landAreaSquareMeters": 178052192662,
+      "waterAreaSquareMeters": 2487934091,
+      "validationRegions": []
+    },
+    {
+      "fips": "30",
+      "code": "MT",
+      "name": "Montana",
+      "bbox": [
+        -116.049155,
+        44.357962,
+        -104.039563,
+        49.00139
+      ],
+      "landAreaSquareMeters": 376973522036,
+      "waterAreaSquareMeters": 3866841435,
+      "validationRegions": []
+    },
+    {
+      "fips": "31",
+      "code": "NE",
+      "name": "Nebraska",
+      "bbox": [
+        -104.053514,
+        39.999998,
+        -95.30829,
+        43.001708
+      ],
+      "landAreaSquareMeters": 198950563271,
+      "waterAreaSquareMeters": 1378346850,
+      "validationRegions": []
+    },
+    {
+      "fips": "32",
+      "code": "NV",
+      "name": "Nevada",
+      "bbox": [
+        -120.006455,
+        35.001857,
+        -114.039648,
+        42.002207
+      ],
+      "landAreaSquareMeters": 284537074263,
+      "waterAreaSquareMeters": 1839852286,
+      "validationRegions": []
+    },
+    {
+      "fips": "33",
+      "code": "NH",
+      "name": "New Hampshire",
+      "bbox": [
+        -72.557247,
+        42.69699,
+        -70.610621,
+        45.305476
+      ],
+      "landAreaSquareMeters": 23190733491,
+      "waterAreaSquareMeters": 1025349624,
+      "validationRegions": []
+    },
+    {
+      "fips": "34",
+      "code": "NJ",
+      "name": "New Jersey",
+      "bbox": [
+        -75.559537,
+        38.928519,
+        -73.893628,
+        41.357423
+      ],
+      "landAreaSquareMeters": 19049443028,
+      "waterAreaSquareMeters": 3533161265,
+      "validationRegions": []
+    },
+    {
+      "fips": "35",
+      "code": "NM",
+      "name": "New Mexico",
+      "bbox": [
+        -109.050173,
+        31.332301,
+        -103.001964,
+        37.000232
+      ],
+      "landAreaSquareMeters": 314198529853,
+      "waterAreaSquareMeters": 726526491,
+      "validationRegions": []
+    },
+    {
+      "fips": "36",
+      "code": "NY",
+      "name": "New York",
+      "bbox": [
+        -79.762152,
+        40.496103,
+        -71.856483,
+        45.01585
+      ],
+      "landAreaSquareMeters": 122049344560,
+      "waterAreaSquareMeters": 19256566831,
+      "validationRegions": []
+    },
+    {
+      "fips": "37",
+      "code": "NC",
+      "name": "North Carolina",
+      "bbox": [
+        -84.321869,
+        33.842316,
+        -75.460621,
+        36.588117
+      ],
+      "landAreaSquareMeters": 125935547374,
+      "waterAreaSquareMeters": 13453873497,
+      "validationRegions": []
+    },
+    {
+      "fips": "38",
+      "code": "ND",
+      "name": "North Dakota",
+      "bbox": [
+        -104.0489,
+        45.935054,
+        -96.554507,
+        49.000574
+      ],
+      "landAreaSquareMeters": 178694402328,
+      "waterAreaSquareMeters": 4414688315,
+      "validationRegions": []
+    },
+    {
+      "fips": "39",
+      "code": "OH",
+      "name": "Ohio",
+      "bbox": [
+        -84.820157,
+        38.403202,
+        -80.518693,
+        41.977164
+      ],
+      "landAreaSquareMeters": 105824499476,
+      "waterAreaSquareMeters": 10273857263,
+      "validationRegions": []
+    },
+    {
+      "fips": "40",
+      "code": "OK",
+      "name": "Oklahoma",
+      "bbox": [
+        -103.002565,
+        33.615833,
+        -94.430662,
+        37.002206
+      ],
+      "landAreaSquareMeters": 177664943367,
+      "waterAreaSquareMeters": 3372936372,
+      "validationRegions": []
+    },
+    {
+      "fips": "41",
+      "code": "OR",
+      "name": "Oregon",
+      "bbox": [
+        -124.566244,
+        41.991794,
+        -116.463504,
+        46.290834
+      ],
+      "landAreaSquareMeters": 248630742196,
+      "waterAreaSquareMeters": 6168664862,
+      "validationRegions": []
+    },
+    {
+      "fips": "42",
+      "code": "PA",
+      "name": "Pennsylvania",
+      "bbox": [
+        -80.519891,
+        39.7198,
+        -74.689516,
+        42.26986
+      ],
+      "landAreaSquareMeters": 115882017582,
+      "waterAreaSquareMeters": 3397072484,
+      "validationRegions": []
+    },
+    {
+      "fips": "44",
+      "code": "RI",
+      "name": "Rhode Island",
+      "bbox": [
+        -71.862772,
+        41.146339,
+        -71.12057,
+        42.018798
+      ],
+      "landAreaSquareMeters": 2677770297,
+      "waterAreaSquareMeters": 1323680040,
+      "validationRegions": []
+    },
+    {
+      "fips": "45",
+      "code": "SC",
+      "name": "South Carolina",
+      "bbox": [
+        -83.35391,
+        32.037593,
+        -78.547324,
+        35.215402
+      ],
+      "landAreaSquareMeters": 77865991519,
+      "waterAreaSquareMeters": 5074452542,
+      "validationRegions": []
+    },
+    {
+      "fips": "46",
+      "code": "SD",
+      "name": "South Dakota",
+      "bbox": [
+        -104.057879,
+        42.479635,
+        -96.436589,
+        45.94545
+      ],
+      "landAreaSquareMeters": 196341986509,
+      "waterAreaSquareMeters": 3387247814,
+      "validationRegions": []
+    },
+    {
+      "fips": "47",
+      "code": "TN",
+      "name": "Tennessee",
+      "bbox": [
+        -90.310453,
+        34.982972,
+        -81.6469,
+        36.678118
+      ],
+      "landAreaSquareMeters": 106771660995,
+      "waterAreaSquareMeters": 2344243062,
+      "validationRegions": []
+    },
+    {
+      "fips": "48",
+      "code": "TX",
+      "name": "Texas",
+      "bbox": [
+        -106.645646,
+        25.837377,
+        -93.508292,
+        36.500704
+      ],
+      "landAreaSquareMeters": 676660157338,
+      "waterAreaSquareMeters": 19008164905,
+      "validationRegions": []
+    },
+    {
+      "fips": "49",
+      "code": "UT",
+      "name": "Utah",
+      "bbox": [
+        -114.052962,
+        36.997968,
+        -109.041058,
+        42.001702
+      ],
+      "landAreaSquareMeters": 213921693698,
+      "waterAreaSquareMeters": 5963352640,
+      "validationRegions": []
+    },
+    {
+      "fips": "50",
+      "code": "VT",
+      "name": "Vermont",
+      "bbox": [
+        -73.43774,
+        42.726853,
+        -71.464555,
+        45.016659
+      ],
+      "landAreaSquareMeters": 23872664356,
+      "waterAreaSquareMeters": 1030573104,
+      "validationRegions": []
+    },
+    {
+      "fips": "51",
+      "code": "VA",
+      "name": "Virginia",
+      "bbox": [
+        -83.675395,
+        36.540738,
+        -75.242469,
+        39.466012
+      ],
+      "landAreaSquareMeters": 102256455003,
+      "waterAreaSquareMeters": 8529795937,
+      "validationRegions": []
+    },
+    {
+      "fips": "53",
+      "code": "WA",
+      "name": "Washington",
+      "bbox": [
+        -124.763068,
+        45.543541,
+        -116.915989,
+        49.002494
+      ],
+      "landAreaSquareMeters": 172121688057,
+      "waterAreaSquareMeters": 12545987222,
+      "validationRegions": [
+        {
+          "id": "seattle",
+          "label": "Seattle",
+          "profiles": [
+            "rain",
+            "shade"
+          ]
+        }
+      ]
+    },
+    {
+      "fips": "54",
+      "code": "WV",
+      "name": "West Virginia",
+      "bbox": [
+        -82.644739,
+        37.201483,
+        -77.719519,
+        40.638801
+      ],
+      "landAreaSquareMeters": 62266655298,
+      "waterAreaSquareMeters": 488773392,
+      "validationRegions": []
+    },
+    {
+      "fips": "55",
+      "code": "WI",
+      "name": "Wisconsin",
+      "bbox": [
+        -92.888114,
+        42.491983,
+        -86.805415,
+        47.080621
+      ],
+      "landAreaSquareMeters": 140295112685,
+      "waterAreaSquareMeters": 29340578971,
+      "validationRegions": []
+    },
+    {
+      "fips": "56",
+      "code": "WY",
+      "name": "Wyoming",
+      "bbox": [
+        -111.054556,
+        40.994746,
+        -104.05216,
+        45.005815
+      ],
+      "landAreaSquareMeters": 251458188895,
+      "waterAreaSquareMeters": 1868027102,
+      "validationRegions": []
+    }
+  ]
+}

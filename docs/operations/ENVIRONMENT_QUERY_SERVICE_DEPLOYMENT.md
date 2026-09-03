@@ -27,6 +27,16 @@ ENVIRONMENT_QUERY_SERVICE_TOKEN=<private-random-token>
 PORT=8787
 ```
 
+For partitioned multi-state deployments, point the service at one or more roots instead of
+listing every store:
+
+```dotenv
+BUILDING_LOCAL_OVERTURE_STORE_ROOTS=/data/us
+```
+
+The service recursively discovers directories containing `manifest.json`. Multiple roots
+are comma-separated; explicit store directories and roots may be used together.
+
 The production process refuses to start without `ENVIRONMENT_QUERY_SERVICE_TOKEN`. The
 runtime image contains one bundled service module and no npm development toolchain.
 
@@ -42,6 +52,7 @@ Recommended limits:
 ```dotenv
 ENVIRONMENT_QUERY_SERVICE_MAX_BBOX_SPAN_DEGREES=0.25
 ENVIRONMENT_QUERY_SERVICE_TIMEOUT_MS=8000
+ENVIRONMENT_QUERY_SERVICE_MAX_LOADED_STORES=8
 BUILDING_QUERY_SERVICE_MAX_BUILDINGS=25000
 COVERED_FEATURE_QUERY_SERVICE_MAX_FEATURES=10000
 ```
@@ -67,6 +78,36 @@ COVERED_FEATURE_QUERY_SERVICE_MAX_FEATURES=10000
 7. Keep the previous release mounted or immediately recoverable for rollback.
 
 The provider rejects a store when a recorded content checksum does not match.
+Only partition manifests are read during coverage discovery. Building and tile-index files
+are loaded on demand, and the service retains at most the configured number of recently used
+stores in memory. This boundary is required before adding statewide or nationwide partition
+sets.
+
+## State Partition Planning
+
+The nationwide catalog is derived from the Census Bureau state cartographic boundary file.
+Create exact boundary-intersecting plans without downloading Overture data:
+
+```bash
+python3 -m venv .venv
+.venv/bin/pip install duckdb
+npm run data:buildings:plan:states -- --states all
+```
+
+Build a deliberately bounded batch from one generated plan:
+
+```bash
+npm run data:buildings:state -- \
+  --plan /tmp/comfortos-us-state-partitions/il/state-plan.json \
+  --max-partitions 4 \
+  --release 2026-08-19.0 \
+  --resume true
+```
+
+Use `--dry-run true` to inspect the exact partition identifiers first. A positive
+`--max-partitions` value is mandatory; full-state or nationwide downloads are never the
+default. Publish completed stores through an atomic manifest or mount switch only after
+quality, latency, and cost gates pass.
 
 ## Application Configuration
 

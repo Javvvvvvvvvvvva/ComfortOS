@@ -9,10 +9,25 @@ import {
   type LocalOvertureStoreManifest,
 } from "@/lib/environment/buildings/providers/localOvertureBuildingProvider";
 
+const MANIFEST_READ_CONCURRENCY = 32;
+const INLINE_REGION_METADATA_LIMIT = 12;
+
 export class MultiRegionOvertureBuildingProvider implements BuildingProvider {
   private readonly providers: LocalOvertureBuildingProvider[];
+  private readonly maxLoadedStores: number;
+  private manifestIndexPromise: Promise<ProviderManifest[]> | null = null;
+  private readonly lastUsed = new Map<LocalOvertureBuildingProvider, number>();
+  private accessSequence = 0;
 
-  constructor(storeDirs: string[]) {
+  constructor(
+    input:
+      | string[]
+      | {
+          storeDirs: string[];
+          maxLoadedStores?: number;
+        },
+  ) {
+    const storeDirs = Array.isArray(input) ? input : input.storeDirs;
     const normalized = storeDirs.map((storeDir) => storeDir.trim()).filter(Boolean);
     if (!normalized.length) {
       throw new Error("At least one Overture building store directory is required.");
@@ -20,6 +35,13 @@ export class MultiRegionOvertureBuildingProvider implements BuildingProvider {
     this.providers = normalized.map(
       (storeDir) => new LocalOvertureBuildingProvider({ storeDir }),
     );
+    const configuredMaximum = Array.isArray(input) ? undefined : input.maxLoadedStores;
+    this.maxLoadedStores =
+      typeof configuredMaximum === "number" &&
+      Number.isInteger(configuredMaximum) &&
+      configuredMaximum > 0
+        ? configuredMaximum
+        : 8;
   }
 
   async getBuildings(bounds: BoundingBox): Promise<Building[]> {
@@ -27,17 +49,23 @@ export class MultiRegionOvertureBuildingProvider implements BuildingProvider {
     if (!selected.length) {
       throw new UnsupportedBuildingRegionError();
     }
-    const groups = await Promise.all(
-      selected.map((provider) => provider.getBuildings(bounds)),
-    );
-    return dedupeBuildings(groups.flat());
+    selected.forEach((provider) => {
+      this.lastUsed.set(provider, ++this.accessSequence);
+    });
+    try {
+      const groups = await Promise.all(
+        selected.map((provider) => provider.getBuildings(bounds)),
+      );
+      return dedupeBuildings(groups.flat());
+    } finally {
+      this.pruneLoadedStores(new Set(selected));
+    }
   }
 
   async getMetadata(): Promise<BuildingProviderMetadata> {
-    const manifests = await Promise.all(
-      this.providers.map((provider) => provider.getManifest()),
+    return metadataFromManifests(
+      (await this.getManifestIndex()).map(({ manifest }) => manifest),
     );
-    return metadataFromManifests(manifests);
   }
 
   async getMetadataForBounds(bounds: BoundingBox): Promise<BuildingProviderMetadata> {
@@ -48,22 +76,77 @@ export class MultiRegionOvertureBuildingProvider implements BuildingProvider {
         region: "unsupported",
       };
     }
-    const manifests = await Promise.all(selected.map((provider) => provider.getManifest()));
+    const selectedSet = new Set(selected);
+    const manifests = (await this.getManifestIndex())
+      .filter(({ provider }) => selectedSet.has(provider))
+      .map(({ manifest }) => manifest);
     return metadataFromManifests(manifests);
   }
 
+  getLoadedStoreCount() {
+    return this.providers.filter((provider) => provider.isLoaded()).length;
+  }
+
   private async providersForBounds(bounds: BoundingBox) {
-    const pairs = await Promise.all(
-      this.providers.map(async (provider) => ({
-        provider,
-        manifest: await provider.getManifest(),
-      })),
-    );
-    return pairs
+    return (await this.getManifestIndex())
       .filter(({ manifest }) => manifestIntersectsBounds(manifest, bounds))
       .map(({ provider }) => provider);
   }
+
+  private getManifestIndex() {
+    if (!this.manifestIndexPromise) {
+      this.manifestIndexPromise = this.loadManifestIndex().catch((error) => {
+        this.manifestIndexPromise = null;
+        throw error;
+      });
+    }
+    return this.manifestIndexPromise;
+  }
+
+  private async loadManifestIndex() {
+    const index: ProviderManifest[] = [];
+    for (
+      let offset = 0;
+      offset < this.providers.length;
+      offset += MANIFEST_READ_CONCURRENCY
+    ) {
+      const batch = this.providers.slice(offset, offset + MANIFEST_READ_CONCURRENCY);
+      index.push(
+        ...(await Promise.all(
+          batch.map(async (provider) => ({
+            provider,
+            manifest: await provider.getManifest(),
+          })),
+        )),
+      );
+    }
+    return index;
+  }
+
+  private pruneLoadedStores(active: Set<LocalOvertureBuildingProvider>) {
+    const loaded = this.providers.filter((provider) => provider.isLoaded());
+    const targetCount = Math.max(this.maxLoadedStores, active.size);
+    if (loaded.length <= targetCount) return;
+
+    const releasable = loaded
+      .filter((provider) => !active.has(provider))
+      .sort(
+        (left, right) =>
+          (this.lastUsed.get(left) ?? 0) - (this.lastUsed.get(right) ?? 0),
+      );
+    let loadedCount = loaded.length;
+    for (const provider of releasable) {
+      if (loadedCount <= targetCount) break;
+      provider.releaseStore();
+      loadedCount -= 1;
+    }
+  }
 }
+
+type ProviderManifest = {
+  provider: LocalOvertureBuildingProvider;
+  manifest: LocalOvertureStoreManifest;
+};
 
 export class UnsupportedBuildingRegionError extends Error {
   constructor() {
@@ -84,7 +167,10 @@ function metadataFromManifests(
       .map((manifest) => manifest.createdAt)
       .sort()
       .at(-1),
-    region: regions.join(","),
+    region:
+      regions.length <= INLINE_REGION_METADATA_LIMIT
+        ? regions.join(",")
+        : `${regions.length} spatial partitions`,
     source: "overture-buildings",
   };
 }

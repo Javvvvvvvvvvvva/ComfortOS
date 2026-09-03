@@ -27,6 +27,13 @@ export default function DataSourcesPage() {
           Comfort recommendations.
         </p>
       </PolicySection>
+      <PolicySection title="Coverage geography">
+        <p>
+          The nationwide coverage catalog uses the United States Census Bureau&apos;s 2025
+          state cartographic boundary file. State boundaries organize data deployment; they
+          do not imply that detailed Comfort data is active statewide.
+        </p>
+      </PolicySection>
       <PolicySection title="Buildings and covered features">
         <p>
           Building footprints and available height attributes come from versioned Overture
@@ -44,8 +51,9 @@ export default function DataSourcesPage() {
       </PolicySection>
       <PolicySection title="Attribution">
         <p>
-          Mapbox, OpenStreetMap contributors, Overture Maps, and the National Weather Service
-          retain ownership and attribution rights in their respective data and services.
+          Mapbox, OpenStreetMap contributors, Overture Maps, the National Weather Service,
+          and the United States Census Bureau retain ownership and attribution rights in
+          their respective data and services.
         </p>
       </PolicySection>
     </PolicyPage>

@@ -51,6 +51,7 @@ const TILE_INDEX_FILE = "tile-index.json";
 
 export class LocalOvertureBuildingProvider implements BuildingProvider {
   private readonly storeDir: string;
+  private manifestPromise: Promise<LocalOvertureStoreManifest> | null = null;
   private loaded:
     | {
         manifest: LocalOvertureStoreManifest;
@@ -58,6 +59,7 @@ export class LocalOvertureBuildingProvider implements BuildingProvider {
         tileIndex: TileIndex;
       }
     | null = null;
+  private loadPromise: Promise<NonNullable<LocalOvertureBuildingProvider["loaded"]>> | null = null;
 
   constructor(options: LocalOvertureBuildingProviderOptions) {
     this.storeDir = options.storeDir;
@@ -81,7 +83,22 @@ export class LocalOvertureBuildingProvider implements BuildingProvider {
   }
 
   async getManifest() {
-    return (await this.loadStore()).manifest;
+    if (!this.manifestPromise) {
+      this.manifestPromise = fs
+        .readFile(path.join(this.storeDir, MANIFEST_FILE), "utf8")
+        .then((text) => {
+          const manifest = JSON.parse(text) as LocalOvertureStoreManifest;
+          if (manifest.format !== "comfortos-local-building-store-v1") {
+            throw new Error("Unsupported local Overture building store.");
+          }
+          return manifest;
+        })
+        .catch((error) => {
+          this.manifestPromise = null;
+          throw error;
+        });
+    }
+    return this.manifestPromise;
   }
 
   async getMetadata(): Promise<BuildingProviderMetadata> {
@@ -95,39 +112,51 @@ export class LocalOvertureBuildingProvider implements BuildingProvider {
     };
   }
 
+  isLoaded() {
+    return this.loaded !== null;
+  }
+
+  releaseStore() {
+    this.loaded = null;
+  }
+
   private async loadStore() {
     if (this.loaded) return this.loaded;
+    if (this.loadPromise) return this.loadPromise;
 
-    const [manifestText, buildingsText, tileIndexText] = await Promise.all([
-      fs.readFile(path.join(this.storeDir, MANIFEST_FILE), "utf8"),
+    this.loadPromise = Promise.all([
+      this.getManifest(),
       fs.readFile(path.join(this.storeDir, BUILDINGS_FILE), "utf8"),
       fs.readFile(path.join(this.storeDir, TILE_INDEX_FILE), "utf8"),
-    ]);
-    const manifest = JSON.parse(manifestText) as LocalOvertureStoreManifest;
-    if (manifest.format !== "comfortos-local-building-store-v1") {
-      throw new Error("Unsupported local Overture building store.");
+    ]).then(([manifest, buildingsText, tileIndexText]) => {
+      verifyStoreChecksum(
+        "buildings.jsonl",
+        buildingsText,
+        manifest.checksums?.buildingsSha256,
+      );
+      verifyStoreChecksum(
+        "tile-index.json",
+        tileIndexText,
+        manifest.checksums?.tileIndexSha256,
+      );
+
+      const loaded = {
+        manifest,
+        buildings: buildingsText
+          .split("\n")
+          .filter(Boolean)
+          .map((line) => JSON.parse(line) as StoredBuilding),
+        tileIndex: JSON.parse(tileIndexText) as TileIndex,
+      };
+      this.loaded = loaded;
+      return loaded;
+    });
+
+    try {
+      return await this.loadPromise;
+    } finally {
+      this.loadPromise = null;
     }
-    verifyStoreChecksum(
-      "buildings.jsonl",
-      buildingsText,
-      manifest.checksums?.buildingsSha256,
-    );
-    verifyStoreChecksum(
-      "tile-index.json",
-      tileIndexText,
-      manifest.checksums?.tileIndexSha256,
-    );
-
-    this.loaded = {
-      manifest,
-      buildings: buildingsText
-        .split("\n")
-        .filter(Boolean)
-        .map((line) => JSON.parse(line) as StoredBuilding),
-      tileIndex: JSON.parse(tileIndexText) as TileIndex,
-    };
-
-    return this.loaded;
   }
 }
 

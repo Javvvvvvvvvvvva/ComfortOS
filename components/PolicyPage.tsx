@@ -25,6 +25,7 @@ export function PolicyPage({
       </header>
       <article className="policy-content">{children}</article>
       <nav className="policy-nav" aria-label="Legal and support">
+        <Link href="/coverage">Coverage</Link>
         <Link href="/privacy">Privacy</Link>
         <Link href="/terms">Terms</Link>
         <Link href="/data-sources">Data sources</Link>

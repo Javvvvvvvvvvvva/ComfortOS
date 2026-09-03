@@ -2077,3 +2077,31 @@ environment
 Yes라면 ComfortOS의 기능이다.
 
 No라면 다른 제품의 기능일 가능성이 높다.
+
+---
+
+# 71. Nationwide Geographic Expansion
+
+미국 전역 지원은 하나의 boolean으로 표현하지 않는다. 지역별 capability를 다음과 같이
+분리한다.
+
+```text
+place search eligibility
+walking routing eligibility
+weather eligibility
+environmental data deployment
+environmental validation
+```
+
+50개 주와 District of Columbia는 공식 Census geography catalog에 등록한다. Mapbox 검색과
+보행 경로, NWS 날씨의 provider eligibility는 전국 범위로 유지하되, building, shade,
+rain-cover data가 실제 배포되지 않은 지역은 `Limited Data`로 동작해야 한다.
+
+대규모 building data는 주 전체 단일 파일이나 도시별 adapter로 만들지 않는다. 공식 주
+경계와 교차하는 bounded spatial partition으로 계획하고, immutable Overture store로
+생성한다. Query service는 manifest만 먼저 읽고, 요청 경로와 교차하는 partition data만
+lazy-load하며 제한된 LRU cache를 유지한다.
+
+주 또는 metro가 catalog에 존재한다는 사실은 detailed Comfort coverage를 의미하지 않는다.
+환경 데이터가 없거나 검증되지 않은 경우 다른 지역 데이터를 빌려 쓰거나 좋은 점수를
+만들지 않으며, Fastest route와 실제 confidence/completeness 상태를 보존한다.

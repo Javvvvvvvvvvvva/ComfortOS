@@ -15,11 +15,15 @@ import {
   boundsForFootprint,
   LocalOvertureBuildingProvider,
 } from "@/lib/environment/buildings/providers/localOvertureBuildingProvider";
-import { manifestIntersectsBounds } from "@/lib/environment/buildings/providers/multiRegionOvertureBuildingProvider";
+import {
+  manifestIntersectsBounds,
+  MultiRegionOvertureBuildingProvider,
+} from "@/lib/environment/buildings/providers/multiRegionOvertureBuildingProvider";
 import { normalizeOvertureFeature } from "@/scripts/ingest-overture-buildings";
 import {
   assertEnvironmentServiceAuthentication,
   assertBboxWithinLimit,
+  discoverBuildingStoreDirs,
   isAuthorizedServiceRequest,
   parseBuildingServiceBbox,
 } from "@/scripts/serve-building-query-service";
@@ -256,6 +260,26 @@ test("production environment service refuses to start without authentication", (
   assert.doesNotThrow(() => assertEnvironmentServiceAuthentication("development", ""));
 });
 
+test("environment service discovers partition stores beneath configured roots", async () => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), "comfortos-store-root-"));
+  const first = path.join(root, "il", "partition-a");
+  const second = path.join(root, "ny", "partition-b");
+  await Promise.all([
+    fs.mkdir(first, { recursive: true }),
+    fs.mkdir(second, { recursive: true }),
+    fs.mkdir(path.join(root, "empty"), { recursive: true }),
+  ]);
+  await Promise.all([
+    fs.writeFile(path.join(first, "manifest.json"), "{}\n", "utf8"),
+    fs.writeFile(path.join(second, "manifest.json"), "{}\n", "utf8"),
+  ]);
+
+  assert.deepEqual(discoverBuildingStoreDirs([root]), [
+    await fs.realpath(first),
+    await fs.realpath(second),
+  ]);
+});
+
 test("multi-region coverage rejects requests outside configured store bounds", () => {
   const manifest = {
     format: "comfortos-local-building-store-v1" as const,
@@ -290,7 +314,74 @@ test("multi-region coverage rejects requests outside configured store bounds", (
   );
 });
 
-async function writeStore(buildings: Array<Building & { bbox: ReturnType<typeof boundsForFootprint> }>) {
+test("multi-region provider reads manifests eagerly but loads only recent data partitions", async () => {
+  const stores = await Promise.all([
+    writeStore([sampleBuilding("minneapolis", -93.266, 44.977)], {
+      region: "minneapolis-partition",
+      bbox: [-93.27, 44.97, -93.25, 44.99],
+    }),
+    writeStore([sampleBuilding("chicago", -87.63, 41.88)], {
+      region: "chicago-partition",
+      bbox: [-87.64, 41.87, -87.61, 41.9],
+    }),
+    writeStore([sampleBuilding("new-york", -74.0, 40.71)], {
+      region: "new-york-partition",
+      bbox: [-74.02, 40.7, -73.98, 40.73],
+    }),
+  ]);
+  const provider = new MultiRegionOvertureBuildingProvider({
+    storeDirs: stores,
+    maxLoadedStores: 1,
+  });
+
+  await provider.getMetadata();
+  assert.equal(provider.getLoadedStoreCount(), 0);
+
+  const minneapolis = await provider.getBuildings({
+    west: -93.267,
+    south: 44.976,
+    east: -93.264,
+    north: 44.979,
+  });
+  assert.equal(minneapolis[0]?.id, "minneapolis");
+  assert.equal(provider.getLoadedStoreCount(), 1);
+
+  const chicago = await provider.getBuildings({
+    west: -87.631,
+    south: 41.879,
+    east: -87.628,
+    north: 41.883,
+  });
+  assert.equal(chicago[0]?.id, "chicago");
+  assert.equal(provider.getLoadedStoreCount(), 1);
+
+  const newYork = await provider.getBuildings({
+    west: -74.001,
+    south: 40.709,
+    east: -73.997,
+    north: 40.714,
+  });
+  assert.equal(newYork[0]?.id, "new-york");
+  assert.equal(provider.getLoadedStoreCount(), 1);
+
+  assert.equal(
+    (await provider.getBuildings({
+      west: -93.267,
+      south: 44.976,
+      east: -93.264,
+      north: 44.979,
+    }))[0]?.id,
+    "minneapolis",
+  );
+});
+
+async function writeStore(
+  buildings: Array<Building & { bbox: ReturnType<typeof boundsForFootprint> }>,
+  options: {
+    region?: string;
+    bbox?: [number, number, number, number];
+  } = {},
+) {
   const storeDir = await fs.mkdtemp(path.join(os.tmpdir(), "comfortos-buildings-"));
   const tileIndex: Record<string, number[]> = {};
   const tileSizeDegrees = 0.005;
@@ -310,7 +401,8 @@ async function writeStore(buildings: Array<Building & { bbox: ReturnType<typeof 
         format: "comfortos-local-building-store-v1",
         source: "overture-buildings",
         createdAt: "2026-08-10T00:00:00.000Z",
-        region: "fixture",
+        region: options.region ?? "fixture",
+        bbox: options.bbox,
         tileSizeDegrees,
         buildingCount: buildings.length,
         explicitHeightCount: buildings.length,

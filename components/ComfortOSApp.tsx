@@ -792,7 +792,8 @@ export function ComfortOSApp() {
           </p>
         ) : null}
 
-        <nav className="product-links" aria-label="Privacy, terms, data sources, and support">
+        <nav className="product-links" aria-label="Coverage, privacy, terms, data sources, and support">
+          <Link href="/coverage">Coverage</Link>
           <Link href="/privacy">Privacy</Link>
           <Link href="/terms">Terms</Link>
           <Link href="/data-sources">Data</Link>

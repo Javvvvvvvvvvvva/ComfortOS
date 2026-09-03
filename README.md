@@ -20,6 +20,24 @@ The current build is the Stage 10 MVP and limited-beta hardening baseline. Manag
 
 Minneapolis, Seattle, and Phoenix are validation scenarios for winter, rain, and heat. They are not hard-coded architecture limits.
 
+## United States Coverage
+
+Place search, managed walking routes, and National Weather Service conditions are eligible
+across all 50 states and the District of Columbia. The public `/coverage` page and
+`/api/regions` endpoint expose that catalog separately from environmental-data readiness.
+
+Detailed Comfort data remains metro-validated in Phoenix, Minneapolis, and Seattle. The
+repository does not claim statewide building, shade, or rain-cover coverage until reviewed
+spatial partitions are deployed. Generate bounded state ingestion plans with:
+
+```bash
+npm run data:buildings:plan:states -- --states IL
+npm run data:buildings:state -- --plan /tmp/comfortos-us-state-partitions/il/state-plan.json --max-partitions 1 --dry-run true
+```
+
+Every real state build requires an explicit `--max-partitions` value so a nationwide data
+download cannot begin accidentally.
+
 ## Architecture
 
 ```text
@@ -173,9 +191,11 @@ Start with the canonical documents:
 - [ADR-021: Stage 10 Limited-Beta Gate](docs/decisions/ADR-021-stage-10-limited-beta-gate.md)
 - [ADR-022: Managed POI Geocoding Provider](docs/decisions/ADR-022-managed-poi-geocoding-provider.md)
 - [ADR-023: Production Provider Boundaries](docs/decisions/ADR-023-production-provider-boundaries.md)
+- [ADR-024: Nationwide Coverage and Partitioned Environmental Data](docs/decisions/ADR-024-nationwide-coverage-and-partitioned-environmental-data.md)
 - [Stage 9.6 Managed Routing Validation](docs/analysis/STAGE_9_6_MANAGED_ROUTING_VALIDATION.md)
 - [Stage 10 MVP Readiness Audit](docs/analysis/STAGE_10_MVP_READINESS_AUDIT.md)
 - [Stage 10.1 Production Hardening](docs/analysis/STAGE_10_1_PRODUCTION_HARDENING.md)
+- [Nationwide Expansion Foundation](docs/analysis/STAGE_10_2_NATIONWIDE_EXPANSION_FOUNDATION.md)
 - [MVP Release Checklist](docs/release/MVP_RELEASE_CHECKLIST.md)
 - [Environment Query Service Deployment](docs/operations/ENVIRONMENT_QUERY_SERVICE_DEPLOYMENT.md)
 - [Observability Runbook](docs/operations/OBSERVABILITY_RUNBOOK.md)

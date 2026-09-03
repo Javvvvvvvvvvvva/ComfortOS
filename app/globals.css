@@ -663,6 +663,88 @@ input:focus-visible,
   font-weight: 800;
 }
 
+.coverage-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-bottom: 1px solid #cdd5d0;
+}
+
+.coverage-summary div {
+  display: grid;
+  align-content: start;
+  gap: 4px;
+  min-height: 112px;
+  padding: 24px 18px 24px 0;
+}
+
+.coverage-summary strong {
+  color: #244b46;
+  font-size: 30px;
+  line-height: 1;
+}
+
+.coverage-summary span {
+  max-width: 180px;
+  color: #5a6661;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.coverage-list {
+  display: grid;
+}
+
+.coverage-row {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) 140px minmax(180px, 1fr);
+  align-items: center;
+  gap: 20px;
+  min-height: 58px;
+  border-bottom: 1px solid #d9dfdb;
+}
+
+.coverage-state {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.coverage-state span {
+  width: 28px;
+  color: #65706b;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.coverage-state strong,
+.coverage-baseline,
+.coverage-comfort {
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.coverage-baseline {
+  color: #245d56;
+  font-weight: 800;
+}
+
+.coverage-comfort {
+  color: #6b746f;
+}
+
+.coverage-comfort.validated {
+  color: #6c4d1b;
+  font-weight: 800;
+}
+
+.coverage-note {
+  margin: 26px 0 0;
+  color: #5a6661;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
 @media (max-width: 520px) {
   .policy-page {
     padding-top: 24px;
@@ -674,6 +756,22 @@ input:focus-visible,
 
   .policy-header h1 {
     font-size: 38px;
+  }
+
+  .coverage-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .coverage-summary div {
+    min-height: 0;
+    border-bottom: 1px solid #d9dfdb;
+    padding: 16px 0;
+  }
+
+  .coverage-row {
+    grid-template-columns: 1fr;
+    gap: 5px;
+    padding: 15px 0;
   }
 }
 
