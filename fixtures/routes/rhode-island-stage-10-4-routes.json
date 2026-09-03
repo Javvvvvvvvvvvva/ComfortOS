@@ -1,0 +1,20 @@
+[
+  {
+    "id": "ri-state-house-brown",
+    "label": "Rhode Island State House to Brown University",
+    "origin": { "latitude": 41.8309, "longitude": -71.4149 },
+    "destination": { "latitude": 41.8268, "longitude": -71.4025 }
+  },
+  {
+    "id": "ri-providence-station-india-point",
+    "label": "Providence Station to India Point Park",
+    "origin": { "latitude": 41.829, "longitude": -71.4133 },
+    "destination": { "latitude": 41.8174, "longitude": -71.3652 }
+  },
+  {
+    "id": "ri-newport-center-cliff-walk",
+    "label": "Newport Center to Cliff Walk",
+    "origin": { "latitude": 41.4901, "longitude": -71.3128 },
+    "destination": { "latitude": 41.4771, "longitude": -71.2985 }
+  }
+]

@@ -1,0 +1,20 @@
+[
+  {
+    "id": "dc-white-house-lincoln",
+    "label": "White House to Lincoln Memorial",
+    "origin": { "latitude": 38.8977, "longitude": -77.0365 },
+    "destination": { "latitude": 38.8893, "longitude": -77.0502 }
+  },
+  {
+    "id": "dc-union-station-capitol",
+    "label": "Union Station to U.S. Capitol",
+    "origin": { "latitude": 38.8971, "longitude": -77.0064 },
+    "destination": { "latitude": 38.8899, "longitude": -77.0091 }
+  },
+  {
+    "id": "dc-stadium-armory-cemetery",
+    "label": "Stadium-Armory to Congressional Cemetery",
+    "origin": { "latitude": 38.8859, "longitude": -76.9771 },
+    "destination": { "latitude": 38.8815, "longitude": -76.9779 }
+  }
+]

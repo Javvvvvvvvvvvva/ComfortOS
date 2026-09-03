@@ -38,6 +38,20 @@ npm run data:buildings:state -- --plan /tmp/comfortos-us-state-partitions/il/sta
 Every real state build requires an explicit `--max-partitions` value so a nationwide data
 download cannot begin accidentally.
 
+For a resumable, pinned nationwide candidate build, use the smallest-jurisdiction-first
+runner. It does not activate or deploy the resulting data:
+
+```bash
+npm run data:buildings:rollout -- \
+  --plan-root /data/comfortos/plans/2026-08-19.0 \
+  --data-root /data/comfortos/overture/us \
+  --release 2026-08-19.0 \
+  --max-partitions 10 \
+  --minimum-free-bytes 8589934592
+```
+
+Audit completed candidates separately with `npm run data:buildings:audit`.
+
 ## Architecture
 
 ```text
@@ -198,6 +212,7 @@ Start with the canonical documents:
 - [Stage 10.1 Production Hardening](docs/analysis/STAGE_10_1_PRODUCTION_HARDENING.md)
 - [Nationwide Expansion Foundation](docs/analysis/STAGE_10_2_NATIONWIDE_EXPANSION_FOUNDATION.md)
 - [Illinois Overture Rollout Pilot](docs/analysis/STAGE_10_3_ILLINOIS_OVERTURE_ROLLOUT.md)
+- [Nationwide Data Build Checkpoint](docs/analysis/STAGE_10_4_NATIONWIDE_DATA_BUILD_CHECKPOINT.md)
 - [MVP Release Checklist](docs/release/MVP_RELEASE_CHECKLIST.md)
 - [Environment Query Service Deployment](docs/operations/ENVIRONMENT_QUERY_SERVICE_DEPLOYMENT.md)
 - [Observability Runbook](docs/operations/OBSERVABILITY_RUNBOOK.md)

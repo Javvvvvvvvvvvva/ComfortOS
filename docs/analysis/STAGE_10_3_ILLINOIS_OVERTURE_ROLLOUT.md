@@ -72,7 +72,7 @@ No building footprint was treated as overhead rain cover.
 
 ## Deployment State
 
-The validated store is staged locally under the ignored `data/overture` hierarchy and can be
+The validated store is staged locally under the ignored `data/overture/us/il` hierarchy and can be
 served through `BUILDING_LOCAL_OVERTURE_STORE_ROOTS`. The repository has no configured R2
 bucket, persistent container volume, or private environment-service host, so production data
 publication cannot be completed from the current credentials. The rollout registry records

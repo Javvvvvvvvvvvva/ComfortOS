@@ -21,7 +21,7 @@
     "unknownHeightCount": 39705,
     "invalidGeometryCount": 0,
     "storeSizeBytes": 238045129,
-    "relativeStorePath": "data/overture/illinois/2026-08-19.0/us-il-w0351-n0167"
+    "relativeStorePath": "data/overture/us/il/2026-08-19.0/us-il-w0351-n0167"
   },
   "randomAccess": {
     "format": "uint64le-offset-uint32le-length-v1",

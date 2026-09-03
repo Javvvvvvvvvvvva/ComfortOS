@@ -123,6 +123,33 @@ Use `--dry-run true` to inspect the exact partition identifiers first. A positiv
 default. Publish completed stores through an atomic manifest or mount switch only after
 quality, latency, and cost gates pass.
 
+For long-running multi-state candidate builds, use the bounded rollout runner rather than
+manually increasing a state's prefix limit:
+
+```bash
+npm run data:buildings:rollout -- \
+  --plan-root /data/comfortos/plans/<release> \
+  --data-root /data/comfortos/overture/us \
+  --release <pinned-release> \
+  --max-partitions 10 \
+  --minimum-free-bytes 8589934592
+```
+
+The runner orders jurisdictions from the fewest planned partitions to the most, skips every
+store with a completed manifest, and stops before starting another partition when available
+storage is below the configured floor. `--dry-run true` reports the exact next partitions.
+Candidate construction does not update application coverage or activate deployment.
+
+Record an auditable checkpoint with:
+
+```bash
+npm run data:buildings:audit -- \
+  --plan-root /data/comfortos/plans/<release> \
+  --data-root /data/comfortos/overture/us \
+  --release <pinned-release> \
+  --output config/data-regions/build-progress/overture-<release>.json
+```
+
 Store validated candidates under a durable release path such as:
 
 ```text

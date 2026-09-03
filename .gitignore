@@ -45,6 +45,7 @@ yarn-error.log*
 *-debug-smoke.png
 docs/analysis/generated/
 data/overture/
+data/overture-plans/
 data/cache/
 *.sqlite
 *.sqlite3
