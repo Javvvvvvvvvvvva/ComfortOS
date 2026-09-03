@@ -9,12 +9,37 @@ type StatePlan = {
   partitions: Array<{ id: string; bbox: [number, number, number, number] }>;
 };
 
+type StateArchiveCheckpoint = {
+  format: "comfortos-us-state-archive-checkpoint-v1";
+  release: string;
+  jurisdiction: { code: string; name: string };
+  dataset: {
+    buildingCount: number;
+    usableHeightCount: number;
+    usableHeightRatio: number | null;
+  };
+  archive: {
+    partitionCount: number;
+    storedBytes: number;
+    remoteVerified: boolean;
+  };
+  localDataPruned: boolean;
+};
+
 async function main() {
   const options = parseArgs(process.argv.slice(2));
   const planRoot = path.resolve(requireOption(options.planRoot, "--plan-root"));
   const dataRoot = path.resolve(requireOption(options.dataRoot, "--data-root"));
   const release = requireOption(options.release, "--release");
-  const report = await auditBuildProgress(planRoot, dataRoot, release);
+  const archiveCheckpointRoot = path.resolve(
+    options.archiveCheckpointRoot ?? "config/data-regions/archive-checkpoints",
+  );
+  const report = await auditBuildProgress(
+    planRoot,
+    dataRoot,
+    release,
+    archiveCheckpointRoot,
+  );
   const text = `${JSON.stringify(report, null, 2)}\n`;
   if (options.output) {
     await fs.mkdir(path.dirname(options.output), { recursive: true });
@@ -28,8 +53,21 @@ export async function auditBuildProgress(
   planRoot: string,
   dataRoot: string,
   release: string,
+  archiveCheckpointRoot?: string,
 ) {
   const plans = await loadStatePlans(planRoot);
+  const archiveCheckpoints = archiveCheckpointRoot
+    ? await loadArchiveCheckpoints(archiveCheckpointRoot, release)
+    : new Map<string, StateArchiveCheckpoint>();
+  const plannedCodes = new Set(plans.map((plan) => plan.jurisdiction.code));
+  const unknownArchivedCodes = [...archiveCheckpoints.keys()].filter(
+    (code) => !plannedCodes.has(code),
+  );
+  if (unknownArchivedCodes.length) {
+    throw new Error(
+      `Archive checkpoints have no matching state plan: ${unknownArchivedCodes.join(", ")}.`,
+    );
+  }
   const uniqueCells = new Set<string>();
   const jurisdictions = [];
   let completedPartitionCount = 0;
@@ -37,15 +75,42 @@ export async function auditBuildProgress(
   let buildingCount = 0;
   let usableHeightCount = 0;
   let storedBytes = 0;
+  let archivedPartitionCount = 0;
 
   for (const plan of plans) {
+    for (const partition of plan.partitions) uniqueCells.add(partition.bbox.join(","));
+    const archiveCheckpoint = archiveCheckpoints.get(plan.jurisdiction.code);
+    if (archiveCheckpoint) {
+      if (archiveCheckpoint.archive.partitionCount !== plan.partitionCount) {
+        throw new Error(
+          `Archive checkpoint partition count mismatch: ${plan.jurisdiction.code}.`,
+        );
+      }
+      completedPartitionCount += plan.partitionCount;
+      archivedPartitionCount += plan.partitionCount;
+      buildingCount += archiveCheckpoint.dataset.buildingCount;
+      usableHeightCount += archiveCheckpoint.dataset.usableHeightCount;
+      storedBytes += archiveCheckpoint.archive.storedBytes;
+      jurisdictions.push({
+        code: plan.jurisdiction.code,
+        name: plan.jurisdiction.name,
+        status: "archived",
+        plannedPartitionCount: plan.partitionCount,
+        completedPartitionCount: plan.partitionCount,
+        invalidPartitionCount: 0,
+        buildingCount: archiveCheckpoint.dataset.buildingCount,
+        usableHeightRatio: archiveCheckpoint.dataset.usableHeightRatio,
+        storedBytes: archiveCheckpoint.archive.storedBytes,
+        localDataPruned: archiveCheckpoint.localDataPruned,
+      });
+      continue;
+    }
     let completed = 0;
     let invalid = 0;
     let stateBuildings = 0;
     let stateUsableHeights = 0;
     let stateBytes = 0;
     for (const partition of plan.partitions) {
-      uniqueCells.add(partition.bbox.join(","));
       const storeDir = path.join(
         dataRoot,
         plan.jurisdiction.code.toLowerCase(),
@@ -134,12 +199,17 @@ export async function auditBuildProgress(
     summary: {
       jurisdictionCount: plans.length,
       completedJurisdictionCount: jurisdictions.filter(
-        (jurisdiction) => jurisdiction.status === "built",
+        (jurisdiction) =>
+          jurisdiction.status === "built" || jurisdiction.status === "archived",
+      ).length,
+      archivedJurisdictionCount: jurisdictions.filter(
+        (jurisdiction) => jurisdiction.status === "archived",
       ).length,
       plannedPartitionCount,
       uniqueGridCellCount: uniqueCells.size,
       duplicateStateAssignmentCount: plannedPartitionCount - uniqueCells.size,
       completedPartitionCount,
+      archivedPartitionCount,
       invalidPartitionCount,
       completionRatio:
         plannedPartitionCount > 0
@@ -152,6 +222,48 @@ export async function auditBuildProgress(
     },
     jurisdictions,
   };
+}
+
+async function loadArchiveCheckpoints(root: string, release: string) {
+  const releaseRoot = path.join(root, release);
+  let entries;
+  try {
+    entries = await fs.readdir(releaseRoot, { withFileTypes: true });
+  } catch (error) {
+    if (isMissingFile(error)) return new Map<string, StateArchiveCheckpoint>();
+    throw error;
+  }
+  const checkpoints = new Map<string, StateArchiveCheckpoint>();
+  for (const entry of entries) {
+    if (!entry.isFile() || !entry.name.endsWith(".json")) continue;
+    const checkpoint = JSON.parse(
+      await fs.readFile(path.join(releaseRoot, entry.name), "utf8"),
+    ) as StateArchiveCheckpoint;
+    if (
+      checkpoint.format !== "comfortos-us-state-archive-checkpoint-v1" ||
+      checkpoint.release !== release ||
+      checkpoint.archive?.remoteVerified !== true ||
+      !checkpoint.jurisdiction?.code ||
+      !Number.isInteger(checkpoint.dataset?.buildingCount) ||
+      checkpoint.dataset.buildingCount < 0 ||
+      !Number.isInteger(checkpoint.dataset?.usableHeightCount) ||
+      checkpoint.dataset.usableHeightCount < 0 ||
+      checkpoint.dataset.usableHeightCount > checkpoint.dataset.buildingCount ||
+      (checkpoint.dataset.usableHeightRatio !== null &&
+        (!Number.isFinite(checkpoint.dataset.usableHeightRatio) ||
+          checkpoint.dataset.usableHeightRatio < 0 ||
+          checkpoint.dataset.usableHeightRatio > 1))
+    ) {
+      throw new Error(`Invalid archive checkpoint: ${entry.name}`);
+    }
+    if (checkpoints.has(checkpoint.jurisdiction.code)) {
+      throw new Error(
+        `Duplicate archive checkpoint: ${checkpoint.jurisdiction.code}.`,
+      );
+    }
+    checkpoints.set(checkpoint.jurisdiction.code, checkpoint);
+  }
+  return checkpoints;
 }
 
 async function loadStatePlans(planRoot: string) {

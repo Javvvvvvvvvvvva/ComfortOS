@@ -51,3 +51,7 @@ Accepted ADRs:
 - `ADR-020-mvp-managed-routing-provider.md`
 - `ADR-021-stage-10-limited-beta-gate.md`
 - `ADR-022-managed-poi-geocoding-provider.md`
+- `ADR-023-production-provider-boundaries.md`
+- `ADR-024-nationwide-coverage-and-partitioned-environmental-data.md`
+- `ADR-025-random-access-building-stores.md`
+- `ADR-026-state-archive-and-local-pruning.md`

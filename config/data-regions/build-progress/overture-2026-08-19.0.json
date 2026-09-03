@@ -1,14 +1,16 @@
 {
   "format": "comfortos-us-overture-build-progress-v1",
-  "generatedAt": "2026-09-03T22:42:19.630Z",
+  "generatedAt": "2026-09-03T23:04:55.589Z",
   "release": "2026-08-19.0",
   "summary": {
     "jurisdictionCount": 51,
     "completedJurisdictionCount": 3,
+    "archivedJurisdictionCount": 0,
     "plannedPartitionCount": 20758,
     "uniqueGridCellCount": 19036,
     "duplicateStateAssignmentCount": 1722,
     "completedPartitionCount": 39,
+    "archivedPartitionCount": 0,
     "invalidPartitionCount": 0,
     "completionRatio": 0.0018787937180845939,
     "buildingCount": 2863088,

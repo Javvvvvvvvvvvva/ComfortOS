@@ -65,10 +65,11 @@ average about 39.5 MB per state-partition assignment. A linear extrapolation wou
 800 GB, but it is only a capacity warning because building density varies greatly by region.
 The nationwide candidate set cannot fit on the current internal disk.
 
-The next build target is Connecticut, with 37 partitions. Continue only after assigning a
-large external staging volume as `--data-root`. This storage is a build workspace, not a
-production deployment, so the decision to deploy only after all states are complete remains
-intact.
+The next build target is Connecticut, with 37 partitions. Stage 10.5 adds verified
+state-by-state R2 archival so completed local states can be pruned before continuing. The
+build machine must still retain enough scratch space for one complete state. This storage is
+a build workspace, not a production deployment, so the decision to deploy only after all
+states are complete remains intact.
 
 ## Judgment
 

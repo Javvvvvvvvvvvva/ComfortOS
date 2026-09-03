@@ -50,7 +50,28 @@ npm run data:buildings:rollout -- \
   --minimum-free-bytes 8589934592
 ```
 
-Audit completed candidates separately with `npm run data:buildings:audit`.
+Audit completed candidates separately with `npm run data:buildings:audit`. The audit and
+rollout commands also read verified state checkpoints from
+`config/data-regions/archive-checkpoints`, so locally pruned states remain complete.
+
+After a state passes live and controlled route validation, archive it to R2 and prune the
+local copy only after remote SHA-256 verification:
+
+```bash
+npm run data:buildings:archive-state -- \
+  --state DC \
+  --release 2026-08-19.0 \
+  --plan-root data/overture-plans/2026-08-19.0 \
+  --data-root data/overture/us \
+  --validation-reports /tmp/dc-live.json,/tmp/dc-controlled.json \
+  --provider r2 \
+  --prune true \
+  --confirm-prune DC@2026-08-19.0
+```
+
+The command loads R2 credentials from `.env.local` by default, publishes the state archive
+manifest last, writes only a compact checkpoint to Git, and never changes production
+deployment coverage.
 
 ## Architecture
 
@@ -213,6 +234,7 @@ Start with the canonical documents:
 - [Nationwide Expansion Foundation](docs/analysis/STAGE_10_2_NATIONWIDE_EXPANSION_FOUNDATION.md)
 - [Illinois Overture Rollout Pilot](docs/analysis/STAGE_10_3_ILLINOIS_OVERTURE_ROLLOUT.md)
 - [Nationwide Data Build Checkpoint](docs/analysis/STAGE_10_4_NATIONWIDE_DATA_BUILD_CHECKPOINT.md)
+- [State Archive Pipeline](docs/analysis/STAGE_10_5_STATE_ARCHIVE_PIPELINE.md)
 - [MVP Release Checklist](docs/release/MVP_RELEASE_CHECKLIST.md)
 - [Environment Query Service Deployment](docs/operations/ENVIRONMENT_QUERY_SERVICE_DEPLOYMENT.md)
 - [Observability Runbook](docs/operations/OBSERVABILITY_RUNBOOK.md)

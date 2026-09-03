@@ -35,7 +35,21 @@ function main() {
     throw new Error("--minimum-free-bytes must be a non-negative integer.");
   }
   const plans = loadPlans(planRoot, options.states ?? "all");
-  const selected = selectRolloutPartitions(plans, dataRoot, release, maximum);
+  const archiveCheckpointRoot = path.resolve(
+    options.archiveCheckpointRoot ?? "config/data-regions/archive-checkpoints",
+  );
+  const archivedJurisdictions = loadArchivedJurisdictionCodes(
+    archiveCheckpointRoot,
+    release,
+    plans,
+  );
+  const selected = selectRolloutPartitions(
+    plans,
+    dataRoot,
+    release,
+    maximum,
+    archivedJurisdictions,
+  );
   const dryRun = options.dryRun === "true";
   let built = 0;
 
@@ -85,6 +99,7 @@ function main() {
         selected: selected.length,
         built,
         minimumFreeBytes,
+        archivedJurisdictions: [...archivedJurisdictions].sort(),
         order: "smallest-jurisdiction-first",
         partitions: selected,
       },
@@ -134,6 +149,7 @@ export function selectRolloutPartitions(
   dataRoot: string,
   release: string,
   maximum: number,
+  archivedJurisdictions = new Set<string>(),
 ) {
   return plans
     .sort(
@@ -141,6 +157,7 @@ export function selectRolloutPartitions(
         left.partitionCount - right.partitionCount ||
         left.jurisdiction.code.localeCompare(right.jurisdiction.code),
     )
+    .filter((plan) => !archivedJurisdictions.has(plan.jurisdiction.code))
     .flatMap((plan): RolloutPartition[] =>
       plan.partitions.flatMap((partition) => {
         const manifestPath = path.join(
@@ -163,6 +180,47 @@ export function selectRolloutPartitions(
       }),
     )
     .slice(0, maximum);
+}
+
+export function loadArchivedJurisdictionCodes(
+  checkpointRoot: string,
+  release: string,
+  plans: RolloutPlan[] = [],
+) {
+  const releaseRoot = path.join(checkpointRoot, release);
+  if (!fs.existsSync(releaseRoot)) return new Set<string>();
+  const archived = new Set<string>();
+  for (const entry of fs.readdirSync(releaseRoot, { withFileTypes: true })) {
+    if (!entry.isFile() || !entry.name.endsWith(".json")) continue;
+    const checkpoint = JSON.parse(
+      fs.readFileSync(path.join(releaseRoot, entry.name), "utf8"),
+    ) as {
+      format?: string;
+      release?: string;
+      jurisdiction?: { code?: string };
+      archive?: { remoteVerified?: boolean; partitionCount?: number };
+    };
+    if (
+      checkpoint.format !== "comfortos-us-state-archive-checkpoint-v1" ||
+      checkpoint.release !== release ||
+      checkpoint.archive?.remoteVerified !== true ||
+      !Number.isInteger(checkpoint.archive?.partitionCount) ||
+      !checkpoint.jurisdiction?.code
+    ) {
+      throw new Error(`Invalid archive checkpoint: ${entry.name}`);
+    }
+    const plan = plans.find(
+      (candidate) => candidate.jurisdiction.code === checkpoint.jurisdiction?.code,
+    );
+    if (
+      plans.length > 0 &&
+      (!plan || plan.partitionCount !== checkpoint.archive.partitionCount)
+    ) {
+      throw new Error(`Archive checkpoint does not match its state plan: ${entry.name}`);
+    }
+    archived.add(checkpoint.jurisdiction.code);
+  }
+  return archived;
 }
 
 function positiveInteger(value: string, name: string) {

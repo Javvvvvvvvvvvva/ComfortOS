@@ -132,7 +132,8 @@ npm run data:buildings:rollout -- \
   --data-root /data/comfortos/overture/us \
   --release <pinned-release> \
   --max-partitions 10 \
-  --minimum-free-bytes 8589934592
+  --minimum-free-bytes 8589934592 \
+  --archive-checkpoint-root config/data-regions/archive-checkpoints
 ```
 
 The runner orders jurisdictions from the fewest planned partitions to the most, skips every
@@ -147,8 +148,37 @@ npm run data:buildings:audit -- \
   --plan-root /data/comfortos/plans/<release> \
   --data-root /data/comfortos/overture/us \
   --release <pinned-release> \
+  --archive-checkpoint-root config/data-regions/archive-checkpoints \
   --output config/data-regions/build-progress/overture-<release>.json
 ```
+
+After a jurisdiction is fully built and has accepted live plus controlled route reports,
+archive it before starting the next jurisdiction:
+
+```bash
+npm run data:buildings:archive-state -- \
+  --state <STATE> \
+  --release <pinned-release> \
+  --plan-root /data/comfortos/plans/<release> \
+  --data-root /data/comfortos/overture/us \
+  --validation-reports /tmp/<state>-live.json,/tmp/<state>-controlled.json \
+  --provider r2 \
+  --prefix overture-buildings \
+  --checkpoint-root config/data-regions/archive-checkpoints \
+  --prune true \
+  --confirm-prune <STATE>@<release>
+```
+
+The archive command automatically loads `.env.local` unless `--env-file` selects another
+file. It requires `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, and
+`R2_BUCKET`. Credentials are never written to output. Uploads use the S3-compatible API and
+multipart transfer; every object is then downloaded and SHA-256 verified. The remote state
+manifest is the final completion marker. A conflicting existing object stops the run, and
+local data remains untouched on every failure before the prune checkpoint.
+
+Use `--dry-run true` without R2 credentials to validate the local state, route reports,
+object list, byte counts, and deterministic state-manifest hash. The resulting archive
+checkpoint is source-control metadata, not a production activation record.
 
 Store validated candidates under a durable release path such as:
 

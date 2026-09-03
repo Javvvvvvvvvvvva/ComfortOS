@@ -22,6 +22,7 @@
     "data:buildings:state": "node --import tsx scripts/build-us-state-overture-buildings.ts",
     "data:buildings:rollout": "node --import tsx scripts/build-us-overture-rollout.ts",
     "data:buildings:audit": "node --import tsx scripts/audit-us-overture-build-progress.ts",
+    "data:buildings:archive-state": "node --import tsx scripts/archive-us-state-overture.ts",
     "data:buildings:index": "node --import tsx scripts/index-overture-building-store.ts",
     "data:covered-features:overpass": "node --import tsx scripts/extract-covered-features-overpass.ts",
     "buildings:serve": "node --import tsx scripts/serve-building-query-service.ts",
@@ -52,6 +53,8 @@
     "suncalc": "^2.0.1"
   },
   "devDependencies": {
+    "@aws-sdk/client-s3": "^3.1126.0",
+    "@aws-sdk/lib-storage": "^3.1126.0",
     "@cloudflare/vite-plugin": "1.54.3",
     "@eslint/js": "9.39.4",
     "@next/eslint-plugin-next": "16.2.6",
