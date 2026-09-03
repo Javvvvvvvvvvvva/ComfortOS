@@ -1,0 +1,20 @@
+[
+  {
+    "id": "chicago-loop-east",
+    "label": "City Hall to Millennium Park",
+    "origin": { "latitude": 41.8837, "longitude": -87.6324 },
+    "destination": { "latitude": 41.8826, "longitude": -87.6226 }
+  },
+  {
+    "id": "chicago-river-north",
+    "label": "Merchandise Mart to Water Tower",
+    "origin": { "latitude": 41.8883, "longitude": -87.6359 },
+    "destination": { "latitude": 41.8977, "longitude": -87.6225 }
+  },
+  {
+    "id": "chicago-south-loop",
+    "label": "Roosevelt Station to Museum Campus",
+    "origin": { "latitude": 41.8673, "longitude": -87.626 },
+    "destination": { "latitude": 41.8663, "longitude": -87.615 }
+  }
+]

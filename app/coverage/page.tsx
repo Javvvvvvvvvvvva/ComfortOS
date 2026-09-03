@@ -9,6 +9,10 @@ export const metadata: Metadata = {
 
 export default function CoveragePage() {
   const jurisdictions = listUsJurisdictionCoverage();
+  const validationRegionCount = jurisdictions.reduce(
+    (total, jurisdiction) => total + jurisdiction.validationRegions.length,
+    0,
+  );
 
   return (
     <main className="policy-page coverage-page">
@@ -20,19 +24,19 @@ export default function CoveragePage() {
         <h1>50 states and D.C.</h1>
         <p className="policy-summary">
           Place search, walking routes, and National Weather Service conditions share one
-          nationwide provider scope. Detailed Comfort estimates appear only where reviewed
-          environmental data is active.
+          nationwide provider scope. Detailed Comfort analysis has been validated only in
+          the metro regions listed below.
         </p>
         <p className="policy-updated">Coverage catalog updated September 3, 2026</p>
       </header>
 
       <section className="coverage-summary" aria-label="Coverage summary">
         <div>
-          <strong>51</strong>
+          <strong>{jurisdictions.length}</strong>
           <span>route and weather jurisdictions</span>
         </div>
         <div>
-          <strong>3</strong>
+          <strong>{validationRegionCount}</strong>
           <span>metro validation regions</span>
         </div>
         <div>
@@ -60,7 +64,7 @@ export default function CoveragePage() {
                     : "coverage-comfort"
                 }
               >
-                {validationLabels || "Comfort data not deployed"}
+                {validationLabels || "Comfort data not validated"}
               </span>
             </article>
           );

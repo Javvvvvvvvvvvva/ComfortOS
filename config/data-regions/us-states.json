@@ -216,7 +216,17 @@
       ],
       "landAreaSquareMeters": 143779367883,
       "waterAreaSquareMeters": 6215353468,
-      "validationRegions": []
+      "validationRegions": [
+        {
+          "id": "chicago",
+          "label": "Chicago",
+          "profiles": [
+            "heat",
+            "shade",
+            "wind"
+          ]
+        }
+      ]
     },
     {
       "fips": "18",

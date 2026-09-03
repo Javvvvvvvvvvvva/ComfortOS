@@ -2102,6 +2102,10 @@ rain-cover data가 실제 배포되지 않은 지역은 `Limited Data`로 동작
 생성한다. Query service는 manifest만 먼저 읽고, 요청 경로와 교차하는 partition data만
 lazy-load하며 제한된 LRU cache를 유지한다.
 
+각 building store는 JSONL 전체를 메모리에 parse하지 않는다. Tile index와 fixed-width
+byte-offset index를 결합해 요청 범위의 building record만 읽고, 원본 파일의 SHA-256은
+streaming 방식으로 검증한다. Offset index가 없는 기존 store만 호환 경로를 사용한다.
+
 주 또는 metro가 catalog에 존재한다는 사실은 detailed Comfort coverage를 의미하지 않는다.
 환경 데이터가 없거나 검증되지 않은 경우 다른 지역 데이터를 빌려 쓰거나 좋은 점수를
 만들지 않으며, Fastest route와 실제 confidence/completeness 상태를 보존한다.

@@ -20,6 +20,7 @@
     "data:buildings:phoenix": "node --import tsx scripts/build-overture-buildings.ts --region phoenix",
     "data:buildings:plan:states": ".venv/bin/python scripts/plan-us-state-building-partitions.py",
     "data:buildings:state": "node --import tsx scripts/build-us-state-overture-buildings.ts",
+    "data:buildings:index": "node --import tsx scripts/index-overture-building-store.ts",
     "data:covered-features:overpass": "node --import tsx scripts/extract-covered-features-overpass.ts",
     "buildings:serve": "node --import tsx scripts/serve-building-query-service.ts",
     "environment:serve": "node --import tsx scripts/serve-building-query-service.ts",
@@ -34,6 +35,7 @@
     "routes:validate:stage8.5": "node --import tsx scripts/validate-stage-8-5-covered-network.ts",
     "routes:validate:stage9": "node --import tsx scripts/validate-stage-9-phoenix-heat.ts",
     "routes:validate:stage9.6:minneapolis": "node --import tsx scripts/validate-stage-9-6-minneapolis.ts",
+    "routes:validate:region-rollout": "node --import tsx scripts/validate-region-rollout.ts",
     "routing:benchmark": "node --import tsx scripts/benchmark-routing-provider.ts",
     "routing:equivalence": "node --import tsx scripts/audit-routing-provider-equivalence.ts",
     "smoke:stage10": "node --import tsx scripts/smoke-stage-10-mvp.ts"

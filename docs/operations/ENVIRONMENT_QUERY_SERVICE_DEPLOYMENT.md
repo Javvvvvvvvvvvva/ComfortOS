@@ -1,6 +1,7 @@
 # Environment Query Service Deployment
 
 Date: 2026-09-02
+Updated: 2026-09-03
 
 ## Purpose
 
@@ -83,6 +84,19 @@ are loaded on demand, and the service retains at most the configured number of r
 stores in memory. This boundary is required before adding statewide or nationwide partition
 sets.
 
+New stores include `building-offsets.bin`, a fixed-width random-access index. On first use,
+the service streams the full building file through SHA-256 verification, loads only the tile
+and offset indexes, and reads the requested building records by byte position. It does not
+parse the full building collection into memory. Convert an older candidate store before
+activation with:
+
+```bash
+npm run data:buildings:index -- --store /data/us/il/release/partition
+```
+
+The conversion writes the offset file before atomically replacing the manifest. Run it on a
+candidate version, never directly on the currently active production mount.
+
 ## State Partition Planning
 
 The nationwide catalog is derived from the Census Bureau state cartographic boundary file.
@@ -108,6 +122,16 @@ Use `--dry-run true` to inspect the exact partition identifiers first. A positiv
 `--max-partitions` value is mandatory; full-state or nationwide downloads are never the
 default. Publish completed stores through an atomic manifest or mount switch only after
 quality, latency, and cost gates pass.
+
+Store validated candidates under a durable release path such as:
+
+```text
+/data/us/<state>/<release>/<partition-id>/
+```
+
+Point `BUILDING_LOCAL_OVERTURE_STORE_ROOTS` at the common root. Keep the previous release
+directory intact until the new release has passed service health, representative bbox,
+route-comparison, memory, and rollback checks.
 
 ## Application Configuration
 

@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import chicagoPilot from "@/config/data-regions/deployments/illinois-chicago-pilot.json";
 import {
   findUsJurisdiction,
   getUsStateCatalog,
@@ -36,9 +37,15 @@ test("nationwide eligibility remains separate from deployed Comfort data", () =>
       .filter((state) => state.environmentalData === "validated-metro")
       .map((state) => state.code)
       .sort(),
-    ["AZ", "MN", "WA"],
+    ["AZ", "IL", "MN", "WA"],
   );
-  assert.equal(findUsJurisdiction("IL")?.validationRegions.length, 0);
+  assert.deepEqual(findUsJurisdiction("IL")?.validationRegions, [
+    {
+      id: "chicago",
+      label: "Chicago",
+      profiles: ["heat", "shade", "wind"],
+    },
+  ]);
 });
 
 test("state catalog records official source and finite planning bounds", () => {
@@ -50,4 +57,15 @@ test("state catalog records official source and finite planning bounds", () => {
     assert.ok(state.bbox.every(Number.isFinite));
     assert.ok(state.landAreaSquareMeters > 0);
   }
+});
+
+test("Chicago rollout is recorded as metro staging rather than statewide production", () => {
+  assert.equal(chicagoPilot.status, "staging-validated");
+  assert.equal(chicagoPilot.jurisdiction.code, "IL");
+  assert.equal(chicagoPilot.region.id, "us-il-w0351-n0167");
+  assert.equal(chicagoPilot.dataset.release, "2026-08-19.0");
+  assert.equal(chicagoPilot.dataset.buildingCount, 450_693);
+  assert.equal(chicagoPilot.randomAccess.recordCount, 450_693);
+  assert.equal(chicagoPilot.validation.successfulRouteCount, 6);
+  assert.equal(chicagoPilot.productionDeployment.status, "not-configured");
 });

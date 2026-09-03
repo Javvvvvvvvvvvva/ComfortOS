@@ -1,0 +1,49 @@
+{
+  "format": "comfortos-environment-rollout-v1",
+  "status": "staging-validated",
+  "jurisdiction": {
+    "fips": "17",
+    "code": "IL",
+    "name": "Illinois"
+  },
+  "region": {
+    "id": "us-il-w0351-n0167",
+    "label": "Chicago metro pilot",
+    "bbox": [-87.75, 41.75, -87.5, 42]
+  },
+  "dataset": {
+    "provider": "Overture Maps",
+    "release": "2026-08-19.0",
+    "license": "ODbL-1.0",
+    "buildingCount": 450693,
+    "explicitHeightCount": 409200,
+    "floorDerivedHeightCount": 1788,
+    "unknownHeightCount": 39705,
+    "invalidGeometryCount": 0,
+    "storeSizeBytes": 238045129,
+    "relativeStorePath": "data/overture/illinois/2026-08-19.0/us-il-w0351-n0167"
+  },
+  "randomAccess": {
+    "format": "uint64le-offset-uint32le-length-v1",
+    "recordCount": 450693,
+    "indexSizeBytes": 5408316,
+    "coldQueryLatencyMs": 255,
+    "warmQueryLatencyUpperBoundMs": 20,
+    "serviceRssBeforeBytes": 840925184,
+    "serviceRssAfterBytes": 117882880
+  },
+  "validation": {
+    "liveRouteCount": 3,
+    "controlledHeatRouteCount": 3,
+    "successfulRouteCount": 6,
+    "comparableRouteCount": 6,
+    "maximumShadeRatioRange": 0.10715194046248738,
+    "averageLiveLatencyMs": 1366,
+    "averageControlledHeatLatencyMs": 390.6666666666667,
+    "managedRoutingProvider": "mapbox-directions-walking"
+  },
+  "productionDeployment": {
+    "status": "not-configured",
+    "blocker": "No durable private environment-service host or object volume is configured."
+  }
+}

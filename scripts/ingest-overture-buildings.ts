@@ -14,6 +14,8 @@ type JsonRecord = Record<string, unknown>;
 type StoredBuilding = Building & { bbox: BoundingBox };
 
 const DEFAULT_TILE_SIZE_DEGREES = 0.005;
+const BUILDING_OFFSETS_FILE = "building-offsets.bin";
+const BUILDING_OFFSET_RECORD_SIZE = 12;
 
 async function main() {
   const options = parseArgs(process.argv.slice(2));
@@ -34,7 +36,9 @@ async function main() {
     .flatMap((feature) => normalizeOvertureFeature(feature))
     .filter((building) => !bounds || intersectsBounds(building.bbox, bounds));
   const tileIndex = buildTileIndex(buildings, tileSizeDegrees);
-  const buildingsText = `${buildings.map((building) => JSON.stringify(building)).join("\n")}\n`;
+  const buildingLines = buildings.map((building) => JSON.stringify(building));
+  const buildingsText = buildingLines.length ? `${buildingLines.join("\n")}\n` : "";
+  const buildingOffsets = buildBuildingOffsets(buildingLines);
   const tileIndexText = `${JSON.stringify(tileIndex)}\n`;
   const manifest: LocalOvertureStoreManifest = {
     format: "comfortos-local-building-store-v1",
@@ -58,9 +62,16 @@ async function main() {
     explicitHeightCount: buildings.filter((building) => building.heightSource === "provider").length,
     floorDerivedHeightCount: buildings.filter((building) => building.heightSource === "floors-derived").length,
     unknownHeightCount: buildings.filter((building) => building.heightSource === "unknown").length,
+    indexedAt: new Date().toISOString(),
+    randomAccessIndex: {
+      file: BUILDING_OFFSETS_FILE,
+      format: "uint64le-offset-uint32le-length-v1",
+      recordSizeBytes: BUILDING_OFFSET_RECORD_SIZE,
+    },
     checksums: {
       buildingsSha256: sha256(buildingsText),
       tileIndexSha256: sha256(tileIndexText),
+      buildingOffsetsSha256: sha256(buildingOffsets),
     },
   };
 
@@ -68,6 +79,7 @@ async function main() {
   await Promise.all([
     fs.writeFile(path.join(outputDir, "buildings.jsonl"), buildingsText, "utf8"),
     fs.writeFile(path.join(outputDir, "tile-index.json"), tileIndexText, "utf8"),
+    fs.writeFile(path.join(outputDir, BUILDING_OFFSETS_FILE), buildingOffsets),
   ]);
   await fs.writeFile(
     path.join(outputDir, "manifest.json"),
@@ -88,8 +100,23 @@ async function main() {
   );
 }
 
-function sha256(value: string) {
+function sha256(value: string | Buffer) {
   return createHash("sha256").update(value).digest("hex");
+}
+
+export function buildBuildingOffsets(lines: string[]) {
+  const offsets = Buffer.alloc(lines.length * BUILDING_OFFSET_RECORD_SIZE);
+  let byteOffset = 0;
+
+  lines.forEach((line, index) => {
+    const byteLength = Buffer.byteLength(line, "utf8");
+    const recordOffset = index * BUILDING_OFFSET_RECORD_SIZE;
+    offsets.writeBigUInt64LE(BigInt(byteOffset), recordOffset);
+    offsets.writeUInt32LE(byteLength, recordOffset + 8);
+    byteOffset += byteLength + 1;
+  });
+
+  return offsets;
 }
 
 export function normalizeOvertureFeature(feature: Feature): StoredBuilding[] {

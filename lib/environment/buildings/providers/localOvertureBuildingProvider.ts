@@ -1,4 +1,5 @@
 import fs from "node:fs/promises";
+import { createReadStream } from "node:fs";
 import path from "node:path";
 import { createHash } from "node:crypto";
 import type { MultiPolygon, Polygon } from "geojson";
@@ -29,9 +30,16 @@ export type LocalOvertureStoreManifest = {
   explicitHeightCount: number;
   floorDerivedHeightCount: number;
   unknownHeightCount: number;
+  indexedAt?: string;
+  randomAccessIndex?: {
+    file: string;
+    format: "uint64le-offset-uint32le-length-v1";
+    recordSizeBytes: 12;
+  };
   checksums?: {
     buildingsSha256: string;
     tileIndexSha256: string;
+    buildingOffsetsSha256?: string;
   };
 };
 
@@ -41,6 +49,13 @@ type StoredBuilding = Building & {
   bbox: BoundingBox;
 };
 
+type LoadedStore = {
+  manifest: LocalOvertureStoreManifest;
+  buildings: StoredBuilding[] | null;
+  buildingOffsets: Buffer | null;
+  tileIndex: TileIndex;
+};
+
 type LocalOvertureBuildingProviderOptions = {
   storeDir: string;
 };
@@ -48,18 +63,16 @@ type LocalOvertureBuildingProviderOptions = {
 const MANIFEST_FILE = "manifest.json";
 const BUILDINGS_FILE = "buildings.jsonl";
 const TILE_INDEX_FILE = "tile-index.json";
+const RANDOM_ACCESS_FORMAT = "uint64le-offset-uint32le-length-v1";
+const RANDOM_ACCESS_RECORD_SIZE = 12;
+const RANDOM_ACCESS_READ_CONCURRENCY = 32;
+const MAX_STORED_BUILDING_BYTES = 16 * 1024 * 1024;
 
 export class LocalOvertureBuildingProvider implements BuildingProvider {
   private readonly storeDir: string;
   private manifestPromise: Promise<LocalOvertureStoreManifest> | null = null;
-  private loaded:
-    | {
-        manifest: LocalOvertureStoreManifest;
-        buildings: StoredBuilding[];
-        tileIndex: TileIndex;
-      }
-    | null = null;
-  private loadPromise: Promise<NonNullable<LocalOvertureBuildingProvider["loaded"]>> | null = null;
+  private loaded: LoadedStore | null = null;
+  private loadPromise: Promise<LoadedStore> | null = null;
 
   constructor(options: LocalOvertureBuildingProviderOptions) {
     this.storeDir = options.storeDir;
@@ -75,8 +88,14 @@ export class LocalOvertureBuildingProvider implements BuildingProvider {
       }
     }
 
-    return [...candidateIndexes].flatMap((index) => {
-      const building = store.buildings[index];
+    const candidateBuildings = store.buildingOffsets
+      ? await this.readBuildingsByOffset(candidateIndexes, store.buildingOffsets)
+      : [...candidateIndexes].flatMap((index) => {
+          const building = store.buildings?.[index];
+          return building ? [building] : [];
+        });
+
+    return candidateBuildings.flatMap((building) => {
       if (!building || !intersectsBounds(building.bbox, bounds)) return [];
       return [stripStoredBounds(building)];
     });
@@ -124,33 +143,7 @@ export class LocalOvertureBuildingProvider implements BuildingProvider {
     if (this.loaded) return this.loaded;
     if (this.loadPromise) return this.loadPromise;
 
-    this.loadPromise = Promise.all([
-      this.getManifest(),
-      fs.readFile(path.join(this.storeDir, BUILDINGS_FILE), "utf8"),
-      fs.readFile(path.join(this.storeDir, TILE_INDEX_FILE), "utf8"),
-    ]).then(([manifest, buildingsText, tileIndexText]) => {
-      verifyStoreChecksum(
-        "buildings.jsonl",
-        buildingsText,
-        manifest.checksums?.buildingsSha256,
-      );
-      verifyStoreChecksum(
-        "tile-index.json",
-        tileIndexText,
-        manifest.checksums?.tileIndexSha256,
-      );
-
-      const loaded = {
-        manifest,
-        buildings: buildingsText
-          .split("\n")
-          .filter(Boolean)
-          .map((line) => JSON.parse(line) as StoredBuilding),
-        tileIndex: JSON.parse(tileIndexText) as TileIndex,
-      };
-      this.loaded = loaded;
-      return loaded;
-    });
+    this.loadPromise = this.loadStoreFiles();
 
     try {
       return await this.loadPromise;
@@ -158,13 +151,158 @@ export class LocalOvertureBuildingProvider implements BuildingProvider {
       this.loadPromise = null;
     }
   }
+
+  private async loadStoreFiles(): Promise<LoadedStore> {
+    const manifest = await this.getManifest();
+    const tileIndexText = await fs.readFile(
+      path.join(this.storeDir, TILE_INDEX_FILE),
+      "utf8",
+    );
+    verifyStoreChecksum(
+      "tile-index.json",
+      tileIndexText,
+      manifest.checksums?.tileIndexSha256,
+    );
+
+    if (manifest.randomAccessIndex) {
+      assertRandomAccessIndex(manifest);
+      await verifyStoreFileChecksum(
+        path.join(this.storeDir, BUILDINGS_FILE),
+        manifest.checksums?.buildingsSha256,
+      );
+      const buildingOffsets = await fs.readFile(
+        path.join(this.storeDir, manifest.randomAccessIndex.file),
+      );
+      verifyStoreChecksum(
+        manifest.randomAccessIndex.file,
+        buildingOffsets,
+        manifest.checksums?.buildingOffsetsSha256,
+      );
+      if (buildingOffsets.length !== manifest.buildingCount * RANDOM_ACCESS_RECORD_SIZE) {
+        throw new Error("Overture building random-access index length is invalid.");
+      }
+      this.loaded = {
+        manifest,
+        buildings: null,
+        buildingOffsets,
+        tileIndex: JSON.parse(tileIndexText) as TileIndex,
+      };
+      return this.loaded;
+    }
+
+    const buildingsText = await fs.readFile(
+      path.join(this.storeDir, BUILDINGS_FILE),
+      "utf8",
+    );
+    verifyStoreChecksum(
+      "buildings.jsonl",
+      buildingsText,
+      manifest.checksums?.buildingsSha256,
+    );
+    this.loaded = {
+      manifest,
+      buildings: buildingsText
+        .split("\n")
+        .filter(Boolean)
+        .map((line) => JSON.parse(line) as StoredBuilding),
+      buildingOffsets: null,
+      tileIndex: JSON.parse(tileIndexText) as TileIndex,
+    };
+    return this.loaded;
+  }
+
+  private async readBuildingsByOffset(
+    candidateIndexes: Set<number>,
+    buildingOffsets: Buffer,
+  ) {
+    const file = await fs.open(path.join(this.storeDir, BUILDINGS_FILE), "r");
+    const buildings: StoredBuilding[] = [];
+    const indexes = [...candidateIndexes].sort((left, right) => left - right);
+
+    try {
+      for (
+        let offset = 0;
+        offset < indexes.length;
+        offset += RANDOM_ACCESS_READ_CONCURRENCY
+      ) {
+        const batch = indexes.slice(offset, offset + RANDOM_ACCESS_READ_CONCURRENCY);
+        buildings.push(
+          ...(await Promise.all(
+            batch.map((index) => readStoredBuilding(file, buildingOffsets, index)),
+          )),
+        );
+      }
+      return buildings;
+    } finally {
+      await file.close();
+    }
+  }
 }
 
-function verifyStoreChecksum(name: string, content: string, expected?: string) {
+async function readStoredBuilding(
+  file: Awaited<ReturnType<typeof fs.open>>,
+  buildingOffsets: Buffer,
+  index: number,
+) {
+  const recordOffset = index * RANDOM_ACCESS_RECORD_SIZE;
+  if (
+    !Number.isInteger(index) ||
+    index < 0 ||
+    recordOffset + RANDOM_ACCESS_RECORD_SIZE > buildingOffsets.length
+  ) {
+    throw new Error("Overture building random-access index contains an invalid record.");
+  }
+
+  const position = buildingOffsets.readBigUInt64LE(recordOffset);
+  const byteLength = buildingOffsets.readUInt32LE(recordOffset + 8);
+  if (
+    position > BigInt(Number.MAX_SAFE_INTEGER) ||
+    byteLength === 0 ||
+    byteLength > MAX_STORED_BUILDING_BYTES
+  ) {
+    throw new Error("Overture building random-access record is invalid.");
+  }
+
+  const buffer = Buffer.allocUnsafe(byteLength);
+  const { bytesRead } = await file.read(buffer, 0, byteLength, Number(position));
+  if (bytesRead !== byteLength) {
+    throw new Error("Overture building random-access read was incomplete.");
+  }
+  return JSON.parse(buffer.toString("utf8")) as StoredBuilding;
+}
+
+function assertRandomAccessIndex(manifest: LocalOvertureStoreManifest) {
+  const index = manifest.randomAccessIndex;
+  if (
+    !index ||
+    index.format !== RANDOM_ACCESS_FORMAT ||
+    index.recordSizeBytes !== RANDOM_ACCESS_RECORD_SIZE ||
+    path.basename(index.file) !== index.file
+  ) {
+    throw new Error("Unsupported Overture building random-access index.");
+  }
+}
+
+function verifyStoreChecksum(
+  name: string,
+  content: string | Buffer,
+  expected?: string,
+) {
   if (!expected) return;
   const actual = createHash("sha256").update(content).digest("hex");
   if (actual !== expected) {
     throw new Error(`Overture building store checksum mismatch for ${name}.`);
+  }
+}
+
+async function verifyStoreFileChecksum(filePath: string, expected?: string) {
+  if (!expected) return;
+  const hash = createHash("sha256");
+  for await (const chunk of createReadStream(filePath)) hash.update(chunk);
+  if (hash.digest("hex") !== expected) {
+    throw new Error(
+      `Overture building store checksum mismatch for ${path.basename(filePath)}.`,
+    );
   }
 }
 

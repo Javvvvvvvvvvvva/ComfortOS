@@ -19,7 +19,11 @@ import {
   manifestIntersectsBounds,
   MultiRegionOvertureBuildingProvider,
 } from "@/lib/environment/buildings/providers/multiRegionOvertureBuildingProvider";
-import { normalizeOvertureFeature } from "@/scripts/ingest-overture-buildings";
+import {
+  buildBuildingOffsets,
+  normalizeOvertureFeature,
+} from "@/scripts/ingest-overture-buildings";
+import { indexOvertureBuildingStore } from "@/scripts/index-overture-building-store";
 import {
   assertEnvironmentServiceAuthentication,
   assertBboxWithinLimit,
@@ -93,6 +97,58 @@ test("local Overture provider rejects a store with a mismatched checksum", async
       }),
     /checksum mismatch/,
   );
+});
+
+test("building offset index preserves UTF-8 byte positions", () => {
+  const lines = ['{"id":"plain"}', '{"id":"한글"}'];
+  const offsets = buildBuildingOffsets(lines);
+
+  assert.equal(offsets.length, 24);
+  assert.equal(offsets.readBigUInt64LE(0), BigInt(0));
+  assert.equal(offsets.readUInt32LE(8), Buffer.byteLength(lines[0]));
+  assert.equal(
+    offsets.readBigUInt64LE(12),
+    BigInt(Buffer.byteLength(lines[0]) + 1),
+  );
+  assert.equal(offsets.readUInt32LE(20), Buffer.byteLength(lines[1]));
+});
+
+test("indexed Overture store queries records without loading the building collection", async () => {
+  const storeDir = await writeStore([
+    sampleBuilding("inside", -87.632, 41.883),
+    sampleBuilding("outside", -87.7, 41.95),
+  ]);
+  const indexed = await indexOvertureBuildingStore(storeDir);
+  const provider = new LocalOvertureBuildingProvider({ storeDir });
+  const buildings = await provider.getBuildings({
+    west: -87.635,
+    south: 41.88,
+    east: -87.625,
+    north: 41.89,
+  });
+  const manifest = await provider.getManifest();
+
+  assert.equal(indexed.offsetIndexBytes, 24);
+  assert.equal(manifest.randomAccessIndex?.recordSizeBytes, 12);
+  assert.equal(buildings.length, 1);
+  assert.equal(buildings[0].id, "inside");
+});
+
+test("random-access migration indexes records that cross stream chunks", async () => {
+  const largeBuilding = {
+    ...sampleBuilding("large-record", -87.632, 41.883),
+    auditPadding: "x".repeat(100_000),
+  };
+  const storeDir = await writeStore([largeBuilding]);
+  await indexOvertureBuildingStore(storeDir);
+
+  const buildings = await new LocalOvertureBuildingProvider({ storeDir }).getBuildings({
+    west: -87.635,
+    south: 41.88,
+    east: -87.625,
+    north: 41.89,
+  });
+  assert.equal(buildings[0]?.id, "large-record");
 });
 
 test("cached building provider records hits and does not cache failures", async () => {
