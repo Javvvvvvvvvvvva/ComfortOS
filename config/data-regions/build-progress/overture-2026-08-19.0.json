@@ -1,21 +1,21 @@
 {
   "format": "comfortos-us-overture-build-progress-v1",
-  "generatedAt": "2026-09-04T06:45:09.450Z",
+  "generatedAt": "2026-09-04T14:27:56.914Z",
   "release": "2026-08-19.0",
   "summary": {
     "jurisdictionCount": 51,
-    "completedJurisdictionCount": 6,
-    "archivedJurisdictionCount": 6,
+    "completedJurisdictionCount": 7,
+    "archivedJurisdictionCount": 7,
     "plannedPartitionCount": 20758,
     "uniqueGridCellCount": 19036,
     "duplicateStateAssignmentCount": 1722,
-    "completedPartitionCount": 194,
-    "archivedPartitionCount": 193,
+    "completedPartitionCount": 259,
+    "archivedPartitionCount": 258,
     "invalidPartitionCount": 0,
-    "completionRatio": 0.009345794392523364,
-    "buildingCount": 13180903,
-    "usableHeightRatio": 0.7984394544137075,
-    "storedBytes": 7150181571
+    "completionRatio": 0.012477117255997688,
+    "buildingCount": 14405231,
+    "usableHeightRatio": 0.7963382190816656,
+    "storedBytes": 7810718739
   },
   "jurisdictions": [
     {
@@ -355,13 +355,14 @@
     {
       "code": "NH",
       "name": "New Hampshire",
-      "status": "pending",
+      "status": "archived",
       "plannedPartitionCount": 65,
-      "completedPartitionCount": 0,
+      "completedPartitionCount": 65,
       "invalidPartitionCount": 0,
-      "buildingCount": 0,
-      "usableHeightRatio": null,
-      "storedBytes": 0
+      "buildingCount": 1224328,
+      "usableHeightRatio": 0.7737166837644814,
+      "storedBytes": 660537168,
+      "localDataPruned": true
     },
     {
       "code": "NJ",

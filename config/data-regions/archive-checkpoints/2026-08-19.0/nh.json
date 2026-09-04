@@ -1,0 +1,57 @@
+{
+  "format": "comfortos-us-state-archive-checkpoint-v1",
+  "createdAt": "2026-09-04T14:19:25.164Z",
+  "release": "2026-08-19.0",
+  "jurisdiction": {
+    "fips": "33",
+    "code": "NH",
+    "name": "New Hampshire"
+  },
+  "validation": [
+    {
+      "kind": "heat",
+      "createdAt": "2026-09-04T14:19:25.164Z",
+      "reportFile": "nh-heat-validation.json",
+      "reportSha256": "c8141491cfcfedb2d9b98775a9cdfed81179f06acbc0224a26456c99ceffff47",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 400
+    },
+    {
+      "kind": "live",
+      "createdAt": "2026-09-04T14:19:08.501Z",
+      "reportFile": "nh-live-validation.json",
+      "reportSha256": "8144f4e90ab0c0944d5b8a382361f2c9fbe3cf927187b9d1b936faf91db89202",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 1467.6666666666667
+    }
+  ],
+  "dataset": {
+    "buildingCount": 1224328,
+    "usableHeightCount": 947283,
+    "usableHeightRatio": 0.7737166837644814
+  },
+  "archive": {
+    "provider": "cloudflare-r2",
+    "location": "comfortos-environment-data",
+    "prefix": "overture-buildings",
+    "stateManifestKey": "overture-buildings/2026-08-19.0/us/nh/state-archive-manifest.json",
+    "stateManifestSha256": "c99dba4d6c56a77c0d9a26245a62a0434e823fb754afb7c8888f8ef9494db1f7",
+    "partitionCount": 65,
+    "objectCount": 260,
+    "storedBytes": 660537168,
+    "remoteVerified": true
+  },
+  "localDataPruned": true
+}

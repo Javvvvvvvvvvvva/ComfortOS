@@ -1,0 +1,20 @@
+[
+  {
+    "id": "nh-manchester-library-victory-park",
+    "label": "Manchester City Library to Victory Park",
+    "origin": { "latitude": 42.9911, "longitude": -71.4636 },
+    "destination": { "latitude": 42.9927, "longitude": -71.4614 }
+  },
+  {
+    "id": "nh-concord-state-house-white-park",
+    "label": "New Hampshire State House to White Park",
+    "origin": { "latitude": 43.2073, "longitude": -71.5370 },
+    "destination": { "latitude": 43.2152, "longitude": -71.5444 }
+  },
+  {
+    "id": "nh-portsmouth-market-square-prescott-park",
+    "label": "Portsmouth Market Square to Prescott Park",
+    "origin": { "latitude": 43.0779, "longitude": -70.7577 },
+    "destination": { "latitude": 43.0751, "longitude": -70.7527 }
+  }
+]
