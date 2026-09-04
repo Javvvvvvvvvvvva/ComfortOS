@@ -34,14 +34,17 @@ function main() {
   if (!/^\d+$/.test(minimumFreeBytes)) {
     throw new Error("--minimum-free-bytes must be a non-negative integer.");
   }
-  const plans = loadPlans(planRoot, options.states ?? "all");
+  const { allPlans, selectedPlans: plans } = loadRolloutPlanSets(
+    planRoot,
+    options.states ?? "all",
+  );
   const archiveCheckpointRoot = path.resolve(
     options.archiveCheckpointRoot ?? "config/data-regions/archive-checkpoints",
   );
   const archivedJurisdictions = loadArchivedJurisdictionCodes(
     archiveCheckpointRoot,
     release,
-    plans,
+    allPlans,
   );
   const selected = selectRolloutPartitions(
     plans,
@@ -142,6 +145,13 @@ export function loadPlans(planRoot: string, states: string) {
     if (missing.length) throw new Error(`Missing state plans: ${missing.join(", ")}.`);
   }
   return plans;
+}
+
+export function loadRolloutPlanSets(planRoot: string, states: string) {
+  const allPlans = loadPlans(planRoot, "all");
+  const selectedPlans =
+    states.toLowerCase() === "all" ? allPlans : loadPlans(planRoot, states);
+  return { allPlans, selectedPlans };
 }
 
 export function selectRolloutPartitions(

@@ -7,6 +7,8 @@ import buildProgress from "@/config/data-regions/build-progress/overture-2026-08
 import { auditBuildProgress } from "@/scripts/audit-us-overture-build-progress";
 import { selectStatePartitions } from "@/scripts/build-us-state-overture-buildings";
 import {
+  loadArchivedJurisdictionCodes,
+  loadRolloutPlanSets,
   selectRolloutPartitions,
   type RolloutPlan,
 } from "@/scripts/build-us-overture-rollout";
@@ -72,6 +74,48 @@ test("nationwide rollout skips remotely archived jurisdictions", () => {
 
   assert.equal(selected.length, 1);
   assert.equal(selected[0].code, "RI");
+});
+
+test("state-filtered rollout validates checkpoints against every known plan", async () => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), "comfortos-filtered-rollout-"));
+  const planRoot = path.join(root, "plans");
+  const checkpointRoot = path.join(root, "checkpoints");
+  for (const plan of [
+    rolloutPlan("DC", "District of Columbia", ["dc-1"]),
+    rolloutPlan("CT", "Connecticut", ["ct-1"]),
+  ]) {
+    const planDir = path.join(planRoot, plan.jurisdiction.code.toLowerCase());
+    await fs.mkdir(planDir, { recursive: true });
+    await fs.writeFile(
+      path.join(planDir, "state-plan.json"),
+      JSON.stringify({
+        format: "comfortos-us-state-building-plan-v1",
+        jurisdiction: plan.jurisdiction,
+        partitionCount: plan.partitionCount,
+        partitions: plan.partitions,
+      }),
+    );
+  }
+  await fs.mkdir(path.join(checkpointRoot, "release"), { recursive: true });
+  await fs.writeFile(
+    path.join(checkpointRoot, "release", "dc.json"),
+    JSON.stringify({
+      format: "comfortos-us-state-archive-checkpoint-v1",
+      release: "release",
+      jurisdiction: { code: "DC" },
+      archive: { remoteVerified: true, partitionCount: 1 },
+    }),
+  );
+
+  const { allPlans, selectedPlans } = loadRolloutPlanSets(planRoot, "CT");
+  const archived = loadArchivedJurisdictionCodes(
+    checkpointRoot,
+    "release",
+    allPlans,
+  );
+
+  assert.deepEqual(selectedPlans.map((plan) => plan.jurisdiction.code), ["CT"]);
+  assert.equal(archived.has("DC"), true);
 });
 
 test("nationwide audit preserves remotely archived progress after local pruning", async () => {

@@ -1,21 +1,21 @@
 {
   "format": "comfortos-us-overture-build-progress-v1",
-  "generatedAt": "2026-09-04T00:03:10.679Z",
+  "generatedAt": "2026-09-04T00:42:53.278Z",
   "release": "2026-08-19.0",
   "summary": {
     "jurisdictionCount": 51,
-    "completedJurisdictionCount": 3,
-    "archivedJurisdictionCount": 3,
+    "completedJurisdictionCount": 4,
+    "archivedJurisdictionCount": 4,
     "plannedPartitionCount": 20758,
     "uniqueGridCellCount": 19036,
     "duplicateStateAssignmentCount": 1722,
-    "completedPartitionCount": 39,
-    "archivedPartitionCount": 38,
+    "completedPartitionCount": 76,
+    "archivedPartitionCount": 75,
     "invalidPartitionCount": 0,
-    "completionRatio": 0.0018787937180845939,
-    "buildingCount": 2863088,
-    "usableHeightRatio": 0.7955763148041555,
-    "storedBytes": 1539854020
+    "completionRatio": 0.003661239040369978,
+    "buildingCount": 5089966,
+    "usableHeightRatio": 0.7437316870093041,
+    "storedBytes": 2801886758
   },
   "jurisdictions": [
     {
@@ -87,13 +87,14 @@
     {
       "code": "CT",
       "name": "Connecticut",
-      "status": "pending",
+      "status": "archived",
       "plannedPartitionCount": 37,
-      "completedPartitionCount": 0,
+      "completedPartitionCount": 37,
       "invalidPartitionCount": 0,
-      "buildingCount": 0,
-      "usableHeightRatio": null,
-      "storedBytes": 0
+      "buildingCount": 2226878,
+      "usableHeightRatio": 0.6770752596235626,
+      "storedBytes": 1262032738,
+      "localDataPruned": true
     },
     {
       "code": "DC",

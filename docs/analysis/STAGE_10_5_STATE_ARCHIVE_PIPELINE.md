@@ -1,7 +1,7 @@
 # Stage 10.5 - State Archive Pipeline
 
 Date: 2026-09-03
-Status: Live and verified for the first three jurisdictions
+Status: Live and verified for the first four jurisdictions
 
 ## Scope
 
@@ -35,16 +35,23 @@ after local deletion. Neither command changes production deployment configuratio
 | District of Columbia | 2 | 9 | 369,890,979 | Verified and locally pruned |
 | Rhode Island | 15 | 61 | 452,787,073 | Verified and locally pruned |
 | Delaware | 21 | 85 | 479,130,839 | Verified and locally pruned |
+| Connecticut | 37 | 149 | 1,262,032,738 | Verified and locally pruned |
 
-All 152 data objects were rehashed locally, uploaded, downloaded from R2, and verified by exact
-byte count and SHA-256. The three state archive manifests were uploaded last, for 155 remote
-objects in total. The six accepted Stage 10.4 reports cover 18 successful and comparable route
-checks.
+All 300 data objects were rehashed locally, uploaded, downloaded from R2, and verified by exact
+byte count and SHA-256. The four state archive manifests were uploaded last, for 304 remote
+objects in total. The eight accepted validation reports cover 24 successful and comparable
+route checks.
 
-The live archive contains 38 completed partitions, 2,412,395 buildings, and 1,301,808,891
+The live archive contains 75 completed partitions, 4,639,273 buildings, and 2,563,841,629
 stored bytes. Compact checkpoints are committed to Git, while the verified local payloads have
 been pruned. The nationwide audit retains those totals from the checkpoints and reports all
-three jurisdictions as `archived`.
+four jurisdictions as `archived`.
+
+Connecticut's 37-partition build contains 2,226,878 buildings with 67.71% usable height
+coverage. Hartford, New Haven, and Stamford each passed live NWS and controlled 38 C route
+validation through managed Mapbox and the private HTTP Overture service. Live validation
+averaged 1,466 ms; controlled heat averaged 490 ms. One transient source connection reset was
+recovered by the resumable builder without fixture fallback or repeated completed work.
 
 ## Credential Verification
 
@@ -64,4 +71,4 @@ R2_BUCKET=comfortos-environment-data
 
 ## Judgment
 
-STATE ARCHIVE PIPELINE LIVE; NEXT TARGET CONNECTICUT
+STATE ARCHIVE PIPELINE LIVE; NEXT TARGET NEW JERSEY

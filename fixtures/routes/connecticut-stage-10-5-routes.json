@@ -1,0 +1,20 @@
+[
+  {
+    "id": "ct-hartford-union-bushnell",
+    "label": "Hartford Union Station to Bushnell Park",
+    "origin": { "latitude": 41.7687, "longitude": -72.6811 },
+    "destination": { "latitude": 41.7656, "longitude": -72.6776 }
+  },
+  {
+    "id": "ct-new-haven-union-yale",
+    "label": "New Haven Union Station to Yale Old Campus",
+    "origin": { "latitude": 41.2975, "longitude": -72.926 },
+    "destination": { "latitude": 41.3083, "longitude": -72.9284 }
+  },
+  {
+    "id": "ct-stamford-station-mill-river",
+    "label": "Stamford Transportation Center to Mill River Park",
+    "origin": { "latitude": 41.0471, "longitude": -73.5429 },
+    "destination": { "latitude": 41.0536, "longitude": -73.5398 }
+  }
+]

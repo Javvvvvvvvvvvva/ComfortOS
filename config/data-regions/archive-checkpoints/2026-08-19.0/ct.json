@@ -1,0 +1,57 @@
+{
+  "format": "comfortos-us-state-archive-checkpoint-v1",
+  "createdAt": "2026-09-04T00:36:07.416Z",
+  "release": "2026-08-19.0",
+  "jurisdiction": {
+    "fips": "09",
+    "code": "CT",
+    "name": "Connecticut"
+  },
+  "validation": [
+    {
+      "kind": "heat",
+      "createdAt": "2026-09-04T00:36:07.416Z",
+      "reportFile": "ct-heat-validation.json",
+      "reportSha256": "b1d6ccbfd7076a637f89c0c0a0492afb200ce685ef1e24c5d74f8f334727855e",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 490
+    },
+    {
+      "kind": "live",
+      "createdAt": "2026-09-04T00:35:48.719Z",
+      "reportFile": "ct-live-validation.json",
+      "reportSha256": "3d8d796fd958b18a3e658bcfc4a89ae85e965fb5d7808141f8b0dfd463ce41d8",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 1466
+    }
+  ],
+  "dataset": {
+    "buildingCount": 2226878,
+    "usableHeightCount": 1507764,
+    "usableHeightRatio": 0.6770752596235626
+  },
+  "archive": {
+    "provider": "cloudflare-r2",
+    "location": "comfortos-environment-data",
+    "prefix": "overture-buildings",
+    "stateManifestKey": "overture-buildings/2026-08-19.0/us/ct/state-archive-manifest.json",
+    "stateManifestSha256": "46249d32f47e1109f09541e3b7c76479c589068b4fbdd75810bf0a3926e60bd4",
+    "partitionCount": 37,
+    "objectCount": 148,
+    "storedBytes": 1262032738,
+    "remoteVerified": true
+  },
+  "localDataPruned": true
+}
