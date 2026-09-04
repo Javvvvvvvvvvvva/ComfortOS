@@ -1,0 +1,57 @@
+{
+  "format": "comfortos-us-state-archive-checkpoint-v1",
+  "createdAt": "2026-09-04T17:51:52.883Z",
+  "release": "2026-08-19.0",
+  "jurisdiction": {
+    "fips": "15",
+    "code": "HI",
+    "name": "Hawaii"
+  },
+  "validation": [
+    {
+      "kind": "heat",
+      "createdAt": "2026-09-04T17:51:52.883Z",
+      "reportFile": "hi-heat-validation.json",
+      "reportSha256": "929f090845b7aec9c227a847f1e6ffab053e035a2c3d1ae6b677fa90596e4c3e",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 649
+    },
+    {
+      "kind": "live",
+      "createdAt": "2026-09-04T17:51:31.466Z",
+      "reportFile": "hi-live-validation.json",
+      "reportSha256": "abbcd895e0b78bb078e68b61cc450feb0358376b2192fa4761bf088eed49287a",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 1275
+    }
+  ],
+  "dataset": {
+    "buildingCount": 358918,
+    "usableHeightCount": 172503,
+    "usableHeightRatio": 0.48061952869457647
+  },
+  "archive": {
+    "provider": "cloudflare-r2",
+    "location": "comfortos-environment-data",
+    "prefix": "overture-buildings",
+    "stateManifestKey": "overture-buildings/2026-08-19.0/us/hi/state-archive-manifest.json",
+    "stateManifestSha256": "1e0a731a8e10556a3651272175f9f9a0f5d34ee5261be0a520cc01283d95caf1",
+    "partitionCount": 68,
+    "objectCount": 272,
+    "storedBytes": 191212508,
+    "remoteVerified": true
+  },
+  "localDataPruned": true
+}

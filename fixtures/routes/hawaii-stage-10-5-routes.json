@@ -1,0 +1,20 @@
+[
+  {
+    "id": "hi-honolulu-aloha-tower-state-capitol",
+    "label": "Aloha Tower to Hawaii State Capitol",
+    "origin": { "latitude": 21.3069, "longitude": -157.8665 },
+    "destination": { "latitude": 21.3070, "longitude": -157.8574 }
+  },
+  {
+    "id": "hi-hilo-farmers-market-liliuokalani-gardens",
+    "label": "Hilo Farmers Market to Liliuokalani Gardens",
+    "origin": { "latitude": 19.7241, "longitude": -155.0862 },
+    "destination": { "latitude": 19.7214, "longitude": -155.0725 }
+  },
+  {
+    "id": "hi-kahului-arts-center-queen-kaahumanu-center",
+    "label": "Maui Arts and Cultural Center to Queen Kaahumanu Center",
+    "origin": { "latitude": 20.8938, "longitude": -156.4806 },
+    "destination": { "latitude": 20.8883, "longitude": -156.4772 }
+  }
+]

@@ -1,21 +1,21 @@
 {
   "format": "comfortos-us-overture-build-progress-v1",
-  "generatedAt": "2026-09-04T14:27:56.914Z",
+  "generatedAt": "2026-09-04T18:15:44.758Z",
   "release": "2026-08-19.0",
   "summary": {
     "jurisdictionCount": 51,
-    "completedJurisdictionCount": 7,
-    "archivedJurisdictionCount": 7,
+    "completedJurisdictionCount": 8,
+    "archivedJurisdictionCount": 8,
     "plannedPartitionCount": 20758,
     "uniqueGridCellCount": 19036,
     "duplicateStateAssignmentCount": 1722,
-    "completedPartitionCount": 259,
-    "archivedPartitionCount": 258,
+    "completedPartitionCount": 327,
+    "archivedPartitionCount": 326,
     "invalidPartitionCount": 0,
-    "completionRatio": 0.012477117255997688,
-    "buildingCount": 14405231,
-    "usableHeightRatio": 0.7963382190816656,
-    "storedBytes": 7810718739
+    "completionRatio": 0.015752962713170827,
+    "buildingCount": 14764149,
+    "usableHeightRatio": 0.7886630648336047,
+    "storedBytes": 8001931247
   },
   "jurisdictions": [
     {
@@ -145,13 +145,14 @@
     {
       "code": "HI",
       "name": "Hawaii",
-      "status": "pending",
+      "status": "archived",
       "plannedPartitionCount": 68,
-      "completedPartitionCount": 0,
+      "completedPartitionCount": 68,
       "invalidPartitionCount": 0,
-      "buildingCount": 0,
-      "usableHeightRatio": null,
-      "storedBytes": 0
+      "buildingCount": 358918,
+      "usableHeightRatio": 0.48061952869457647,
+      "storedBytes": 191212508,
+      "localDataPruned": true
     },
     {
       "code": "IA",

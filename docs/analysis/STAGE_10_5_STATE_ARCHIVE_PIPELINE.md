@@ -1,7 +1,7 @@
 # Stage 10.5 - State Archive Pipeline
 
 Date: 2026-09-04
-Status: Live and verified for the first seven jurisdictions
+Status: Live and verified for the first eight jurisdictions
 
 ## Scope
 
@@ -39,16 +39,17 @@ after local deletion. Neither command changes production deployment configuratio
 | New Jersey | 55 | 221 | 2,591,249,796 | Verified and locally pruned |
 | Massachusetts | 63 | 253 | 1,757,045,017 | Verified and locally pruned |
 | New Hampshire | 65 | 261 | 660,537,168 | Verified and locally pruned |
+| Hawaii | 68 | 273 | 191,212,508 | Verified and locally pruned |
 
-All 1,032 data objects were rehashed locally, uploaded, downloaded from R2, and verified by exact
-byte count and SHA-256. The seven state archive manifests were uploaded last, for 1,039 remote
-objects in total. The fourteen accepted validation reports cover 42 successful and comparable
+All 1,304 data objects were rehashed locally, uploaded, downloaded from R2, and verified by exact
+byte count and SHA-256. The eight state archive manifests were uploaded last, for 1,312 remote
+objects in total. The sixteen accepted validation reports cover 48 successful and comparable
 route checks.
 
-The live archive contains 258 completed partitions, 13,954,538 buildings, and 7,572,673,610
+The live archive contains 326 completed partitions, 14,313,456 buildings, and 7,763,886,118
 stored bytes. Compact checkpoints are committed to Git, while the verified local payloads have
 been pruned. The nationwide audit retains those totals from the checkpoints and reports all
-seven jurisdictions as `archived`.
+eight jurisdictions as `archived`.
 
 Connecticut's 37-partition build contains 2,226,878 buildings with 67.71% usable height
 coverage. Hartford, New Haven, and Stamford each passed live NWS and controlled 38 C route
@@ -78,6 +79,12 @@ validation through managed Mapbox and the private HTTP Overture service. Live va
 averaged 1,468 ms; controlled heat averaged 400 ms. Transient official STAC request failures
 were recovered by the bounded retry path without fixture fallback or repeated completed work.
 
+Hawaii's 68-partition build contains 358,918 buildings with 48.06% usable height coverage.
+Honolulu, Hilo, and Kahului each passed live NWS and controlled 38 C route validation through
+managed Mapbox and the private HTTP Overture service. Live validation averaged 1,275 ms;
+controlled heat averaged 649 ms. Two transient official STAC request failures were recovered
+by the bounded retry path without fixture fallback or repeated completed work.
+
 ## Credential Verification
 
 The configured R2 account passed a live bucket health check and an isolated put, get,
@@ -96,4 +103,4 @@ R2_BUCKET=comfortos-environment-data
 
 ## Judgment
 
-STATE ARCHIVE PIPELINE LIVE; NEXT TARGET HAWAII
+STATE ARCHIVE PIPELINE LIVE; NEXT TARGET VERMONT
