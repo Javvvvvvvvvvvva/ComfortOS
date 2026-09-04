@@ -1,7 +1,7 @@
 # Stage 10.5 - State Archive Pipeline
 
 Date: 2026-09-03
-Status: Pipeline validated; remote credentials required
+Status: Live and verified for the first three jurisdictions
 
 ## Scope
 
@@ -28,24 +28,32 @@ requires `--prune true` and the exact confirmation `<STATE>@<RELEASE>`.
 The nationwide audit now reports archived jurisdictions, and the rollout runner skips them
 after local deletion. Neither command changes production deployment configuration.
 
-## Existing-State Dry Runs
+## Initial Live Archives
 
-| Jurisdiction | Partitions | Data objects | Stored bytes | Result |
+| Jurisdiction | Partitions | Remote objects | Stored bytes | Result |
 | --- | ---: | ---: | ---: | --- |
-| District of Columbia | 2 | 8 | 369,890,979 | Passed |
-| Rhode Island | 15 | 60 | 452,787,073 | Passed |
-| Delaware | 21 | 84 | 479,130,839 | Passed |
+| District of Columbia | 2 | 9 | 369,890,979 | Verified and locally pruned |
+| Rhode Island | 15 | 61 | 452,787,073 | Verified and locally pruned |
+| Delaware | 21 | 85 | 479,130,839 | Verified and locally pruned |
 
-All 152 partition files were rehashed locally. The six accepted Stage 10.4 reports cover 18
-successful and comparable route checks. No upload or deletion occurred during dry-run.
+All 152 data objects were rehashed locally, uploaded, downloaded from R2, and verified by exact
+byte count and SHA-256. The three state archive manifests were uploaded last, for 155 remote
+objects in total. The six accepted Stage 10.4 reports cover 18 successful and comparable route
+checks.
 
-## Credential Gate
+The live archive contains 38 completed partitions, 2,412,395 buildings, and 1,301,808,891
+stored bytes. Compact checkpoints are committed to Git, while the verified local payloads have
+been pruned. The nationwide audit retains those totals from the checkpoints and reports all
+three jurisdictions as `archived`.
 
-The current environment has no configured R2 account, S3 access key, secret access key, or
-bucket. No archive checkpoint is accepted until a real remote upload and read-back succeeds.
-The existing 1.54 GB of local Overture data remains intact.
+## Credential Verification
 
-Required server-side variables:
+The configured R2 account passed a live bucket health check and an isolated put, get,
+SHA-256 verification, and delete round trip. The temporary health object was removed. Secret
+values remain only in the ignored `.env.local` file and are never written to logs, manifests,
+checkpoints, or Git.
+
+Required server-side variables remain:
 
 ```dotenv
 R2_ACCOUNT_ID=
@@ -56,4 +64,4 @@ R2_BUCKET=comfortos-environment-data
 
 ## Judgment
 
-STATE ARCHIVE PIPELINE READY; REMOTE STORAGE CREDENTIALS REQUIRED
+STATE ARCHIVE PIPELINE LIVE; NEXT TARGET CONNECTICUT

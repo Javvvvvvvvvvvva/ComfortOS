@@ -1,0 +1,57 @@
+{
+  "format": "comfortos-us-state-archive-checkpoint-v1",
+  "createdAt": "2026-09-03T22:09:53.219Z",
+  "release": "2026-08-19.0",
+  "jurisdiction": {
+    "fips": "11",
+    "code": "DC",
+    "name": "District of Columbia"
+  },
+  "validation": [
+    {
+      "kind": "heat",
+      "createdAt": "2026-09-03T22:09:53.219Z",
+      "reportFile": "dc-heat-validation.json",
+      "reportSha256": "1d66be1fe2c6ee2d416ba2175672d24a05b5016ab6021a3ec9529dd2f480c157",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 496
+    },
+    {
+      "kind": "live",
+      "createdAt": "2026-09-03T22:09:35.424Z",
+      "reportFile": "dc-live-validation.json",
+      "reportSha256": "217f1401aaacbbe40c22339978804698b81a6244f7ebdc296e2ac29c8a97b947",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 1553.6666666666667
+    }
+  ],
+  "dataset": {
+    "buildingCount": 678589,
+    "usableHeightCount": 529457,
+    "usableHeightRatio": 0.7802322171446929
+  },
+  "archive": {
+    "provider": "cloudflare-r2",
+    "location": "comfortos-environment-data",
+    "prefix": "overture-buildings",
+    "stateManifestKey": "overture-buildings/2026-08-19.0/us/dc/state-archive-manifest.json",
+    "stateManifestSha256": "747c694f1ace44aa60d83927ff341e86a30a52a10b8a0d7c00ff1e0777bc7b18",
+    "partitionCount": 2,
+    "objectCount": 8,
+    "storedBytes": 369890979,
+    "remoteVerified": true
+  },
+  "localDataPruned": true
+}

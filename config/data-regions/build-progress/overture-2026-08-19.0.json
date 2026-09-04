@@ -1,16 +1,16 @@
 {
   "format": "comfortos-us-overture-build-progress-v1",
-  "generatedAt": "2026-09-03T23:04:55.589Z",
+  "generatedAt": "2026-09-04T00:03:10.679Z",
   "release": "2026-08-19.0",
   "summary": {
     "jurisdictionCount": 51,
     "completedJurisdictionCount": 3,
-    "archivedJurisdictionCount": 0,
+    "archivedJurisdictionCount": 3,
     "plannedPartitionCount": 20758,
     "uniqueGridCellCount": 19036,
     "duplicateStateAssignmentCount": 1722,
     "completedPartitionCount": 39,
-    "archivedPartitionCount": 0,
+    "archivedPartitionCount": 38,
     "invalidPartitionCount": 0,
     "completionRatio": 0.0018787937180845939,
     "buildingCount": 2863088,
@@ -98,24 +98,26 @@
     {
       "code": "DC",
       "name": "District of Columbia",
-      "status": "built",
+      "status": "archived",
       "plannedPartitionCount": 2,
       "completedPartitionCount": 2,
       "invalidPartitionCount": 0,
       "buildingCount": 678589,
       "usableHeightRatio": 0.7802322171446929,
-      "storedBytes": 369890979
+      "storedBytes": 369890979,
+      "localDataPruned": true
     },
     {
       "code": "DE",
       "name": "Delaware",
-      "status": "built",
+      "status": "archived",
       "plannedPartitionCount": 21,
       "completedPartitionCount": 21,
       "invalidPartitionCount": 0,
       "buildingCount": 888987,
       "usableHeightRatio": 0.8034785660532718,
-      "storedBytes": 479130839
+      "storedBytes": 479130839,
+      "localDataPruned": true
     },
     {
       "code": "FL",
@@ -450,13 +452,14 @@
     {
       "code": "RI",
       "name": "Rhode Island",
-      "status": "built",
+      "status": "archived",
       "plannedPartitionCount": 15,
       "completedPartitionCount": 15,
       "invalidPartitionCount": 0,
       "buildingCount": 844819,
       "usableHeightRatio": 0.7375283936559192,
-      "storedBytes": 452787073
+      "storedBytes": 452787073,
+      "localDataPruned": true
     },
     {
       "code": "SC",

@@ -1,0 +1,57 @@
+{
+  "format": "comfortos-us-state-archive-checkpoint-v1",
+  "createdAt": "2026-09-03T22:42:00.912Z",
+  "release": "2026-08-19.0",
+  "jurisdiction": {
+    "fips": "10",
+    "code": "DE",
+    "name": "Delaware"
+  },
+  "validation": [
+    {
+      "kind": "heat",
+      "createdAt": "2026-09-03T22:42:00.912Z",
+      "reportFile": "de-heat-validation.json",
+      "reportSha256": "73485becb1e644c5e292575e58d34a7ce39ec0781c47975b760ad424a15a8b5f",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 615.3333333333334
+    },
+    {
+      "kind": "live",
+      "createdAt": "2026-09-03T22:41:49.275Z",
+      "reportFile": "de-live-validation.json",
+      "reportSha256": "b517f6213d71d6fa41179e529cb8f744f756b471453bdf575e85f7dcdc685dea",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 1759.3333333333333
+    }
+  ],
+  "dataset": {
+    "buildingCount": 888987,
+    "usableHeightCount": 714282,
+    "usableHeightRatio": 0.8034785660532718
+  },
+  "archive": {
+    "provider": "cloudflare-r2",
+    "location": "comfortos-environment-data",
+    "prefix": "overture-buildings",
+    "stateManifestKey": "overture-buildings/2026-08-19.0/us/de/state-archive-manifest.json",
+    "stateManifestSha256": "9d7a049dea23cd766ca774cfe7d26b884fd6a14d3e49bcfcccfc0918eac6dbbf",
+    "partitionCount": 21,
+    "objectCount": 84,
+    "storedBytes": 479130839,
+    "remoteVerified": true
+  },
+  "localDataPruned": true
+}

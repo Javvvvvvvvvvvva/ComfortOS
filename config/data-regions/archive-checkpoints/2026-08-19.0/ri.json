@@ -1,0 +1,57 @@
+{
+  "format": "comfortos-us-state-archive-checkpoint-v1",
+  "createdAt": "2026-09-03T22:20:54.432Z",
+  "release": "2026-08-19.0",
+  "jurisdiction": {
+    "fips": "44",
+    "code": "RI",
+    "name": "Rhode Island"
+  },
+  "validation": [
+    {
+      "kind": "heat",
+      "createdAt": "2026-09-03T22:20:54.432Z",
+      "reportFile": "ri-heat-validation.json",
+      "reportSha256": "7b4f98c3ba5aa7132727229cf0655af51e764990ff02c8e694a0d8de0ba2374a",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 1338.6666666666667
+    },
+    {
+      "kind": "live",
+      "createdAt": "2026-09-03T22:20:39.225Z",
+      "reportFile": "ri-live-validation.json",
+      "reportSha256": "ba390cde676208928dd4c5c40b50135aa76b41468154900580aa60ced1b7ec0f",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 2344.6666666666665
+    }
+  ],
+  "dataset": {
+    "buildingCount": 844819,
+    "usableHeightCount": 623078,
+    "usableHeightRatio": 0.7375283936559192
+  },
+  "archive": {
+    "provider": "cloudflare-r2",
+    "location": "comfortos-environment-data",
+    "prefix": "overture-buildings",
+    "stateManifestKey": "overture-buildings/2026-08-19.0/us/ri/state-archive-manifest.json",
+    "stateManifestSha256": "7755f9cc788a70fb68bcbf1540a1343ca3a965453cb91ae35c8132f720ddbcc1",
+    "partitionCount": 15,
+    "objectCount": 60,
+    "storedBytes": 452787073,
+    "remoteVerified": true
+  },
+  "localDataPruned": true
+}

@@ -133,6 +133,13 @@ test("checked-in nationwide build progress is internally consistent", () => {
     (jurisdiction) =>
       jurisdiction.status === "built" || jurisdiction.status === "archived",
   ).length;
+  const archivedJurisdictions = buildProgress.jurisdictions.filter(
+    (jurisdiction) => jurisdiction.status === "archived",
+  );
+  const archivedPartitions = archivedJurisdictions.reduce(
+    (total, jurisdiction) => total + jurisdiction.completedPartitionCount,
+    0,
+  );
 
   assert.equal(buildProgress.summary.jurisdictionCount, 51);
   assert.equal(
@@ -146,8 +153,14 @@ test("checked-in nationwide build progress is internally consistent", () => {
     completedJurisdictions,
   );
   assert.equal(buildProgress.summary.invalidPartitionCount, 0);
-  assert.equal(buildProgress.summary.archivedJurisdictionCount, 0);
-  assert.equal(buildProgress.summary.archivedPartitionCount, 0);
+  assert.equal(
+    buildProgress.summary.archivedJurisdictionCount,
+    archivedJurisdictions.length,
+  );
+  assert.equal(
+    buildProgress.summary.archivedPartitionCount,
+    archivedPartitions,
+  );
 });
 
 function rolloutPlan(code: string, name: string, ids: string[]): RolloutPlan {
