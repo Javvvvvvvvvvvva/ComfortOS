@@ -1,0 +1,20 @@
+[
+  {
+    "id": "nj-newark-penn-military-park",
+    "label": "Newark Penn Station to Military Park",
+    "origin": { "latitude": 40.7346, "longitude": -74.1647 },
+    "destination": { "latitude": 40.7401, "longitude": -74.1687 }
+  },
+  {
+    "id": "nj-trenton-station-state-house",
+    "label": "Trenton Transit Center to New Jersey State House",
+    "origin": { "latitude": 40.2183, "longitude": -74.7545 },
+    "destination": { "latitude": 40.2206, "longitude": -74.7699 }
+  },
+  {
+    "id": "nj-atlantic-city-station-boardwalk-hall",
+    "label": "Atlantic City Rail Terminal to Boardwalk Hall",
+    "origin": { "latitude": 39.3633, "longitude": -74.4411 },
+    "destination": { "latitude": 39.3551, "longitude": -74.4386 }
+  }
+]

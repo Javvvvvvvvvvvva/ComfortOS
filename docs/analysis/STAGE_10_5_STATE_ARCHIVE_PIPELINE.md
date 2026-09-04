@@ -1,7 +1,7 @@
 # Stage 10.5 - State Archive Pipeline
 
 Date: 2026-09-03
-Status: Live and verified for the first four jurisdictions
+Status: Live and verified for the first five jurisdictions
 
 ## Scope
 
@@ -36,22 +36,31 @@ after local deletion. Neither command changes production deployment configuratio
 | Rhode Island | 15 | 61 | 452,787,073 | Verified and locally pruned |
 | Delaware | 21 | 85 | 479,130,839 | Verified and locally pruned |
 | Connecticut | 37 | 149 | 1,262,032,738 | Verified and locally pruned |
+| New Jersey | 55 | 221 | 2,591,249,796 | Verified and locally pruned |
 
-All 300 data objects were rehashed locally, uploaded, downloaded from R2, and verified by exact
-byte count and SHA-256. The four state archive manifests were uploaded last, for 304 remote
-objects in total. The eight accepted validation reports cover 24 successful and comparable
+All 520 data objects were rehashed locally, uploaded, downloaded from R2, and verified by exact
+byte count and SHA-256. The five state archive manifests were uploaded last, for 525 remote
+objects in total. The ten accepted validation reports cover 30 successful and comparable
 route checks.
 
-The live archive contains 75 completed partitions, 4,639,273 buildings, and 2,563,841,629
+The live archive contains 130 completed partitions, 9,509,301 buildings, and 5,155,091,425
 stored bytes. Compact checkpoints are committed to Git, while the verified local payloads have
 been pruned. The nationwide audit retains those totals from the checkpoints and reports all
-four jurisdictions as `archived`.
+five jurisdictions as `archived`.
 
 Connecticut's 37-partition build contains 2,226,878 buildings with 67.71% usable height
 coverage. Hartford, New Haven, and Stamford each passed live NWS and controlled 38 C route
 validation through managed Mapbox and the private HTTP Overture service. Live validation
 averaged 1,466 ms; controlled heat averaged 490 ms. One transient source connection reset was
 recovered by the resumable builder without fixture fallback or repeated completed work.
+
+New Jersey's 55-partition build contains 4,870,028 buildings with 89.25% usable height
+coverage. Newark, Trenton, and Atlantic City each passed live NWS and controlled 38 C route
+validation through managed Mapbox and the private HTTP Overture service. Live validation
+averaged 1,350 ms; controlled heat averaged 441 ms. One transient source connection reset was
+recovered by the resumable builder. The first live-weather run also encountered a temporary
+NWS availability failure; the official endpoint was confirmed healthy and the complete live
+suite passed on retry without using mocked weather or fixture fallback.
 
 ## Credential Verification
 
@@ -71,4 +80,4 @@ R2_BUCKET=comfortos-environment-data
 
 ## Judgment
 
-STATE ARCHIVE PIPELINE LIVE; NEXT TARGET NEW JERSEY
+STATE ARCHIVE PIPELINE LIVE; NEXT TARGET MASSACHUSETTS

@@ -1,0 +1,57 @@
+{
+  "format": "comfortos-us-state-archive-checkpoint-v1",
+  "createdAt": "2026-09-04T02:02:39.302Z",
+  "release": "2026-08-19.0",
+  "jurisdiction": {
+    "fips": "34",
+    "code": "NJ",
+    "name": "New Jersey"
+  },
+  "validation": [
+    {
+      "kind": "heat",
+      "createdAt": "2026-09-04T02:02:39.302Z",
+      "reportFile": "nj-heat-validation.json",
+      "reportSha256": "dc876f76283fd38e404a1b5d7119cd830713840038faf058cf5481459ffc09fe",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 441
+    },
+    {
+      "kind": "live",
+      "createdAt": "2026-09-04T02:02:16.107Z",
+      "reportFile": "nj-live-validation.json",
+      "reportSha256": "c890c4c77b3f7a30585dc0f2682ca53d901cba6adff9b6d6f4dedf301952f8e7",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 1349.6666666666667
+    }
+  ],
+  "dataset": {
+    "buildingCount": 4870028,
+    "usableHeightCount": 4346686,
+    "usableHeightRatio": 0.8925381948522678
+  },
+  "archive": {
+    "provider": "cloudflare-r2",
+    "location": "comfortos-environment-data",
+    "prefix": "overture-buildings",
+    "stateManifestKey": "overture-buildings/2026-08-19.0/us/nj/state-archive-manifest.json",
+    "stateManifestSha256": "a1bb881ee7e8baba74b7e4ce98d1da1a034288bf2ef53cf0b6bc05ff2997f963",
+    "partitionCount": 55,
+    "objectCount": 220,
+    "storedBytes": 2591249796,
+    "remoteVerified": true
+  },
+  "localDataPruned": true
+}

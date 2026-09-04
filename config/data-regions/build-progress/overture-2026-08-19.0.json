@@ -1,21 +1,21 @@
 {
   "format": "comfortos-us-overture-build-progress-v1",
-  "generatedAt": "2026-09-04T00:42:53.278Z",
+  "generatedAt": "2026-09-04T02:17:46.618Z",
   "release": "2026-08-19.0",
   "summary": {
     "jurisdictionCount": 51,
-    "completedJurisdictionCount": 4,
-    "archivedJurisdictionCount": 4,
+    "completedJurisdictionCount": 5,
+    "archivedJurisdictionCount": 5,
     "plannedPartitionCount": 20758,
     "uniqueGridCellCount": 19036,
     "duplicateStateAssignmentCount": 1722,
-    "completedPartitionCount": 76,
-    "archivedPartitionCount": 75,
+    "completedPartitionCount": 131,
+    "archivedPartitionCount": 130,
     "invalidPartitionCount": 0,
-    "completionRatio": 0.003661239040369978,
-    "buildingCount": 5089966,
-    "usableHeightRatio": 0.7437316870093041,
-    "storedBytes": 2801886758
+    "completionRatio": 0.006310819924848251,
+    "buildingCount": 9959994,
+    "usableHeightRatio": 0.816491957726079,
+    "storedBytes": 5393136554
   },
   "jurisdictions": [
     {
@@ -365,13 +365,14 @@
     {
       "code": "NJ",
       "name": "New Jersey",
-      "status": "pending",
+      "status": "archived",
       "plannedPartitionCount": 55,
-      "completedPartitionCount": 0,
+      "completedPartitionCount": 55,
       "invalidPartitionCount": 0,
-      "buildingCount": 0,
-      "usableHeightRatio": null,
-      "storedBytes": 0
+      "buildingCount": 4870028,
+      "usableHeightRatio": 0.8925381948522678,
+      "storedBytes": 2591249796,
+      "localDataPruned": true
     },
     {
       "code": "NM",
