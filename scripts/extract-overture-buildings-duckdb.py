@@ -11,6 +11,8 @@ import duckdb
 
 
 STAC_ROOT = "https://stac.overturemaps.org/catalog.json"
+STAC_FETCH_ATTEMPTS = 5
+STAC_FETCH_TIMEOUT_SECONDS = 30
 
 
 def main():
@@ -258,8 +260,30 @@ def extract_buildings(assets, bbox, output_path):
 
 
 def fetch_json(url):
-    with urllib.request.urlopen(url) as response:
-        return json.load(response)
+    request = urllib.request.Request(
+        url,
+        headers={
+            "Accept": "application/json",
+            "User-Agent": "ComfortOS-Overture-Ingestion/1.0",
+        },
+    )
+    for attempt in range(1, STAC_FETCH_ATTEMPTS + 1):
+        try:
+            with urllib.request.urlopen(
+                request,
+                timeout=STAC_FETCH_TIMEOUT_SECONDS,
+            ) as response:
+                return json.load(response)
+        except Exception:
+            if attempt == STAC_FETCH_ATTEMPTS:
+                raise
+            delay_seconds = min(2 ** (attempt - 1), 8)
+            print(
+                f"Overture STAC request failed; retrying in {delay_seconds}s "
+                f"({attempt}/{STAC_FETCH_ATTEMPTS}).",
+                file=sys.stderr,
+            )
+            time.sleep(delay_seconds)
 
 
 def intersects(left, right):

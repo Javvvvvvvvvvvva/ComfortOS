@@ -1,7 +1,7 @@
 # Stage 10.5 - State Archive Pipeline
 
-Date: 2026-09-03
-Status: Live and verified for the first five jurisdictions
+Date: 2026-09-04
+Status: Live and verified for the first six jurisdictions
 
 ## Scope
 
@@ -37,16 +37,17 @@ after local deletion. Neither command changes production deployment configuratio
 | Delaware | 21 | 85 | 479,130,839 | Verified and locally pruned |
 | Connecticut | 37 | 149 | 1,262,032,738 | Verified and locally pruned |
 | New Jersey | 55 | 221 | 2,591,249,796 | Verified and locally pruned |
+| Massachusetts | 63 | 253 | 1,757,045,017 | Verified and locally pruned |
 
-All 520 data objects were rehashed locally, uploaded, downloaded from R2, and verified by exact
-byte count and SHA-256. The five state archive manifests were uploaded last, for 525 remote
-objects in total. The ten accepted validation reports cover 30 successful and comparable
+All 772 data objects were rehashed locally, uploaded, downloaded from R2, and verified by exact
+byte count and SHA-256. The six state archive manifests were uploaded last, for 778 remote
+objects in total. The twelve accepted validation reports cover 36 successful and comparable
 route checks.
 
-The live archive contains 130 completed partitions, 9,509,301 buildings, and 5,155,091,425
+The live archive contains 193 completed partitions, 12,730,210 buildings, and 6,912,136,442
 stored bytes. Compact checkpoints are committed to Git, while the verified local payloads have
 been pruned. The nationwide audit retains those totals from the checkpoints and reports all
-five jurisdictions as `archived`.
+six jurisdictions as `archived`.
 
 Connecticut's 37-partition build contains 2,226,878 buildings with 67.71% usable height
 coverage. Hartford, New Haven, and Stamford each passed live NWS and controlled 38 C route
@@ -61,6 +62,14 @@ averaged 1,350 ms; controlled heat averaged 441 ms. One transient source connect
 recovered by the resumable builder. The first live-weather run also encountered a temporary
 NWS availability failure; the official endpoint was confirmed healthy and the complete live
 suite passed on retry without using mocked weather or fixture fallback.
+
+Massachusetts' 63-partition build contains 3,220,909 buildings with 74.26% usable height
+coverage. Boston, Worcester, and Springfield each passed live NWS and controlled 38 C route
+validation through managed Mapbox and the private HTTP Overture service. Live validation
+averaged 1,520 ms; controlled heat averaged 596 ms. Repeated transient STAC connection
+closures were resumed without fixture fallback. The extractor now applies bounded exponential
+backoff to official STAC JSON requests; the remaining live build automatically recovered two
+consecutive STAC failures without restarting its partition.
 
 ## Credential Verification
 
@@ -80,4 +89,4 @@ R2_BUCKET=comfortos-environment-data
 
 ## Judgment
 
-STATE ARCHIVE PIPELINE LIVE; NEXT TARGET MASSACHUSETTS
+STATE ARCHIVE PIPELINE LIVE; NEXT TARGET NEW HAMPSHIRE

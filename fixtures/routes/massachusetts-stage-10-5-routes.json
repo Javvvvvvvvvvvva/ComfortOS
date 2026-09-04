@@ -1,0 +1,20 @@
+[
+  {
+    "id": "ma-boston-south-station-common",
+    "label": "Boston South Station to Boston Common",
+    "origin": { "latitude": 42.3523, "longitude": -71.0552 },
+    "destination": { "latitude": 42.3551, "longitude": -71.0657 }
+  },
+  {
+    "id": "ma-worcester-union-common",
+    "label": "Worcester Union Station to Worcester Common",
+    "origin": { "latitude": 42.2618, "longitude": -71.7957 },
+    "destination": { "latitude": 42.2626, "longitude": -71.8023 }
+  },
+  {
+    "id": "ma-springfield-union-court-square",
+    "label": "Springfield Union Station to Court Square",
+    "origin": { "latitude": 42.1067, "longitude": -72.5929 },
+    "destination": { "latitude": 42.1016, "longitude": -72.5898 }
+  }
+]

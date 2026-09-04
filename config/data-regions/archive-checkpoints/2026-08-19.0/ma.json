@@ -1,0 +1,57 @@
+{
+  "format": "comfortos-us-state-archive-checkpoint-v1",
+  "createdAt": "2026-09-04T06:33:12.345Z",
+  "release": "2026-08-19.0",
+  "jurisdiction": {
+    "fips": "25",
+    "code": "MA",
+    "name": "Massachusetts"
+  },
+  "validation": [
+    {
+      "kind": "heat",
+      "createdAt": "2026-09-04T06:33:12.345Z",
+      "reportFile": "ma-heat-validation.json",
+      "reportSha256": "193ae7721767f18ceb382a4ccb47872a1e76d423c3854854e4e151fc29e77d82",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 596.3333333333334
+    },
+    {
+      "kind": "live",
+      "createdAt": "2026-09-04T06:32:49.417Z",
+      "reportFile": "ma-live-validation.json",
+      "reportSha256": "d352727b29b19cb7a16ea7bab0fa0b22df85f432a2361b784e707fa96048c9cd",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 1520
+    }
+  ],
+  "dataset": {
+    "buildingCount": 3220909,
+    "usableHeightCount": 2391898,
+    "usableHeightRatio": 0.7426158267743671
+  },
+  "archive": {
+    "provider": "cloudflare-r2",
+    "location": "comfortos-environment-data",
+    "prefix": "overture-buildings",
+    "stateManifestKey": "overture-buildings/2026-08-19.0/us/ma/state-archive-manifest.json",
+    "stateManifestSha256": "f0fed1ab2da16e639c53123839076cce5614ebfa6ca0cc86a236f62f2f324a6a",
+    "partitionCount": 63,
+    "objectCount": 252,
+    "storedBytes": 1757045017,
+    "remoteVerified": true
+  },
+  "localDataPruned": true
+}

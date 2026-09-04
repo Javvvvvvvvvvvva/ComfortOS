@@ -1,21 +1,21 @@
 {
   "format": "comfortos-us-overture-build-progress-v1",
-  "generatedAt": "2026-09-04T02:17:46.618Z",
+  "generatedAt": "2026-09-04T06:45:09.450Z",
   "release": "2026-08-19.0",
   "summary": {
     "jurisdictionCount": 51,
-    "completedJurisdictionCount": 5,
-    "archivedJurisdictionCount": 5,
+    "completedJurisdictionCount": 6,
+    "archivedJurisdictionCount": 6,
     "plannedPartitionCount": 20758,
     "uniqueGridCellCount": 19036,
     "duplicateStateAssignmentCount": 1722,
-    "completedPartitionCount": 131,
-    "archivedPartitionCount": 130,
+    "completedPartitionCount": 194,
+    "archivedPartitionCount": 193,
     "invalidPartitionCount": 0,
-    "completionRatio": 0.006310819924848251,
-    "buildingCount": 9959994,
-    "usableHeightRatio": 0.816491957726079,
-    "storedBytes": 5393136554
+    "completionRatio": 0.009345794392523364,
+    "buildingCount": 13180903,
+    "usableHeightRatio": 0.7984394544137075,
+    "storedBytes": 7150181571
   },
   "jurisdictions": [
     {
@@ -233,13 +233,14 @@
     {
       "code": "MA",
       "name": "Massachusetts",
-      "status": "pending",
+      "status": "archived",
       "plannedPartitionCount": 63,
-      "completedPartitionCount": 0,
+      "completedPartitionCount": 63,
       "invalidPartitionCount": 0,
-      "buildingCount": 0,
-      "usableHeightRatio": null,
-      "storedBytes": 0
+      "buildingCount": 3220909,
+      "usableHeightRatio": 0.7426158267743671,
+      "storedBytes": 1757045017,
+      "localDataPruned": true
     },
     {
       "code": "MD",
