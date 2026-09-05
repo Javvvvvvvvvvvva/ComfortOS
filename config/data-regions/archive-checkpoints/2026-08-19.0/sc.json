@@ -1,0 +1,57 @@
+{
+  "format": "comfortos-us-state-archive-checkpoint-v1",
+  "createdAt": "2026-09-05T14:29:56.979Z",
+  "release": "2026-08-19.0",
+  "jurisdiction": {
+    "fips": "45",
+    "code": "SC",
+    "name": "South Carolina"
+  },
+  "validation": [
+    {
+      "kind": "heat",
+      "createdAt": "2026-09-05T14:29:56.979Z",
+      "reportFile": "sc-heat-validation.json",
+      "reportSha256": "4daddc30c26e33ff6c5bd609b72f03e0a1fae2c97721d45df98c41751f9e7e05",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 415
+    },
+    {
+      "kind": "live",
+      "createdAt": "2026-09-05T14:29:36.994Z",
+      "reportFile": "sc-live-validation.json",
+      "reportSha256": "eda69a6b14e80db88e271b2e22f96e1562ecb1022a7768ee820ee8944eda09cb",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 1851.6666666666667
+    }
+  ],
+  "dataset": {
+    "buildingCount": 3594952,
+    "usableHeightCount": 2424110,
+    "usableHeightRatio": 0.6743094205430281
+  },
+  "archive": {
+    "provider": "cloudflare-r2",
+    "location": "comfortos-environment-data",
+    "prefix": "overture-buildings",
+    "stateManifestKey": "overture-buildings/2026-08-19.0/us/sc/state-archive-manifest.json",
+    "stateManifestSha256": "5ee753861ddfb53383fb0996239c49f1a6de0ac8f78d38bfa04bdd7e65ccfd60",
+    "partitionCount": 155,
+    "objectCount": 620,
+    "storedBytes": 1879443180,
+    "remoteVerified": true
+  },
+  "localDataPruned": true
+}

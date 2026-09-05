@@ -1,0 +1,20 @@
+[
+  {
+    "id": "sc-charleston-marion-square-waterfront-park",
+    "label": "Marion Square to Waterfront Park",
+    "origin": { "latitude": 32.7876, "longitude": -79.9373 },
+    "destination": { "latitude": 32.7789, "longitude": -79.9255 }
+  },
+  {
+    "id": "sc-columbia-state-house-finlay-park",
+    "label": "South Carolina State House to Finlay Park",
+    "origin": { "latitude": 34.0007, "longitude": -81.0332 },
+    "destination": { "latitude": 34.0127, "longitude": -81.0362 }
+  },
+  {
+    "id": "sc-greenville-falls-park-county-museum",
+    "label": "Falls Park to Greenville County Museum of Art",
+    "origin": { "latitude": 34.8444, "longitude": -82.4017 },
+    "destination": { "latitude": 34.8568, "longitude": -82.4002 }
+  }
+]

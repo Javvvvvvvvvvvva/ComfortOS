@@ -1,21 +1,21 @@
 {
   "format": "comfortos-us-overture-build-progress-v1",
-  "generatedAt": "2026-09-05T08:16:02.679Z",
+  "generatedAt": "2026-09-05T16:02:27.196Z",
   "release": "2026-08-19.0",
   "summary": {
     "jurisdictionCount": 51,
-    "completedJurisdictionCount": 11,
-    "archivedJurisdictionCount": 11,
+    "completedJurisdictionCount": 12,
+    "archivedJurisdictionCount": 12,
     "plannedPartitionCount": 20758,
     "uniqueGridCellCount": 19036,
     "duplicateStateAssignmentCount": 1722,
-    "completedPartitionCount": 613,
-    "archivedPartitionCount": 612,
+    "completedPartitionCount": 768,
+    "archivedPartitionCount": 767,
     "invalidPartitionCount": 0,
-    "completionRatio": 0.02953078331245785,
-    "buildingCount": 21176637,
-    "usableHeightRatio": 0.7592190865811224,
-    "storedBytes": 11517849684
+    "completionRatio": 0.03699778398689662,
+    "buildingCount": 24771589,
+    "usableHeightRatio": 0.7468966564882051,
+    "storedBytes": 13397292864
   },
   "jurisdictions": [
     {
@@ -470,13 +470,14 @@
     {
       "code": "SC",
       "name": "South Carolina",
-      "status": "pending",
+      "status": "archived",
       "plannedPartitionCount": 155,
-      "completedPartitionCount": 0,
+      "completedPartitionCount": 155,
       "invalidPartitionCount": 0,
-      "buildingCount": 0,
-      "usableHeightRatio": null,
-      "storedBytes": 0
+      "buildingCount": 3594952,
+      "usableHeightRatio": 0.6743094205430281,
+      "storedBytes": 1879443180,
+      "localDataPruned": true
     },
     {
       "code": "SD",
