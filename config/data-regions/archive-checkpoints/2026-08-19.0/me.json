@@ -1,0 +1,57 @@
+{
+  "format": "comfortos-us-state-archive-checkpoint-v1",
+  "createdAt": "2026-09-05T17:52:05.589Z",
+  "release": "2026-08-19.0",
+  "jurisdiction": {
+    "fips": "23",
+    "code": "ME",
+    "name": "Maine"
+  },
+  "validation": [
+    {
+      "kind": "heat",
+      "createdAt": "2026-09-05T17:52:05.589Z",
+      "reportFile": "me-heat-validation.json",
+      "reportSha256": "173dfd087672a167ebcf06b85df6bbf214363554e91a9509d07442201789b6f8",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 688.6666666666666
+    },
+    {
+      "kind": "live",
+      "createdAt": "2026-09-05T17:51:40.979Z",
+      "reportFile": "me-live-validation.json",
+      "reportSha256": "a8f3f75d70cdb19a32c605b8ca03c2613da860a960036d20405a740c60fd2e8e",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 1759
+    }
+  ],
+  "dataset": {
+    "buildingCount": 1066154,
+    "usableHeightCount": 773782,
+    "usableHeightRatio": 0.7257694479409166
+  },
+  "archive": {
+    "provider": "cloudflare-r2",
+    "location": "comfortos-environment-data",
+    "prefix": "overture-buildings",
+    "stateManifestKey": "overture-buildings/2026-08-19.0/us/me/state-archive-manifest.json",
+    "stateManifestSha256": "a96cc5cb9ba6e8c931f10c6b87031a768e8797cc08ff0d1dbd062b0ff0886974",
+    "partitionCount": 196,
+    "objectCount": 784,
+    "storedBytes": 548504445,
+    "remoteVerified": true
+  },
+  "localDataPruned": true
+}

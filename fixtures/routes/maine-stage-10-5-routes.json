@@ -1,0 +1,20 @@
+[
+  {
+    "id": "me-portland-monument-square-eastern-promenade",
+    "label": "Monument Square to Eastern Promenade",
+    "origin": { "latitude": 43.6576, "longitude": -70.2589 },
+    "destination": { "latitude": 43.6688, "longitude": -70.2477 }
+  },
+  {
+    "id": "me-augusta-state-house-fort-western",
+    "label": "Maine State House to Old Fort Western",
+    "origin": { "latitude": 44.3073, "longitude": -69.7820 },
+    "destination": { "latitude": 44.3150, "longitude": -69.7710 }
+  },
+  {
+    "id": "me-bangor-public-library-cascade-park",
+    "label": "Bangor Public Library to Cascade Park",
+    "origin": { "latitude": 44.8014, "longitude": -68.7703 },
+    "destination": { "latitude": 44.8170, "longitude": -68.7520 }
+  }
+]

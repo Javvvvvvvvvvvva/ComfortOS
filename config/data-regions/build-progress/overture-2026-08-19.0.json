@@ -1,21 +1,21 @@
 {
   "format": "comfortos-us-overture-build-progress-v1",
-  "generatedAt": "2026-09-05T17:05:43.616Z",
+  "generatedAt": "2026-09-05T18:15:50.018Z",
   "release": "2026-08-19.0",
   "summary": {
     "jurisdictionCount": 51,
-    "completedJurisdictionCount": 13,
-    "archivedJurisdictionCount": 13,
+    "completedJurisdictionCount": 14,
+    "archivedJurisdictionCount": 14,
     "plannedPartitionCount": 20758,
     "uniqueGridCellCount": 19036,
     "duplicateStateAssignmentCount": 1722,
-    "completedPartitionCount": 962,
-    "archivedPartitionCount": 961,
+    "completedPartitionCount": 1158,
+    "archivedPartitionCount": 1157,
     "invalidPartitionCount": 0,
-    "completionRatio": 0.046343578379419985,
-    "buildingCount": 29672703,
-    "usableHeightRatio": 0.7519062890900098,
-    "storedBytes": 15988357892
+    "completionRatio": 0.05578572116774256,
+    "buildingCount": 30738857,
+    "usableHeightRatio": 0.7509997525282088,
+    "storedBytes": 16536862337
   },
   "jurisdictions": [
     {
@@ -259,13 +259,14 @@
     {
       "code": "ME",
       "name": "Maine",
-      "status": "pending",
+      "status": "archived",
       "plannedPartitionCount": 196,
-      "completedPartitionCount": 0,
+      "completedPartitionCount": 196,
       "invalidPartitionCount": 0,
-      "buildingCount": 0,
-      "usableHeightRatio": null,
-      "storedBytes": 0
+      "buildingCount": 1066154,
+      "usableHeightRatio": 0.7257694479409166,
+      "storedBytes": 548504445,
+      "localDataPruned": true
     },
     {
       "code": "MI",
