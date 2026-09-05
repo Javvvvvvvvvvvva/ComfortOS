@@ -1,0 +1,57 @@
+{
+  "format": "comfortos-us-state-archive-checkpoint-v1",
+  "createdAt": "2026-09-05T16:48:35.387Z",
+  "release": "2026-08-19.0",
+  "jurisdiction": {
+    "fips": "18",
+    "code": "IN",
+    "name": "Indiana"
+  },
+  "validation": [
+    {
+      "kind": "heat",
+      "createdAt": "2026-09-05T16:48:35.387Z",
+      "reportFile": "in-heat-validation.json",
+      "reportSha256": "153dcb393d24a4865b6d5225e8fcf6dabbaaf9efd58d4f4d42db2f3eef799a4f",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 529
+    },
+    {
+      "kind": "live",
+      "createdAt": "2026-09-05T16:48:13.829Z",
+      "reportFile": "in-live-validation.json",
+      "reportSha256": "cf7861d2a423372c0ad668ba3c358d94ce74d79b1f9b2f1fa2bc964558810dfd",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 4677.666666666667
+    }
+  ],
+  "dataset": {
+    "buildingCount": 4901114,
+    "usableHeightCount": 3809275,
+    "usableHeightRatio": 0.7772263611905375
+  },
+  "archive": {
+    "provider": "cloudflare-r2",
+    "location": "comfortos-environment-data",
+    "prefix": "overture-buildings",
+    "stateManifestKey": "overture-buildings/2026-08-19.0/us/in/state-archive-manifest.json",
+    "stateManifestSha256": "6a9030ecad572904e8c409f85a2946f8f2601626ef3ca11f28d5280b5b775827",
+    "partitionCount": 194,
+    "objectCount": 776,
+    "storedBytes": 2591065028,
+    "remoteVerified": true
+  },
+  "localDataPruned": true
+}

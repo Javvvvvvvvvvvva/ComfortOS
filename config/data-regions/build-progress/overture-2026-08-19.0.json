@@ -1,21 +1,21 @@
 {
   "format": "comfortos-us-overture-build-progress-v1",
-  "generatedAt": "2026-09-05T16:02:27.196Z",
+  "generatedAt": "2026-09-05T17:05:43.616Z",
   "release": "2026-08-19.0",
   "summary": {
     "jurisdictionCount": 51,
-    "completedJurisdictionCount": 12,
-    "archivedJurisdictionCount": 12,
+    "completedJurisdictionCount": 13,
+    "archivedJurisdictionCount": 13,
     "plannedPartitionCount": 20758,
     "uniqueGridCellCount": 19036,
     "duplicateStateAssignmentCount": 1722,
-    "completedPartitionCount": 768,
-    "archivedPartitionCount": 767,
+    "completedPartitionCount": 962,
+    "archivedPartitionCount": 961,
     "invalidPartitionCount": 0,
-    "completionRatio": 0.03699778398689662,
-    "buildingCount": 24771589,
-    "usableHeightRatio": 0.7468966564882051,
-    "storedBytes": 13397292864
+    "completionRatio": 0.046343578379419985,
+    "buildingCount": 29672703,
+    "usableHeightRatio": 0.7519062890900098,
+    "storedBytes": 15988357892
   },
   "jurisdictions": [
     {
@@ -190,13 +190,14 @@
     {
       "code": "IN",
       "name": "Indiana",
-      "status": "pending",
+      "status": "archived",
       "plannedPartitionCount": 194,
-      "completedPartitionCount": 0,
+      "completedPartitionCount": 194,
       "invalidPartitionCount": 0,
-      "buildingCount": 0,
-      "usableHeightRatio": null,
-      "storedBytes": 0
+      "buildingCount": 4901114,
+      "usableHeightRatio": 0.7772263611905375,
+      "storedBytes": 2591065028,
+      "localDataPruned": true
     },
     {
       "code": "KS",

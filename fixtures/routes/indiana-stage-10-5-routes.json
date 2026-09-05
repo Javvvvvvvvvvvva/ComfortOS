@@ -1,0 +1,20 @@
+[
+  {
+    "id": "in-indianapolis-monument-circle-white-river-state-park",
+    "label": "Monument Circle to White River State Park",
+    "origin": { "latitude": 39.7685, "longitude": -86.1580 },
+    "destination": { "latitude": 39.7669, "longitude": -86.1737 }
+  },
+  {
+    "id": "in-fort-wayne-courthouse-lakeside-park",
+    "label": "Allen County Courthouse to Lakeside Park",
+    "origin": { "latitude": 41.0795, "longitude": -85.1394 },
+    "destination": { "latitude": 41.0913, "longitude": -85.1174 }
+  },
+  {
+    "id": "in-evansville-ford-center-sunset-park",
+    "label": "Ford Center to Sunset Park",
+    "origin": { "latitude": 37.9722, "longitude": -87.5673 },
+    "destination": { "latitude": 37.9630, "longitude": -87.5745 }
+  }
+]
