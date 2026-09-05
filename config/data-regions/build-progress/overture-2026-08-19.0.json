@@ -1,21 +1,21 @@
 {
   "format": "comfortos-us-overture-build-progress-v1",
-  "generatedAt": "2026-09-05T05:41:55.526Z",
+  "generatedAt": "2026-09-05T08:16:02.679Z",
   "release": "2026-08-19.0",
   "summary": {
     "jurisdictionCount": 51,
-    "completedJurisdictionCount": 10,
-    "archivedJurisdictionCount": 10,
+    "completedJurisdictionCount": 11,
+    "archivedJurisdictionCount": 11,
     "plannedPartitionCount": 20758,
     "uniqueGridCellCount": 19036,
     "duplicateStateAssignmentCount": 1722,
-    "completedPartitionCount": 473,
-    "archivedPartitionCount": 472,
+    "completedPartitionCount": 613,
+    "archivedPartitionCount": 612,
     "invalidPartitionCount": 0,
-    "completionRatio": 0.022786395606513153,
-    "buildingCount": 19389667,
-    "usableHeightRatio": 0.7605656662386208,
-    "storedBytes": 10588264610
+    "completionRatio": 0.02953078331245785,
+    "buildingCount": 21176637,
+    "usableHeightRatio": 0.7592190865811224,
+    "storedBytes": 11517849684
   },
   "jurisdictions": [
     {
@@ -570,13 +570,14 @@
     {
       "code": "WV",
       "name": "West Virginia",
-      "status": "pending",
+      "status": "archived",
       "plannedPartitionCount": 140,
-      "completedPartitionCount": 0,
+      "completedPartitionCount": 140,
       "invalidPartitionCount": 0,
-      "buildingCount": 0,
-      "usableHeightRatio": null,
-      "storedBytes": 0
+      "buildingCount": 1786970,
+      "usableHeightRatio": 0.744607911716481,
+      "storedBytes": 929585074,
+      "localDataPruned": true
     },
     {
       "code": "WY",

@@ -1,7 +1,7 @@
 # Stage 10.5 - State Archive Pipeline
 
 Date: 2026-09-05
-Status: Live and verified for the first ten jurisdictions
+Status: Live and verified for the first eleven jurisdictions
 
 ## Scope
 
@@ -42,16 +42,17 @@ after local deletion. Neither command changes production deployment configuratio
 | Hawaii | 68 | 273 | 191,212,508 | Verified and locally pruned |
 | Vermont | 72 | 289 | 441,552,817 | Verified and locally pruned |
 | Maryland | 74 | 297 | 2,144,780,546 | Verified and locally pruned |
+| West Virginia | 140 | 561 | 929,585,074 | Verified and locally pruned |
 
-All 1,888 data objects were rehashed locally, uploaded, downloaded from R2, and verified by exact
-byte count and SHA-256. The ten state archive manifests were uploaded last, for 1,898 remote
-objects in total. The twenty accepted validation reports cover 60 successful and comparable
+All 2,448 data objects were rehashed locally, uploaded, downloaded from R2, and verified by exact
+byte count and SHA-256. The eleven state archive manifests were uploaded last, for 2,459 remote
+objects in total. The twenty-two accepted validation reports cover 66 successful and comparable
 route checks.
 
-The live archive contains 472 completed partitions, 18,938,974 buildings, and 10,350,219,481
+The live archive contains 612 completed partitions, 20,725,944 buildings, and 11,279,804,555
 stored bytes. Compact checkpoints are committed to Git, while the verified local payloads have
 been pruned. The nationwide audit retains those totals from the checkpoints and reports all
-ten jurisdictions as `archived`.
+eleven jurisdictions as `archived`.
 
 Connecticut's 37-partition build contains 2,226,878 buildings with 67.71% usable height
 coverage. Hartford, New Haven, and Stamford each passed live NWS and controlled 38 C route
@@ -103,6 +104,13 @@ controlled heat averaged 489 ms. Two transient official STAC request failures we
 the bounded retry path without fixture fallback or repeated completed work. All R2 objects passed
 the hardened timeout and verification path on the first archive run.
 
+West Virginia's 140-partition build contains 1,786,970 buildings with 74.46% usable height
+coverage. Charleston, Morgantown, and Huntington each passed live NWS and controlled 38 C route
+validation through managed Mapbox and the private HTTP Overture service. Live validation
+averaged 1,846 ms; controlled heat averaged 783 ms. The build used disjoint partition workers to
+reduce elapsed time while retaining per-partition resume and checksum guarantees. All R2 objects
+passed the hardened timeout and verification path on the first archive run.
+
 ## Credential Verification
 
 The configured R2 account passed a live bucket health check and an isolated put, get,
@@ -121,4 +129,4 @@ R2_BUCKET=comfortos-environment-data
 
 ## Judgment
 
-STATE ARCHIVE PIPELINE LIVE; NEXT TARGET WEST VIRGINIA
+STATE ARCHIVE PIPELINE LIVE; NEXT TARGET SOUTH CAROLINA

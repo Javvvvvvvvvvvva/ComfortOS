@@ -1,0 +1,20 @@
+[
+  {
+    "id": "wv-charleston-state-capitol-haddad-riverfront-park",
+    "label": "West Virginia State Capitol to Haddad Riverfront Park",
+    "origin": { "latitude": 38.3364, "longitude": -81.6120 },
+    "destination": { "latitude": 38.3504, "longitude": -81.6384 }
+  },
+  {
+    "id": "wv-morgantown-mountainlair-core-arboretum",
+    "label": "WVU Mountainlair to Core Arboretum",
+    "origin": { "latitude": 39.6347, "longitude": -79.9539 },
+    "destination": { "latitude": 39.6460, "longitude": -79.9810 }
+  },
+  {
+    "id": "wv-huntington-marshall-harris-riverfront-park",
+    "label": "Marshall University to Harris Riverfront Park",
+    "origin": { "latitude": 38.4223, "longitude": -82.4285 },
+    "destination": { "latitude": 38.4187, "longitude": -82.4438 }
+  }
+]

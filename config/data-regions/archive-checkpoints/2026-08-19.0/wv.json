@@ -1,0 +1,57 @@
+{
+  "format": "comfortos-us-state-archive-checkpoint-v1",
+  "createdAt": "2026-09-05T08:04:12.581Z",
+  "release": "2026-08-19.0",
+  "jurisdiction": {
+    "fips": "54",
+    "code": "WV",
+    "name": "West Virginia"
+  },
+  "validation": [
+    {
+      "kind": "heat",
+      "createdAt": "2026-09-05T08:04:12.581Z",
+      "reportFile": "wv-heat-validation.json",
+      "reportSha256": "cd5341f9e7d3598e99a0e43942498ff8a2e38578448d3c1c4182ab71a30cc4f5",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 782.6666666666666
+    },
+    {
+      "kind": "live",
+      "createdAt": "2026-09-05T08:03:56.543Z",
+      "reportFile": "wv-live-validation.json",
+      "reportSha256": "cb929accf7336219f2bbd0d77a389be66f5568aaa7138fc7b35fa7501f06aa20",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 1845.6666666666667
+    }
+  ],
+  "dataset": {
+    "buildingCount": 1786970,
+    "usableHeightCount": 1330592,
+    "usableHeightRatio": 0.744607911716481
+  },
+  "archive": {
+    "provider": "cloudflare-r2",
+    "location": "comfortos-environment-data",
+    "prefix": "overture-buildings",
+    "stateManifestKey": "overture-buildings/2026-08-19.0/us/wv/state-archive-manifest.json",
+    "stateManifestSha256": "f6fa59fa11e62c879a262362bad62aaec9b05d7554295f102fde1eaee727adea",
+    "partitionCount": 140,
+    "objectCount": 560,
+    "storedBytes": 929585074,
+    "remoteVerified": true
+  },
+  "localDataPruned": true
+}
