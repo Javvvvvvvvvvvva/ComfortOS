@@ -1,0 +1,20 @@
+[
+  {
+    "id": "vt-burlington-city-hall-waterfront-park",
+    "label": "Burlington City Hall Park to Waterfront Park",
+    "origin": { "latitude": 44.4765, "longitude": -73.2130 },
+    "destination": { "latitude": 44.4794, "longitude": -73.2215 }
+  },
+  {
+    "id": "vt-montpelier-transit-center-state-house",
+    "label": "Montpelier Transit Center to Vermont State House",
+    "origin": { "latitude": 44.2595, "longitude": -72.5764 },
+    "destination": { "latitude": 44.2624, "longitude": -72.5805 }
+  },
+  {
+    "id": "vt-rutland-amtrak-main-street-park",
+    "label": "Rutland Amtrak Station to Main Street Park",
+    "origin": { "latitude": 43.6058, "longitude": -72.9814 },
+    "destination": { "latitude": 43.6089, "longitude": -72.9787 }
+  }
+]

@@ -30,6 +30,11 @@ an existing key with different content is an immutable conflict and stops the ru
 remote manifest is the completion marker, while the Git checkpoint is the durable input to
 the nationwide audit and next-work selector.
 
+R2 upload and verification requests use bounded connection, request, and idle timeouts.
+Transient verification failures receive bounded exponential retry, while missing objects and
+immutable content conflicts retain their existing fail-safe behavior. Retry exhaustion leaves
+the state checkpoint unpublished and the local source data untouched.
+
 Archival is not deployment. No production active-region manifest is changed until all 50
 states and the District of Columbia have completed the nationwide acceptance process.
 

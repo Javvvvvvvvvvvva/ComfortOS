@@ -1,0 +1,57 @@
+{
+  "format": "comfortos-us-state-archive-checkpoint-v1",
+  "createdAt": "2026-09-04T23:21:18.371Z",
+  "release": "2026-08-19.0",
+  "jurisdiction": {
+    "fips": "50",
+    "code": "VT",
+    "name": "Vermont"
+  },
+  "validation": [
+    {
+      "kind": "heat",
+      "createdAt": "2026-09-04T23:21:18.371Z",
+      "reportFile": "vt-heat-validation.json",
+      "reportSha256": "12110a7ed7cf756c110402edebb9d581eaf3687e3e55c3624489ebde3d848024",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 383.3333333333333
+    },
+    {
+      "kind": "live",
+      "createdAt": "2026-09-04T23:20:51.172Z",
+      "reportFile": "vt-live-validation.json",
+      "reportSha256": "e42d966eec92721a195bc417b827ce971352ba13cfd7b5dd54b9ed5312efc3f2",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 1255.3333333333333
+    }
+  ],
+  "dataset": {
+    "buildingCount": 759478,
+    "usableHeightCount": 584084,
+    "usableHeightRatio": 0.7690598016005731
+  },
+  "archive": {
+    "provider": "cloudflare-r2",
+    "location": "comfortos-environment-data",
+    "prefix": "overture-buildings",
+    "stateManifestKey": "overture-buildings/2026-08-19.0/us/vt/state-archive-manifest.json",
+    "stateManifestSha256": "b4ca3790b17afe3e71cc9cdef64ebe2354c8d7221c4b78a7e4fc8778c786be2f",
+    "partitionCount": 72,
+    "objectCount": 288,
+    "storedBytes": 441552817,
+    "remoteVerified": true
+  },
+  "localDataPruned": true
+}

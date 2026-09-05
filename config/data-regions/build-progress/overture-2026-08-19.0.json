@@ -1,21 +1,21 @@
 {
   "format": "comfortos-us-overture-build-progress-v1",
-  "generatedAt": "2026-09-04T18:15:44.758Z",
+  "generatedAt": "2026-09-05T02:49:51.904Z",
   "release": "2026-08-19.0",
   "summary": {
     "jurisdictionCount": 51,
-    "completedJurisdictionCount": 8,
-    "archivedJurisdictionCount": 8,
+    "completedJurisdictionCount": 9,
+    "archivedJurisdictionCount": 9,
     "plannedPartitionCount": 20758,
     "uniqueGridCellCount": 19036,
     "duplicateStateAssignmentCount": 1722,
-    "completedPartitionCount": 327,
-    "archivedPartitionCount": 326,
+    "completedPartitionCount": 399,
+    "archivedPartitionCount": 398,
     "invalidPartitionCount": 0,
-    "completionRatio": 0.015752962713170827,
-    "buildingCount": 14764149,
-    "usableHeightRatio": 0.7886630648336047,
-    "storedBytes": 8001931247
+    "completionRatio": 0.019221504961942384,
+    "buildingCount": 15523627,
+    "usableHeightRatio": 0.7877039946914468,
+    "storedBytes": 8443484064
   },
   "jurisdictions": [
     {
@@ -535,13 +535,14 @@
     {
       "code": "VT",
       "name": "Vermont",
-      "status": "pending",
+      "status": "archived",
       "plannedPartitionCount": 72,
-      "completedPartitionCount": 0,
+      "completedPartitionCount": 72,
       "invalidPartitionCount": 0,
-      "buildingCount": 0,
-      "usableHeightRatio": null,
-      "storedBytes": 0
+      "buildingCount": 759478,
+      "usableHeightRatio": 0.7690598016005731,
+      "storedBytes": 441552817,
+      "localDataPruned": true
     },
     {
       "code": "WA",

@@ -19,6 +19,9 @@ const STORE_FILES = [
   "manifest.json",
 ] as const;
 
+const R2_VERIFICATION_ATTEMPTS = 5;
+const R2_RETRY_BASE_DELAY_MS = 1_000;
+
 type StatePlan = {
   format: "comfortos-us-state-building-plan-v1";
   jurisdiction: { code: string; name: string };
@@ -553,6 +556,13 @@ export function createR2ObjectStore(options: {
   const clientConfig: S3ClientConfig = {
     region: "auto",
     endpoint: `https://${options.accountId}.r2.cloudflarestorage.com`,
+    maxAttempts: 3,
+    requestHandler: {
+      connectionTimeout: 10_000,
+      requestTimeout: 5 * 60_000,
+      socketTimeout: 30_000,
+      throwOnRequestTimeout: true,
+    },
     credentials: {
       accessKeyId: options.accessKeyId,
       secretAccessKey: options.secretAccessKey,
@@ -566,23 +576,40 @@ export function createR2ObjectStore(options: {
     location: options.bucket,
     async inspect(key) {
       try {
-        const head = await client.send(
-          new HeadObjectCommand({ Bucket: options.bucket, Key: key }),
+        return await retryTransientOperation(
+          async () => {
+            const head = await client.send(
+              new HeadObjectCommand({ Bucket: options.bucket, Key: key }),
+            );
+            const body = await client.send(
+              new GetObjectCommand({ Bucket: options.bucket, Key: key }),
+            );
+            if (!body.Body) throw new Error(`R2 object returned no body: ${key}`);
+            const hash = createHash("sha256");
+            let sizeBytes = 0;
+            for await (const chunk of body.Body as AsyncIterable<Uint8Array>) {
+              hash.update(chunk);
+              sizeBytes += chunk.byteLength;
+            }
+            if (
+              head.ContentLength !== undefined &&
+              head.ContentLength !== sizeBytes
+            ) {
+              throw new Error(`R2 object length changed while verifying: ${key}`);
+            }
+            return { exists: true, sizeBytes, sha256: hash.digest("hex") };
+          },
+          {
+            attempts: R2_VERIFICATION_ATTEMPTS,
+            baseDelayMs: R2_RETRY_BASE_DELAY_MS,
+            shouldRetry: (error) => !isRemoteMissing(error),
+            onRetry: (attempt, delayMs) => {
+              console.warn(
+                `R2 verification request failed; retrying in ${delayMs / 1_000}s (${attempt}/${R2_VERIFICATION_ATTEMPTS}).`,
+              );
+            },
+          },
         );
-        const body = await client.send(
-          new GetObjectCommand({ Bucket: options.bucket, Key: key }),
-        );
-        if (!body.Body) throw new Error(`R2 object returned no body: ${key}`);
-        const hash = createHash("sha256");
-        let sizeBytes = 0;
-        for await (const chunk of body.Body as AsyncIterable<Uint8Array>) {
-          hash.update(chunk);
-          sizeBytes += chunk.byteLength;
-        }
-        if (head.ContentLength !== undefined && head.ContentLength !== sizeBytes) {
-          throw new Error(`R2 object length changed while verifying: ${key}`);
-        }
-        return { exists: true, sizeBytes, sha256: hash.digest("hex") };
       } catch (error) {
         if (isRemoteMissing(error)) return { exists: false };
         throw new Error(`R2 verification failed for ${key}.`, { cause: error });
@@ -610,6 +637,37 @@ export function createR2ObjectStore(options: {
       }
     },
   };
+}
+
+export async function retryTransientOperation<T>(
+  operation: () => Promise<T>,
+  options: {
+    attempts: number;
+    baseDelayMs: number;
+    shouldRetry?: (error: unknown) => boolean;
+    onRetry?: (attempt: number, delayMs: number) => void;
+  },
+) {
+  let lastError: unknown;
+  for (let attempt = 1; attempt <= options.attempts; attempt += 1) {
+    try {
+      return await operation();
+    } catch (error) {
+      lastError = error;
+      if (
+        attempt === options.attempts ||
+        options.shouldRetry?.(error) === false
+      ) {
+        throw error;
+      }
+      const delayMs = options.baseDelayMs * 2 ** (attempt - 1);
+      options.onRetry?.(attempt, delayMs);
+      if (delayMs > 0) {
+        await new Promise((resolve) => setTimeout(resolve, delayMs));
+      }
+    }
+  }
+  throw lastError;
 }
 
 async function syncObject(

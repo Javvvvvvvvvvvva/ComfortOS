@@ -7,6 +7,7 @@ import test from "node:test";
 import {
   archiveState,
   createFilesystemObjectStore,
+  retryTransientOperation,
   validateReports,
   type StateArchiveOptions,
 } from "@/scripts/archive-us-state-overture";
@@ -109,6 +110,49 @@ test("state archival dry-run validates all local checksums without uploading", a
   assert.equal(result.partitionCount, 1);
   assert.equal(result.objectCount, 4);
   await assert.rejects(fs.stat(fixture.archiveRoot), { code: "ENOENT" });
+});
+
+test("R2 verification retries transient failures with bounded backoff", async () => {
+  let attempts = 0;
+  const retries: Array<[number, number]> = [];
+  const result = await retryTransientOperation(
+    async () => {
+      attempts += 1;
+      if (attempts < 3) throw new Error("temporary stream failure");
+      return "verified";
+    },
+    {
+      attempts: 5,
+      baseDelayMs: 0,
+      onRetry: (attempt, delayMs) => retries.push([attempt, delayMs]),
+    },
+  );
+
+  assert.equal(result, "verified");
+  assert.equal(attempts, 3);
+  assert.deepEqual(retries, [
+    [1, 0],
+    [2, 0],
+  ]);
+});
+
+test("R2 verification does not retry permanent failures", async () => {
+  let attempts = 0;
+  await assert.rejects(
+    retryTransientOperation(
+      async () => {
+        attempts += 1;
+        throw new Error("missing object");
+      },
+      {
+        attempts: 5,
+        baseDelayMs: 0,
+        shouldRetry: () => false,
+      },
+    ),
+    /missing object/,
+  );
+  assert.equal(attempts, 1);
 });
 
 async function createFixture() {
