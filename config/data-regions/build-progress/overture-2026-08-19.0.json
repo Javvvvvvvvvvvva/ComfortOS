@@ -1,21 +1,21 @@
 {
   "format": "comfortos-us-overture-build-progress-v1",
-  "generatedAt": "2026-09-05T02:49:51.904Z",
+  "generatedAt": "2026-09-05T05:41:55.526Z",
   "release": "2026-08-19.0",
   "summary": {
     "jurisdictionCount": 51,
-    "completedJurisdictionCount": 9,
-    "archivedJurisdictionCount": 9,
+    "completedJurisdictionCount": 10,
+    "archivedJurisdictionCount": 10,
     "plannedPartitionCount": 20758,
     "uniqueGridCellCount": 19036,
     "duplicateStateAssignmentCount": 1722,
-    "completedPartitionCount": 399,
-    "archivedPartitionCount": 398,
+    "completedPartitionCount": 473,
+    "archivedPartitionCount": 472,
     "invalidPartitionCount": 0,
-    "completionRatio": 0.019221504961942384,
-    "buildingCount": 15523627,
-    "usableHeightRatio": 0.7877039946914468,
-    "storedBytes": 8443484064
+    "completionRatio": 0.022786395606513153,
+    "buildingCount": 19389667,
+    "usableHeightRatio": 0.7605656662386208,
+    "storedBytes": 10588264610
   },
   "jurisdictions": [
     {
@@ -246,13 +246,14 @@
     {
       "code": "MD",
       "name": "Maryland",
-      "status": "pending",
+      "status": "archived",
       "plannedPartitionCount": 74,
-      "completedPartitionCount": 0,
+      "completedPartitionCount": 74,
       "invalidPartitionCount": 0,
-      "buildingCount": 0,
-      "usableHeightRatio": null,
-      "storedBytes": 0
+      "buildingCount": 3866040,
+      "usableHeightRatio": 0.6515949136584205,
+      "storedBytes": 2144780546,
+      "localDataPruned": true
     },
     {
       "code": "ME",

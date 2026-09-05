@@ -1,0 +1,57 @@
+{
+  "format": "comfortos-us-state-archive-checkpoint-v1",
+  "createdAt": "2026-09-05T05:33:48.376Z",
+  "release": "2026-08-19.0",
+  "jurisdiction": {
+    "fips": "24",
+    "code": "MD",
+    "name": "Maryland"
+  },
+  "validation": [
+    {
+      "kind": "heat",
+      "createdAt": "2026-09-05T05:33:48.376Z",
+      "reportFile": "md-heat-validation.json",
+      "reportSha256": "5ad613ecd429f9e8006a6dabbdaaf65556ee33073b03ef62ffe2085bcc83ec29",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 488.6666666666667
+    },
+    {
+      "kind": "live",
+      "createdAt": "2026-09-05T05:33:30.471Z",
+      "reportFile": "md-live-validation.json",
+      "reportSha256": "b70143c633989a4589f817ce3e2f93719c87b7f2b4b31712e3165cacae4d44d2",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 1361
+    }
+  ],
+  "dataset": {
+    "buildingCount": 3866040,
+    "usableHeightCount": 2519092,
+    "usableHeightRatio": 0.6515949136584205
+  },
+  "archive": {
+    "provider": "cloudflare-r2",
+    "location": "comfortos-environment-data",
+    "prefix": "overture-buildings",
+    "stateManifestKey": "overture-buildings/2026-08-19.0/us/md/state-archive-manifest.json",
+    "stateManifestSha256": "4ca901cf783bc9c91923b6df818e556727c45308e227476ebb07ad2e718c1539",
+    "partitionCount": 74,
+    "objectCount": 296,
+    "storedBytes": 2144780546,
+    "remoteVerified": true
+  },
+  "localDataPruned": true
+}

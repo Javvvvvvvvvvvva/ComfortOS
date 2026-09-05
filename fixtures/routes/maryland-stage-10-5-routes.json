@@ -1,0 +1,20 @@
+[
+  {
+    "id": "md-baltimore-penn-station-washington-monument",
+    "label": "Baltimore Penn Station to Washington Monument",
+    "origin": { "latitude": 39.3075, "longitude": -76.6156 },
+    "destination": { "latitude": 39.2975, "longitude": -76.6157 }
+  },
+  {
+    "id": "md-annapolis-state-house-city-dock",
+    "label": "Maryland State House to Annapolis City Dock",
+    "origin": { "latitude": 38.9786, "longitude": -76.4914 },
+    "destination": { "latitude": 38.9773, "longitude": -76.4858 }
+  },
+  {
+    "id": "md-frederick-visitor-center-baker-park",
+    "label": "Frederick Visitor Center to Baker Park",
+    "origin": { "latitude": 39.4140, "longitude": -77.4102 },
+    "destination": { "latitude": 39.4173, "longitude": -77.4193 }
+  }
+]
