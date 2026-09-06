@@ -1,21 +1,21 @@
 {
   "format": "comfortos-us-overture-build-progress-v1",
-  "generatedAt": "2026-09-06T05:37:24.767Z",
+  "generatedAt": "2026-09-06T06:31:51.293Z",
   "release": "2026-08-19.0",
   "summary": {
     "jurisdictionCount": 51,
-    "completedJurisdictionCount": 16,
-    "archivedJurisdictionCount": 16,
+    "completedJurisdictionCount": 17,
+    "archivedJurisdictionCount": 17,
     "plannedPartitionCount": 20758,
     "uniqueGridCellCount": 19036,
     "duplicateStateAssignmentCount": 1722,
-    "completedPartitionCount": 1588,
-    "archivedPartitionCount": 1587,
+    "completedPartitionCount": 1811,
+    "archivedPartitionCount": 1810,
     "invalidPartitionCount": 0,
-    "completionRatio": 0.0765006262645727,
-    "buildingCount": 41535116,
-    "usableHeightRatio": 0.7616838243572017,
-    "storedBytes": 22233073472
+    "completionRatio": 0.0872434723961846,
+    "buildingCount": 46745242,
+    "usableHeightRatio": 0.7456484020341578,
+    "storedBytes": 25035827131
   },
   "jurisdictions": [
     {
@@ -530,13 +530,14 @@
     {
       "code": "VA",
       "name": "Virginia",
-      "status": "pending",
+      "status": "archived",
       "plannedPartitionCount": 223,
-      "completedPartitionCount": 0,
+      "completedPartitionCount": 223,
       "invalidPartitionCount": 0,
-      "buildingCount": 0,
-      "usableHeightRatio": null,
-      "storedBytes": 0
+      "buildingCount": 5210126,
+      "usableHeightRatio": 0.6178140413494798,
+      "storedBytes": 2802753659,
+      "localDataPruned": true
     },
     {
       "code": "VT",

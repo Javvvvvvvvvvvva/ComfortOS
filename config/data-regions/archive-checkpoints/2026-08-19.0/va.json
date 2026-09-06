@@ -1,0 +1,57 @@
+{
+  "format": "comfortos-us-state-archive-checkpoint-v1",
+  "createdAt": "2026-09-06T06:14:45.320Z",
+  "release": "2026-08-19.0",
+  "jurisdiction": {
+    "fips": "51",
+    "code": "VA",
+    "name": "Virginia"
+  },
+  "validation": [
+    {
+      "kind": "heat",
+      "createdAt": "2026-09-06T06:14:45.320Z",
+      "reportFile": "va-heat-validation.json",
+      "reportSha256": "1a39893cf4fed5c5d860ff5fd22c42bc2f37a52d36f25a05114454c8c4e02b56",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 462.6666666666667
+    },
+    {
+      "kind": "live",
+      "createdAt": "2026-09-06T06:14:32.231Z",
+      "reportFile": "va-live-validation.json",
+      "reportSha256": "5d9f2e7d64a768116a91f7bd0e2fdae3832a1481f5897e9a403aa35b95a68245",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 1500.3333333333333
+    }
+  ],
+  "dataset": {
+    "buildingCount": 5210126,
+    "usableHeightCount": 3218889,
+    "usableHeightRatio": 0.6178140413494798
+  },
+  "archive": {
+    "provider": "cloudflare-r2",
+    "location": "comfortos-environment-data",
+    "prefix": "overture-buildings",
+    "stateManifestKey": "overture-buildings/2026-08-19.0/us/va/state-archive-manifest.json",
+    "stateManifestSha256": "e31a1258f0beda1f3c736d4f929ec7747ca34eaa19079ba7501a8d3cf7e05909",
+    "partitionCount": 223,
+    "objectCount": 892,
+    "storedBytes": 2802753659,
+    "remoteVerified": true
+  },
+  "localDataPruned": true
+}

@@ -1,0 +1,20 @@
+[
+  {
+    "id": "va-richmond-capitol-browns-island",
+    "label": "Virginia State Capitol to Brown's Island",
+    "origin": { "latitude": 37.5388, "longitude": -77.4336 },
+    "destination": { "latitude": 37.5347, "longitude": -77.4416 }
+  },
+  {
+    "id": "va-virginia-beach-neptune-moca",
+    "label": "Neptune Statue to Virginia MOCA",
+    "origin": { "latitude": 36.8591, "longitude": -75.9775 },
+    "destination": { "latitude": 36.8462, "longitude": -75.9826 }
+  },
+  {
+    "id": "va-roanoke-market-elmwood-park",
+    "label": "Roanoke City Market to Elmwood Park",
+    "origin": { "latitude": 37.2712, "longitude": -79.9405 },
+    "destination": { "latitude": 37.2690, "longitude": -79.9440 }
+  }
+]
