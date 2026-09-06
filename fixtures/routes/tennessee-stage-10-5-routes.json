@@ -1,0 +1,20 @@
+[
+  {
+    "id": "tn-nashville-capitol-riverfront-park",
+    "label": "Tennessee State Capitol to Riverfront Park",
+    "origin": { "latitude": 36.1657, "longitude": -86.7841 },
+    "destination": { "latitude": 36.1625, "longitude": -86.7744 }
+  },
+  {
+    "id": "tn-memphis-city-hall-beale-street",
+    "label": "Memphis City Hall to Beale Street",
+    "origin": { "latitude": 35.1492, "longitude": -90.0508 },
+    "destination": { "latitude": 35.1395, "longitude": -90.0520 }
+  },
+  {
+    "id": "tn-knoxville-market-square-worlds-fair-park",
+    "label": "Market Square to World's Fair Park",
+    "origin": { "latitude": 35.9654, "longitude": -83.9195 },
+    "destination": { "latitude": 35.9615, "longitude": -83.9251 }
+  }
+]

@@ -1,21 +1,21 @@
 {
   "format": "comfortos-us-overture-build-progress-v1",
-  "generatedAt": "2026-09-06T07:25:50.316Z",
+  "generatedAt": "2026-09-06T08:18:51.160Z",
   "release": "2026-08-19.0",
   "summary": {
     "jurisdictionCount": 51,
-    "completedJurisdictionCount": 18,
-    "archivedJurisdictionCount": 18,
+    "completedJurisdictionCount": 19,
+    "archivedJurisdictionCount": 19,
     "plannedPartitionCount": 20758,
     "uniqueGridCellCount": 19036,
     "duplicateStateAssignmentCount": 1722,
-    "completedPartitionCount": 2043,
-    "archivedPartitionCount": 2042,
+    "completedPartitionCount": 2275,
+    "archivedPartitionCount": 2274,
     "invalidPartitionCount": 0,
-    "completionRatio": 0.09841988630889295,
-    "buildingCount": 48773573,
-    "usableHeightRatio": 0.7414956045971862,
-    "storedBytes": 26100767028
+    "completionRatio": 0.10959630022160131,
+    "buildingCount": 53316814,
+    "usableHeightRatio": 0.7409638542918187,
+    "storedBytes": 28510852085
   },
   "jurisdictions": [
     {
@@ -498,13 +498,14 @@
     {
       "code": "TN",
       "name": "Tennessee",
-      "status": "pending",
+      "status": "archived",
       "plannedPartitionCount": 232,
-      "completedPartitionCount": 0,
+      "completedPartitionCount": 232,
       "invalidPartitionCount": 0,
-      "buildingCount": 0,
-      "usableHeightRatio": null,
-      "storedBytes": 0
+      "buildingCount": 4543241,
+      "usableHeightRatio": 0.7352552946233757,
+      "storedBytes": 2410085057,
+      "localDataPruned": true
     },
     {
       "code": "TX",

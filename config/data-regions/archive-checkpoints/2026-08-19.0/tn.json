@@ -1,0 +1,57 @@
+{
+  "format": "comfortos-us-state-archive-checkpoint-v1",
+  "createdAt": "2026-09-06T08:02:24.187Z",
+  "release": "2026-08-19.0",
+  "jurisdiction": {
+    "fips": "47",
+    "code": "TN",
+    "name": "Tennessee"
+  },
+  "validation": [
+    {
+      "kind": "heat",
+      "createdAt": "2026-09-06T08:02:24.187Z",
+      "reportFile": "tn-heat-validation.json",
+      "reportSha256": "46d35821fe446d744a5452fa39521a84e1fe53bbdf31619e4e33a0ee212bc33d",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 363.3333333333333
+    },
+    {
+      "kind": "live",
+      "createdAt": "2026-09-06T08:02:09.745Z",
+      "reportFile": "tn-live-validation.json",
+      "reportSha256": "dfe2741f2f9e7165e9996d38f9e6facef062b39c4d510d0ec19accd5576b2677",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 1305
+    }
+  ],
+  "dataset": {
+    "buildingCount": 4543241,
+    "usableHeightCount": 3340442,
+    "usableHeightRatio": 0.7352552946233757
+  },
+  "archive": {
+    "provider": "cloudflare-r2",
+    "location": "comfortos-environment-data",
+    "prefix": "overture-buildings",
+    "stateManifestKey": "overture-buildings/2026-08-19.0/us/tn/state-archive-manifest.json",
+    "stateManifestSha256": "ad4f5d6ab0f6526d9a8b4bbeab291c4a6164ffdc0477ef37058aa2893f0ecc00",
+    "partitionCount": 232,
+    "objectCount": 928,
+    "storedBytes": 2410085057,
+    "remoteVerified": true
+  },
+  "localDataPruned": true
+}
