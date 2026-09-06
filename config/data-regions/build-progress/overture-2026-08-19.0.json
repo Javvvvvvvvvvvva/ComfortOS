@@ -1,21 +1,21 @@
 {
   "format": "comfortos-us-overture-build-progress-v1",
-  "generatedAt": "2026-09-06T13:32:48.346Z",
+  "generatedAt": "2026-09-06T16:34:41.224Z",
   "release": "2026-08-19.0",
   "summary": {
     "jurisdictionCount": 51,
-    "completedJurisdictionCount": 22,
-    "archivedJurisdictionCount": 22,
+    "completedJurisdictionCount": 23,
+    "archivedJurisdictionCount": 23,
     "plannedPartitionCount": 20758,
     "uniqueGridCellCount": 19036,
     "duplicateStateAssignmentCount": 1722,
-    "completedPartitionCount": 3001,
-    "archivedPartitionCount": 3000,
+    "completedPartitionCount": 3252,
+    "archivedPartitionCount": 3251,
     "invalidPartitionCount": 0,
-    "completionRatio": 0.14457076789671452,
-    "buildingCount": 66428679,
-    "usableHeightRatio": 0.7409545807767757,
-    "storedBytes": 35454421843
+    "completionRatio": 0.15666249156951537,
+    "buildingCount": 69184147,
+    "usableHeightRatio": 0.7443267024741954,
+    "storedBytes": 36921840500
   },
   "jurisdictions": [
     {
@@ -227,13 +227,14 @@
     {
       "code": "LA",
       "name": "Louisiana",
-      "status": "pending",
+      "status": "archived",
       "plannedPartitionCount": 251,
-      "completedPartitionCount": 0,
+      "completedPartitionCount": 251,
       "invalidPartitionCount": 0,
-      "buildingCount": 0,
-      "usableHeightRatio": null,
-      "storedBytes": 0
+      "buildingCount": 2755468,
+      "usableHeightRatio": 0.8256216366874883,
+      "storedBytes": 1467418657,
+      "localDataPruned": true
     },
     {
       "code": "MA",

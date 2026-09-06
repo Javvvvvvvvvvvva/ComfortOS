@@ -1,0 +1,57 @@
+{
+  "format": "comfortos-us-state-archive-checkpoint-v1",
+  "createdAt": "2026-09-06T14:47:45.000Z",
+  "release": "2026-08-19.0",
+  "jurisdiction": {
+    "fips": "22",
+    "code": "LA",
+    "name": "Louisiana"
+  },
+  "validation": [
+    {
+      "kind": "heat",
+      "createdAt": "2026-09-06T14:47:45.000Z",
+      "reportFile": "la-heat-validation.json",
+      "reportSha256": "f5602d6d44d7b73dfee421ed3c9fc4712db4b3b4068c213761a6282e6d8d6a93",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 466.3333333333333
+    },
+    {
+      "kind": "live",
+      "createdAt": "2026-09-06T14:47:31.606Z",
+      "reportFile": "la-live-validation.json",
+      "reportSha256": "87f297139603a2c8efe53087d57a48282157980a2a0bf4695628be43d8a5c032",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 1455.3333333333333
+    }
+  ],
+  "dataset": {
+    "buildingCount": 2755468,
+    "usableHeightCount": 2274974,
+    "usableHeightRatio": 0.8256216366874883
+  },
+  "archive": {
+    "provider": "cloudflare-r2",
+    "location": "comfortos-environment-data",
+    "prefix": "overture-buildings",
+    "stateManifestKey": "overture-buildings/2026-08-19.0/us/la/state-archive-manifest.json",
+    "stateManifestSha256": "c1847c594ced19680ea999f4c9ae9063f48e0b03c72c29362ec4125f82b21cd6",
+    "partitionCount": 251,
+    "objectCount": 1004,
+    "storedBytes": 1467418657,
+    "remoteVerified": true
+  },
+  "localDataPruned": true
+}

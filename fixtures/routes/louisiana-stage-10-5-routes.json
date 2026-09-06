@@ -1,0 +1,20 @@
+[
+  {
+    "id": "la-new-orleans-jackson-square-lafayette-square",
+    "label": "New Orleans Jackson Square to Lafayette Square",
+    "origin": { "latitude": 29.9574, "longitude": -90.0629 },
+    "destination": { "latitude": 29.9489, "longitude": -90.0715 }
+  },
+  {
+    "id": "la-baton-rouge-state-capitol-town-square",
+    "label": "Louisiana State Capitol to North Boulevard Town Square",
+    "origin": { "latitude": 30.4571, "longitude": -91.1874 },
+    "destination": { "latitude": 30.4484, "longitude": -91.1872 }
+  },
+  {
+    "id": "la-shreveport-festival-plaza-riverview-park",
+    "label": "Shreveport Festival Plaza to Riverview Park",
+    "origin": { "latitude": 32.5148, "longitude": -93.7488 },
+    "destination": { "latitude": 32.5184, "longitude": -93.7437 }
+  }
+]
