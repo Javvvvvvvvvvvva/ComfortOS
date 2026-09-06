@@ -1,0 +1,20 @@
+[
+  {
+    "id": "ky-louisville-city-hall-waterfront-park",
+    "label": "Louisville City Hall to Waterfront Park",
+    "origin": { "latitude": 38.2540, "longitude": -85.7593 },
+    "destination": { "latitude": 38.2598, "longitude": -85.7424 }
+  },
+  {
+    "id": "ky-lexington-triangle-park-university-of-kentucky",
+    "label": "Triangle Park to University of Kentucky",
+    "origin": { "latitude": 38.0490, "longitude": -84.5007 },
+    "destination": { "latitude": 38.0380, "longitude": -84.5047 }
+  },
+  {
+    "id": "ky-bowling-green-fountain-square-cherry-hall",
+    "label": "Fountain Square Park to Cherry Hall",
+    "origin": { "latitude": 36.9924, "longitude": -86.4436 },
+    "destination": { "latitude": 36.9858, "longitude": -86.4552 }
+  }
+]

@@ -1,0 +1,57 @@
+{
+  "format": "comfortos-us-state-archive-checkpoint-v1",
+  "createdAt": "2026-09-05T22:59:33.483Z",
+  "release": "2026-08-19.0",
+  "jurisdiction": {
+    "fips": "21",
+    "code": "KY",
+    "name": "Kentucky"
+  },
+  "validation": [
+    {
+      "kind": "heat",
+      "createdAt": "2026-09-05T22:59:33.483Z",
+      "reportFile": "ky-heat-validation.json",
+      "reportSha256": "cff504143227a9c0ad5cb4471be802acf8636011153873267c07fe0c25cbdfa1",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 600
+    },
+    {
+      "kind": "live",
+      "createdAt": "2026-09-05T22:59:09.719Z",
+      "reportFile": "ky-live-validation.json",
+      "reportSha256": "d35f628099b40d9808427996f00d31e9be5ddf7ba9d0ec025e2c0816bac66da1",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 1577
+    }
+  ],
+  "dataset": {
+    "buildingCount": 3819246,
+    "usableHeightCount": 2835354,
+    "usableHeightRatio": 0.7423858007575317
+  },
+  "archive": {
+    "provider": "cloudflare-r2",
+    "location": "comfortos-environment-data",
+    "prefix": "overture-buildings",
+    "stateManifestKey": "overture-buildings/2026-08-19.0/us/ky/state-archive-manifest.json",
+    "stateManifestSha256": "af0540e1008a827e8a47e623a94da4643ba0a9363d984077d0c92a1fd74f200f",
+    "partitionCount": 215,
+    "objectCount": 860,
+    "storedBytes": 2020142364,
+    "remoteVerified": true
+  },
+  "localDataPruned": true
+}
