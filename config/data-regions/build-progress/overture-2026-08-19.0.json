@@ -1,21 +1,21 @@
 {
   "format": "comfortos-us-overture-build-progress-v1",
-  "generatedAt": "2026-09-06T06:31:51.293Z",
+  "generatedAt": "2026-09-06T07:25:50.316Z",
   "release": "2026-08-19.0",
   "summary": {
     "jurisdictionCount": 51,
-    "completedJurisdictionCount": 17,
-    "archivedJurisdictionCount": 17,
+    "completedJurisdictionCount": 18,
+    "archivedJurisdictionCount": 18,
     "plannedPartitionCount": 20758,
     "uniqueGridCellCount": 19036,
     "duplicateStateAssignmentCount": 1722,
-    "completedPartitionCount": 1811,
-    "archivedPartitionCount": 1810,
+    "completedPartitionCount": 2043,
+    "archivedPartitionCount": 2042,
     "invalidPartitionCount": 0,
-    "completionRatio": 0.0872434723961846,
-    "buildingCount": 46745242,
-    "usableHeightRatio": 0.7456484020341578,
-    "storedBytes": 25035827131
+    "completionRatio": 0.09841988630889295,
+    "buildingCount": 48773573,
+    "usableHeightRatio": 0.7414956045971862,
+    "storedBytes": 26100767028
   },
   "jurisdictions": [
     {
@@ -305,13 +305,14 @@
     {
       "code": "MS",
       "name": "Mississippi",
-      "status": "pending",
+      "status": "archived",
       "plannedPartitionCount": 232,
-      "completedPartitionCount": 0,
+      "completedPartitionCount": 232,
       "invalidPartitionCount": 0,
-      "buildingCount": 0,
-      "usableHeightRatio": null,
-      "storedBytes": 0
+      "buildingCount": 2028331,
+      "usableHeightRatio": 0.645789567876249,
+      "storedBytes": 1064939897,
+      "localDataPruned": true
     },
     {
       "code": "MT",

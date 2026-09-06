@@ -1,0 +1,57 @@
+{
+  "format": "comfortos-us-state-archive-checkpoint-v1",
+  "createdAt": "2026-09-06T07:11:48.639Z",
+  "release": "2026-08-19.0",
+  "jurisdiction": {
+    "fips": "28",
+    "code": "MS",
+    "name": "Mississippi"
+  },
+  "validation": [
+    {
+      "kind": "heat",
+      "createdAt": "2026-09-06T07:11:48.639Z",
+      "reportFile": "ms-heat-validation.json",
+      "reportSha256": "fae8c6bdab54a1c67428aa552829840c95e74f1df311db4889e6188a10bca414",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 359
+    },
+    {
+      "kind": "live",
+      "createdAt": "2026-09-06T07:11:36.236Z",
+      "reportFile": "ms-live-validation.json",
+      "reportSha256": "db617232c4303264b92e24bd2d22ec178879da299404da4ec43d8b3fdb8b9b74",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 1145.3333333333333
+    }
+  ],
+  "dataset": {
+    "buildingCount": 2028331,
+    "usableHeightCount": 1309875,
+    "usableHeightRatio": 0.645789567876249
+  },
+  "archive": {
+    "provider": "cloudflare-r2",
+    "location": "comfortos-environment-data",
+    "prefix": "overture-buildings",
+    "stateManifestKey": "overture-buildings/2026-08-19.0/us/ms/state-archive-manifest.json",
+    "stateManifestSha256": "13619e57d5467be18781f5f7ff3fa8feeceb158f0f4907c1b3a7a5dabd010267",
+    "partitionCount": 232,
+    "objectCount": 928,
+    "storedBytes": 1064939897,
+    "remoteVerified": true
+  },
+  "localDataPruned": true
+}

@@ -1,0 +1,20 @@
+[
+  {
+    "id": "ms-jackson-capitol-museum-of-art",
+    "label": "Mississippi State Capitol to Mississippi Museum of Art",
+    "origin": { "latitude": 32.3038, "longitude": -90.1821 },
+    "destination": { "latitude": 32.2984, "longitude": -90.1870 }
+  },
+  {
+    "id": "ms-gulfport-city-hall-jones-park",
+    "label": "Gulfport City Hall to Jones Park",
+    "origin": { "latitude": 30.3674, "longitude": -89.0928 },
+    "destination": { "latitude": 30.3653, "longitude": -89.0876 }
+  },
+  {
+    "id": "ms-tupelo-fairpark-elvis-birthplace",
+    "label": "Fairpark to Elvis Presley Birthplace",
+    "origin": { "latitude": 34.2581, "longitude": -88.7034 },
+    "destination": { "latitude": 34.2594, "longitude": -88.6790 }
+  }
+]
