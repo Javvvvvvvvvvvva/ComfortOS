@@ -1,0 +1,20 @@
+[
+  {
+    "id": "oh-columbus-statehouse-scioto-mile",
+    "label": "Ohio Statehouse to Scioto Mile",
+    "origin": { "latitude": 39.9612, "longitude": -82.9988 },
+    "destination": { "latitude": 39.9585, "longitude": -83.0036 }
+  },
+  {
+    "id": "oh-cleveland-public-square-rock-hall",
+    "label": "Public Square to Rock and Roll Hall of Fame",
+    "origin": { "latitude": 41.4995, "longitude": -81.6938 },
+    "destination": { "latitude": 41.5085, "longitude": -81.6954 }
+  },
+  {
+    "id": "oh-cincinnati-fountain-square-washington-park",
+    "label": "Fountain Square to Washington Park",
+    "origin": { "latitude": 39.1016, "longitude": -84.5126 },
+    "destination": { "latitude": 39.1088, "longitude": -84.5171 }
+  }
+]

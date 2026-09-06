@@ -1,21 +1,21 @@
 {
   "format": "comfortos-us-overture-build-progress-v1",
-  "generatedAt": "2026-09-06T00:15:15.834Z",
+  "generatedAt": "2026-09-06T05:37:24.767Z",
   "release": "2026-08-19.0",
   "summary": {
     "jurisdictionCount": 51,
-    "completedJurisdictionCount": 15,
-    "archivedJurisdictionCount": 15,
+    "completedJurisdictionCount": 16,
+    "archivedJurisdictionCount": 16,
     "plannedPartitionCount": 20758,
     "uniqueGridCellCount": 19036,
     "duplicateStateAssignmentCount": 1722,
-    "completedPartitionCount": 1373,
-    "archivedPartitionCount": 1372,
+    "completedPartitionCount": 1588,
+    "archivedPartitionCount": 1587,
     "invalidPartitionCount": 0,
-    "completionRatio": 0.06614317371615763,
-    "buildingCount": 34558103,
-    "usableHeightRatio": 0.7500477673788981,
-    "storedBytes": 18557004701
+    "completionRatio": 0.0765006262645727,
+    "buildingCount": 41535116,
+    "usableHeightRatio": 0.7616838243572017,
+    "storedBytes": 22233073472
   },
   "jurisdictions": [
     {
@@ -417,13 +417,14 @@
     {
       "code": "OH",
       "name": "Ohio",
-      "status": "pending",
+      "status": "archived",
       "plannedPartitionCount": 215,
-      "completedPartitionCount": 0,
+      "completedPartitionCount": 215,
       "invalidPartitionCount": 0,
-      "buildingCount": 0,
-      "usableHeightRatio": null,
-      "storedBytes": 0
+      "buildingCount": 6977013,
+      "usableHeightRatio": 0.8193188116461873,
+      "storedBytes": 3676068771,
+      "localDataPruned": true
     },
     {
       "code": "OK",
