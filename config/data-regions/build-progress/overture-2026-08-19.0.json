@@ -1,21 +1,21 @@
 {
   "format": "comfortos-us-overture-build-progress-v1",
-  "generatedAt": "2026-09-06T08:18:51.160Z",
+  "generatedAt": "2026-09-06T09:09:10.478Z",
   "release": "2026-08-19.0",
   "summary": {
     "jurisdictionCount": 51,
-    "completedJurisdictionCount": 19,
-    "archivedJurisdictionCount": 19,
+    "completedJurisdictionCount": 20,
+    "archivedJurisdictionCount": 20,
     "plannedPartitionCount": 20758,
     "uniqueGridCellCount": 19036,
     "duplicateStateAssignmentCount": 1722,
-    "completedPartitionCount": 2275,
-    "archivedPartitionCount": 2274,
+    "completedPartitionCount": 2512,
+    "archivedPartitionCount": 2511,
     "invalidPartitionCount": 0,
-    "completionRatio": 0.10959630022160131,
-    "buildingCount": 53316814,
-    "usableHeightRatio": 0.7409638542918187,
-    "storedBytes": 28510852085
+    "completionRatio": 0.1210135851238077,
+    "buildingCount": 55316002,
+    "usableHeightRatio": 0.7419197613016212,
+    "storedBytes": 29562570684
   },
   "jurisdictions": [
     {
@@ -43,13 +43,14 @@
     {
       "code": "AR",
       "name": "Arkansas",
-      "status": "pending",
+      "status": "archived",
       "plannedPartitionCount": 237,
-      "completedPartitionCount": 0,
+      "completedPartitionCount": 237,
       "invalidPartitionCount": 0,
-      "buildingCount": 0,
-      "usableHeightRatio": null,
-      "storedBytes": 0
+      "buildingCount": 1999188,
+      "usableHeightRatio": 0.7674130697063007,
+      "storedBytes": 1051718599,
+      "localDataPruned": true
     },
     {
       "code": "AZ",

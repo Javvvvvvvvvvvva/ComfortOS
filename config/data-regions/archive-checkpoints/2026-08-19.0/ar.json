@@ -1,0 +1,57 @@
+{
+  "format": "comfortos-us-state-archive-checkpoint-v1",
+  "createdAt": "2026-09-06T08:55:37.208Z",
+  "release": "2026-08-19.0",
+  "jurisdiction": {
+    "fips": "05",
+    "code": "AR",
+    "name": "Arkansas"
+  },
+  "validation": [
+    {
+      "kind": "heat",
+      "createdAt": "2026-09-06T08:55:37.208Z",
+      "reportFile": "ar-heat-validation.json",
+      "reportSha256": "91c0817193d5d614b2182049afefcbb3eea3dba009971ce9ad3b467fb936b23b",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 600.6666666666666
+    },
+    {
+      "kind": "live",
+      "createdAt": "2026-09-06T08:55:25.376Z",
+      "reportFile": "ar-live-validation.json",
+      "reportSha256": "ab898cb08f11957a8f1922f920d537abdeb0bb980b39b134df6eb231c1d394f0",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 1362
+    }
+  ],
+  "dataset": {
+    "buildingCount": 1999188,
+    "usableHeightCount": 1534203,
+    "usableHeightRatio": 0.7674130697063007
+  },
+  "archive": {
+    "provider": "cloudflare-r2",
+    "location": "comfortos-environment-data",
+    "prefix": "overture-buildings",
+    "stateManifestKey": "overture-buildings/2026-08-19.0/us/ar/state-archive-manifest.json",
+    "stateManifestSha256": "5a4eed352f36f8a05d14343ee1794f29d24c0b243e67627e5b5c3a8c05ee8927",
+    "partitionCount": 237,
+    "objectCount": 948,
+    "storedBytes": 1051718599,
+    "remoteVerified": true
+  },
+  "localDataPruned": true
+}

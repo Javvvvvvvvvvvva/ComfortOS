@@ -1,0 +1,20 @@
+[
+  {
+    "id": "ar-little-rock-capitol-river-market",
+    "label": "Arkansas State Capitol to River Market",
+    "origin": { "latitude": 34.7466, "longitude": -92.2896 },
+    "destination": { "latitude": 34.7472, "longitude": -92.2659 }
+  },
+  {
+    "id": "ar-fayetteville-square-university",
+    "label": "Fayetteville Downtown Square to University of Arkansas",
+    "origin": { "latitude": 36.0626, "longitude": -94.1606 },
+    "destination": { "latitude": 36.0687, "longitude": -94.1748 }
+  },
+  {
+    "id": "ar-fort-smith-historic-site-creekmore-park",
+    "label": "Fort Smith National Historic Site to Creekmore Park",
+    "origin": { "latitude": 35.3873, "longitude": -94.4309 },
+    "destination": { "latitude": 35.3777, "longitude": -94.3970 }
+  }
+]
