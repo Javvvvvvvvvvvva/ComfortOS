@@ -1,21 +1,21 @@
 {
   "format": "comfortos-us-overture-build-progress-v1",
-  "generatedAt": "2026-09-06T16:34:41.224Z",
+  "generatedAt": "2026-09-06T17:57:40.804Z",
   "release": "2026-08-19.0",
   "summary": {
     "jurisdictionCount": 51,
-    "completedJurisdictionCount": 23,
-    "archivedJurisdictionCount": 23,
+    "completedJurisdictionCount": 24,
+    "archivedJurisdictionCount": 24,
     "plannedPartitionCount": 20758,
     "uniqueGridCellCount": 19036,
     "duplicateStateAssignmentCount": 1722,
-    "completedPartitionCount": 3252,
-    "archivedPartitionCount": 3251,
+    "completedPartitionCount": 3528,
+    "archivedPartitionCount": 3527,
     "invalidPartitionCount": 0,
-    "completionRatio": 0.15666249156951537,
-    "buildingCount": 69184147,
-    "usableHeightRatio": 0.7443267024741954,
-    "storedBytes": 36921840500
+    "completionRatio": 0.16995857018980634,
+    "buildingCount": 74380952,
+    "usableHeightRatio": 0.744296147217906,
+    "storedBytes": 39618933651
   },
   "jurisdictions": [
     {
@@ -136,13 +136,14 @@
     {
       "code": "GA",
       "name": "Georgia",
-      "status": "pending",
+      "status": "archived",
       "plannedPartitionCount": 276,
-      "completedPartitionCount": 0,
+      "completedPartitionCount": 276,
       "invalidPartitionCount": 0,
-      "buildingCount": 0,
-      "usableHeightRatio": null,
-      "storedBytes": 0
+      "buildingCount": 5196805,
+      "usableHeightRatio": 0.7438893704882135,
+      "storedBytes": 2697093151,
+      "localDataPruned": true
     },
     {
       "code": "HI",

@@ -1,0 +1,57 @@
+{
+  "format": "comfortos-us-state-archive-checkpoint-v1",
+  "createdAt": "2026-09-06T17:36:54.981Z",
+  "release": "2026-08-19.0",
+  "jurisdiction": {
+    "fips": "13",
+    "code": "GA",
+    "name": "Georgia"
+  },
+  "validation": [
+    {
+      "kind": "heat",
+      "createdAt": "2026-09-06T17:36:54.981Z",
+      "reportFile": "ga-heat-validation.json",
+      "reportSha256": "ae8aa97e736da8bd4917269df04d6f69fe5bc7ab4f84bf20176d01ecc1c6be06",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 471.3333333333333
+    },
+    {
+      "kind": "live",
+      "createdAt": "2026-09-06T17:36:41.911Z",
+      "reportFile": "ga-live-validation.json",
+      "reportSha256": "cf75b44e0ff39836cbd7fc6e113b5b65077581c4d9728ddbf92437761ad4b1f8",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 1607.6666666666667
+    }
+  ],
+  "dataset": {
+    "buildingCount": 5196805,
+    "usableHeightCount": 3865848,
+    "usableHeightRatio": 0.7438893704882135
+  },
+  "archive": {
+    "provider": "cloudflare-r2",
+    "location": "comfortos-environment-data",
+    "prefix": "overture-buildings",
+    "stateManifestKey": "overture-buildings/2026-08-19.0/us/ga/state-archive-manifest.json",
+    "stateManifestSha256": "b95cb1fd9bfc6cc840d75e474b6760006dd9b07c57efa43b4f90d932fa69734a",
+    "partitionCount": 276,
+    "objectCount": 1104,
+    "storedBytes": 2697093151,
+    "remoteVerified": true
+  },
+  "localDataPruned": true
+}

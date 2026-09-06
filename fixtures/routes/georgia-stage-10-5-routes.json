@@ -1,0 +1,20 @@
+[
+  {
+    "id": "ga-atlanta-centennial-park-state-capitol",
+    "label": "Atlanta Centennial Olympic Park to Georgia State Capitol",
+    "origin": { "latitude": 33.7603, "longitude": -84.3935 },
+    "destination": { "latitude": 33.7490, "longitude": -84.3880 }
+  },
+  {
+    "id": "ga-augusta-history-museum-springfield-village-park",
+    "label": "Augusta Museum of History to Springfield Village Park",
+    "origin": { "latitude": 33.4742, "longitude": -81.9595 },
+    "destination": { "latitude": 33.4817, "longitude": -81.9673 }
+  },
+  {
+    "id": "ga-savannah-forsyth-park-johnson-square",
+    "label": "Savannah Forsyth Park to Johnson Square",
+    "origin": { "latitude": 32.0709, "longitude": -81.0936 },
+    "destination": { "latitude": 32.0809, "longitude": -81.0907 }
+  }
+]

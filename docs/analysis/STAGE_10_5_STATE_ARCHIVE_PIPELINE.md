@@ -1,7 +1,7 @@
 # Stage 10.5 - State Archive Pipeline
 
 Date: 2026-09-06
-Status: Live and verified for the first twenty-three jurisdictions
+Status: Live and verified for the first twenty-four jurisdictions
 
 ## Scope
 
@@ -55,16 +55,17 @@ after local deletion. Neither command changes production deployment configuratio
 | Pennsylvania | 244 | 977 | 4,056,494,152 | Verified and locally pruned |
 | Alabama | 245 | 981 | 1,835,357,007 | Verified and locally pruned |
 | Louisiana | 251 | 1,005 | 1,467,418,657 | Verified and locally pruned |
+| Georgia | 276 | 1,105 | 2,697,093,151 | Verified and locally pruned |
 
-All 13,004 data objects were rehashed locally, uploaded, downloaded from R2, and verified by exact
-byte count and SHA-256. The twenty-three state archive manifests were uploaded last, for 13,027 remote
-objects in total. The forty-six accepted validation reports cover 138 successful and comparable
+All 14,108 data objects were rehashed locally, uploaded, downloaded from R2, and verified by exact
+byte count and SHA-256. The twenty-four state archive manifests were uploaded last, for 14,132 remote
+objects in total. The forty-eight accepted validation reports cover 144 successful and comparable
 route checks.
 
-The live archive contains 3,251 completed partitions, 68,733,454 buildings, and 36,683,795,371
+The live archive contains 3,527 completed partitions, 73,930,259 buildings, and 39,380,888,522
 stored bytes. Compact checkpoints are committed to Git, while the verified local payloads have
 been pruned. The nationwide audit retains those totals from the checkpoints and reports all
-twenty-three jurisdictions as `archived`.
+twenty-four jurisdictions as `archived`.
 
 Connecticut's 37-partition build contains 2,226,878 buildings with 67.71% usable height
 coverage. Hartford, New Haven, and Stamford each passed live NWS and controlled 38 C route
@@ -220,6 +221,13 @@ invalid stores. Transient official STAC requests recovered through bounded retry
 R2 archive resumed by reusing 697 already verified objects before all remote objects were verified
 and local data was pruned.
 
+Georgia's 276-partition build contains 5,196,805 buildings with 74.39% usable height coverage.
+Atlanta, Augusta, and Savannah each passed live NWS and controlled 38 C route validation through
+managed Mapbox and the private HTTP Overture service. Live validation averaged 1,608 ms; controlled
+heat averaged 471 ms. Four disjoint partition workers covered the complete state plan without
+overlapping writes, and the canonical audit confirmed all 276 partitions with zero invalid stores.
+All R2 objects passed remote byte-count and SHA-256 verification before local data was pruned.
+
 ## Credential Verification
 
 The configured R2 account passed a live bucket health check and an isolated put, get,
@@ -238,4 +246,4 @@ R2_BUCKET=comfortos-environment-data
 
 ## Judgment
 
-STATE ARCHIVE PIPELINE LIVE; NEXT TARGET GEORGIA
+STATE ARCHIVE PIPELINE LIVE; NEXT TARGET NORTH CAROLINA
