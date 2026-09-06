@@ -1,0 +1,20 @@
+[
+  {
+    "id": "il-chicago-millennium-park-grant-park",
+    "label": "Chicago Millennium Park to Grant Park",
+    "origin": { "latitude": 41.8826, "longitude": -87.6226 },
+    "destination": { "latitude": 41.8722, "longitude": -87.6188 }
+  },
+  {
+    "id": "il-springfield-state-capitol-lincoln-home",
+    "label": "Illinois State Capitol to Lincoln Home",
+    "origin": { "latitude": 39.7983, "longitude": -89.6544 },
+    "destination": { "latitude": 39.7974, "longitude": -89.6450 }
+  },
+  {
+    "id": "il-peoria-riverfront-museum-civic-center",
+    "label": "Peoria Riverfront Museum to Peoria Civic Center",
+    "origin": { "latitude": 40.6920, "longitude": -89.5890 },
+    "destination": { "latitude": 40.6920, "longitude": -89.5946 }
+  }
+]

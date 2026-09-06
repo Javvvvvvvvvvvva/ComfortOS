@@ -1,0 +1,57 @@
+{
+  "format": "comfortos-us-state-archive-checkpoint-v1",
+  "createdAt": "2026-09-06T20:48:27.383Z",
+  "release": "2026-08-19.0",
+  "jurisdiction": {
+    "fips": "17",
+    "code": "IL",
+    "name": "Illinois"
+  },
+  "validation": [
+    {
+      "kind": "heat",
+      "createdAt": "2026-09-06T20:48:27.383Z",
+      "reportFile": "il-heat-validation.json",
+      "reportSha256": "853581c903780c40e029f21a9a11a8f5567eccdb94ec8fd0a5b00da2ca1bdfba",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 345.6666666666667
+    },
+    {
+      "kind": "live",
+      "createdAt": "2026-09-06T20:47:19.430Z",
+      "reportFile": "il-live-validation.json",
+      "reportSha256": "62ed280ecc484546de474bbd61de4b97934e184a3036a79a0de8577afa972608",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 1629.3333333333333
+    }
+  ],
+  "dataset": {
+    "buildingCount": 7011707,
+    "usableHeightCount": 5735677,
+    "usableHeightRatio": 0.8180143579872918
+  },
+  "archive": {
+    "provider": "cloudflare-r2",
+    "location": "comfortos-environment-data",
+    "prefix": "overture-buildings",
+    "stateManifestKey": "overture-buildings/2026-08-19.0/us/il/state-archive-manifest.json",
+    "stateManifestSha256": "2d622349812217475a6ec3192f37ddd2d23079b5d7f233a6b2d265061eed0b6a",
+    "partitionCount": 289,
+    "objectCount": 1156,
+    "storedBytes": 3694201828,
+    "remoteVerified": true
+  },
+  "localDataPruned": true
+}

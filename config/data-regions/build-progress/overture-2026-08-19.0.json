@@ -1,21 +1,21 @@
 {
   "format": "comfortos-us-overture-build-progress-v1",
-  "generatedAt": "2026-09-06T19:19:37.665Z",
+  "generatedAt": "2026-09-06T21:11:54.296Z",
   "release": "2026-08-19.0",
   "summary": {
     "jurisdictionCount": 51,
-    "completedJurisdictionCount": 25,
-    "archivedJurisdictionCount": 25,
+    "completedJurisdictionCount": 26,
+    "archivedJurisdictionCount": 26,
     "plannedPartitionCount": 20758,
     "uniqueGridCellCount": 19036,
     "duplicateStateAssignmentCount": 1722,
-    "completedPartitionCount": 3805,
-    "archivedPartitionCount": 3804,
+    "completedPartitionCount": 4093,
+    "archivedPartitionCount": 4093,
     "invalidPartitionCount": 0,
-    "completionRatio": 0.1833028230079969,
-    "buildingCount": 81134607,
-    "usableHeightRatio": 0.7373348218720034,
-    "storedBytes": 43137838592
+    "completionRatio": 0.19717699200308314,
+    "buildingCount": 87695621,
+    "usableHeightRatio": 0.7428884048839793,
+    "storedBytes": 46593995291
   },
   "jurisdictions": [
     {
@@ -182,13 +182,14 @@
     {
       "code": "IL",
       "name": "Illinois",
-      "status": "in-progress",
+      "status": "archived",
       "plannedPartitionCount": 289,
-      "completedPartitionCount": 1,
+      "completedPartitionCount": 289,
       "invalidPartitionCount": 0,
-      "buildingCount": 450693,
-      "usableHeightRatio": 0.9119023370675826,
-      "storedBytes": 238045129
+      "buildingCount": 7011707,
+      "usableHeightRatio": 0.8180143579872918,
+      "storedBytes": 3694201828,
+      "localDataPruned": true
     },
     {
       "code": "IN",
