@@ -1,0 +1,57 @@
+{
+  "format": "comfortos-us-state-archive-checkpoint-v1",
+  "createdAt": "2026-09-06T11:25:40.997Z",
+  "release": "2026-08-19.0",
+  "jurisdiction": {
+    "fips": "42",
+    "code": "PA",
+    "name": "Pennsylvania"
+  },
+  "validation": [
+    {
+      "kind": "heat",
+      "createdAt": "2026-09-06T11:25:40.997Z",
+      "reportFile": "pa-heat-validation.json",
+      "reportSha256": "c0a3969ea84d9149ac1f6b233141f9f9645cf416ef10ba3a43e130eb86dd457d",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 402.6666666666667
+    },
+    {
+      "kind": "live",
+      "createdAt": "2026-09-06T11:25:29.433Z",
+      "reportFile": "pa-live-validation.json",
+      "reportSha256": "bb0984b312acb85aba7a202b8f02c208ee56d64f1eb71c12de21d81b29f9933c",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 1446.3333333333333
+    }
+  ],
+  "dataset": {
+    "buildingCount": 7683897,
+    "usableHeightCount": 5910906,
+    "usableHeightRatio": 0.7692588799667669
+  },
+  "archive": {
+    "provider": "cloudflare-r2",
+    "location": "comfortos-environment-data",
+    "prefix": "overture-buildings",
+    "stateManifestKey": "overture-buildings/2026-08-19.0/us/pa/state-archive-manifest.json",
+    "stateManifestSha256": "a9a219666b1878fdd91c322c63956e332b3cc6258a10176c6f8d73f048944b39",
+    "partitionCount": 244,
+    "objectCount": 976,
+    "storedBytes": 4056494152,
+    "remoteVerified": true
+  },
+  "localDataPruned": true
+}

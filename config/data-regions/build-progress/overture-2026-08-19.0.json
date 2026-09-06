@@ -1,21 +1,21 @@
 {
   "format": "comfortos-us-overture-build-progress-v1",
-  "generatedAt": "2026-09-06T09:09:10.478Z",
+  "generatedAt": "2026-09-06T11:45:57.861Z",
   "release": "2026-08-19.0",
   "summary": {
     "jurisdictionCount": 51,
-    "completedJurisdictionCount": 20,
-    "archivedJurisdictionCount": 20,
+    "completedJurisdictionCount": 21,
+    "archivedJurisdictionCount": 21,
     "plannedPartitionCount": 20758,
     "uniqueGridCellCount": 19036,
     "duplicateStateAssignmentCount": 1722,
-    "completedPartitionCount": 2512,
-    "archivedPartitionCount": 2511,
+    "completedPartitionCount": 2756,
+    "archivedPartitionCount": 2755,
     "invalidPartitionCount": 0,
-    "completionRatio": 0.1210135851238077,
-    "buildingCount": 55316002,
-    "usableHeightRatio": 0.7419197613016212,
-    "storedBytes": 29562570684
+    "completionRatio": 0.1327680894113113,
+    "buildingCount": 62999899,
+    "usableHeightRatio": 0.7452542265186806,
+    "storedBytes": 33619064836
   },
   "jurisdictions": [
     {
@@ -453,13 +453,14 @@
     {
       "code": "PA",
       "name": "Pennsylvania",
-      "status": "pending",
+      "status": "archived",
       "plannedPartitionCount": 244,
-      "completedPartitionCount": 0,
+      "completedPartitionCount": 244,
       "invalidPartitionCount": 0,
-      "buildingCount": 0,
-      "usableHeightRatio": null,
-      "storedBytes": 0
+      "buildingCount": 7683897,
+      "usableHeightRatio": 0.7692588799667669,
+      "storedBytes": 4056494152,
+      "localDataPruned": true
     },
     {
       "code": "RI",

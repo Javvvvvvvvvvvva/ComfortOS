@@ -1,0 +1,20 @@
+[
+  {
+    "id": "pa-pittsburgh-market-square-point-state-park",
+    "label": "Pittsburgh Market Square to Point State Park",
+    "origin": { "latitude": 40.4406, "longitude": -80.0035 },
+    "destination": { "latitude": 40.4410, "longitude": -80.0105 }
+  },
+  {
+    "id": "pa-harrisburg-capitol-city-island",
+    "label": "Pennsylvania State Capitol to City Island",
+    "origin": { "latitude": 40.2644, "longitude": -76.8836 },
+    "destination": { "latitude": 40.2547, "longitude": -76.8867 }
+  },
+  {
+    "id": "pa-philadelphia-city-hall-reading-terminal",
+    "label": "Philadelphia City Hall to Reading Terminal Market",
+    "origin": { "latitude": 39.9526, "longitude": -75.1636 },
+    "destination": { "latitude": 39.9533, "longitude": -75.1592 }
+  }
+]
