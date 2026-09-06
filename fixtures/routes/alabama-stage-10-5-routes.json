@@ -1,0 +1,20 @@
+[
+  {
+    "id": "al-birmingham-railroad-park-kelly-ingram-park",
+    "label": "Birmingham Railroad Park to Kelly Ingram Park",
+    "origin": { "latitude": 33.5091, "longitude": -86.8106 },
+    "destination": { "latitude": 33.5164, "longitude": -86.8144 }
+  },
+  {
+    "id": "al-montgomery-capitol-riverfront-park",
+    "label": "Alabama State Capitol to Riverfront Park",
+    "origin": { "latitude": 32.3777, "longitude": -86.3006 },
+    "destination": { "latitude": 32.3790, "longitude": -86.3136 }
+  },
+  {
+    "id": "al-mobile-bienville-square-cooper-riverside-park",
+    "label": "Mobile Bienville Square to Cooper Riverside Park",
+    "origin": { "latitude": 30.6915, "longitude": -88.0436 },
+    "destination": { "latitude": 30.6930, "longitude": -88.0392 }
+  }
+]

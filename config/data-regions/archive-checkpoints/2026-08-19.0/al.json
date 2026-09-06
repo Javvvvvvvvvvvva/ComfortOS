@@ -1,0 +1,57 @@
+{
+  "format": "comfortos-us-state-archive-checkpoint-v1",
+  "createdAt": "2026-09-06T13:13:38.969Z",
+  "release": "2026-08-19.0",
+  "jurisdiction": {
+    "fips": "01",
+    "code": "AL",
+    "name": "Alabama"
+  },
+  "validation": [
+    {
+      "kind": "heat",
+      "createdAt": "2026-09-06T13:13:38.969Z",
+      "reportFile": "al-heat-validation.json",
+      "reportSha256": "aea5e89f7f170d181c81bcd588b61d64db0e8a7dbde5ea7d5fc894e7a4dbade0",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 392
+    },
+    {
+      "kind": "live",
+      "createdAt": "2026-09-06T13:13:24.148Z",
+      "reportFile": "al-live-validation.json",
+      "reportSha256": "36f1c14fb3993b5ca4b0ffe6193859fdadb2872ded53d32d84f82dafb9be3345",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 1323
+    }
+  ],
+  "dataset": {
+    "buildingCount": 3428780,
+    "usableHeightCount": 2269693,
+    "usableHeightRatio": 0.6619535228273613
+  },
+  "archive": {
+    "provider": "cloudflare-r2",
+    "location": "comfortos-environment-data",
+    "prefix": "overture-buildings",
+    "stateManifestKey": "overture-buildings/2026-08-19.0/us/al/state-archive-manifest.json",
+    "stateManifestSha256": "c66f0d4eb92720645f96b9cf22c99c374b825c9bb92c0e796d56bb149572b4d4",
+    "partitionCount": 245,
+    "objectCount": 980,
+    "storedBytes": 1835357007,
+    "remoteVerified": true
+  },
+  "localDataPruned": true
+}

@@ -1,21 +1,21 @@
 {
   "format": "comfortos-us-overture-build-progress-v1",
-  "generatedAt": "2026-09-06T11:45:57.861Z",
+  "generatedAt": "2026-09-06T13:32:48.346Z",
   "release": "2026-08-19.0",
   "summary": {
     "jurisdictionCount": 51,
-    "completedJurisdictionCount": 21,
-    "archivedJurisdictionCount": 21,
+    "completedJurisdictionCount": 22,
+    "archivedJurisdictionCount": 22,
     "plannedPartitionCount": 20758,
     "uniqueGridCellCount": 19036,
     "duplicateStateAssignmentCount": 1722,
-    "completedPartitionCount": 2756,
-    "archivedPartitionCount": 2755,
+    "completedPartitionCount": 3001,
+    "archivedPartitionCount": 3000,
     "invalidPartitionCount": 0,
-    "completionRatio": 0.1327680894113113,
-    "buildingCount": 62999899,
-    "usableHeightRatio": 0.7452542265186806,
-    "storedBytes": 33619064836
+    "completionRatio": 0.14457076789671452,
+    "buildingCount": 66428679,
+    "usableHeightRatio": 0.7409545807767757,
+    "storedBytes": 35454421843
   },
   "jurisdictions": [
     {
@@ -32,13 +32,14 @@
     {
       "code": "AL",
       "name": "Alabama",
-      "status": "pending",
+      "status": "archived",
       "plannedPartitionCount": 245,
-      "completedPartitionCount": 0,
+      "completedPartitionCount": 245,
       "invalidPartitionCount": 0,
-      "buildingCount": 0,
-      "usableHeightRatio": null,
-      "storedBytes": 0
+      "buildingCount": 3428780,
+      "usableHeightRatio": 0.6619535228273613,
+      "storedBytes": 1835357007,
+      "localDataPruned": true
     },
     {
       "code": "AR",
