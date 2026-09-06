@@ -1,0 +1,20 @@
+[
+  {
+    "id": "nc-raleigh-state-capitol-nash-square",
+    "label": "Raleigh State Capitol to Nash Square",
+    "origin": { "latitude": 35.7804, "longitude": -78.6391 },
+    "destination": { "latitude": 35.7767, "longitude": -78.6425 }
+  },
+  {
+    "id": "nc-charlotte-romare-bearden-first-ward-park",
+    "label": "Charlotte Romare Bearden Park to First Ward Park",
+    "origin": { "latitude": 35.2272, "longitude": -80.8464 },
+    "destination": { "latitude": 35.2295, "longitude": -80.8390 }
+  },
+  {
+    "id": "nc-asheville-pack-square-aston-park",
+    "label": "Asheville Pack Square to Aston Park",
+    "origin": { "latitude": 35.5951, "longitude": -82.5515 },
+    "destination": { "latitude": 35.5896, "longitude": -82.5578 }
+  }
+]

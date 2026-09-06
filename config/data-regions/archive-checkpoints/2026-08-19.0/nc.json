@@ -1,0 +1,57 @@
+{
+  "format": "comfortos-us-state-archive-checkpoint-v1",
+  "createdAt": "2026-09-06T18:44:51.562Z",
+  "release": "2026-08-19.0",
+  "jurisdiction": {
+    "fips": "37",
+    "code": "NC",
+    "name": "North Carolina"
+  },
+  "validation": [
+    {
+      "kind": "heat",
+      "createdAt": "2026-09-06T18:44:51.562Z",
+      "reportFile": "nc-heat-validation.json",
+      "reportSha256": "343822783c82775d18d39d416bd20e91966028231b639bc26bb183745905b42e",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 414.6666666666667
+    },
+    {
+      "kind": "live",
+      "createdAt": "2026-09-06T18:44:36.673Z",
+      "reportFile": "nc-live-validation.json",
+      "reportSha256": "89d9ec7bb2040f96502ec040b45bb317e5fb22579723c48c5b40ede652309650",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 1256
+    }
+  ],
+  "dataset": {
+    "buildingCount": 6753655,
+    "usableHeightCount": 4461915,
+    "usableHeightRatio": 0.6606667056578993
+  },
+  "archive": {
+    "provider": "cloudflare-r2",
+    "location": "comfortos-environment-data",
+    "prefix": "overture-buildings",
+    "stateManifestKey": "overture-buildings/2026-08-19.0/us/nc/state-archive-manifest.json",
+    "stateManifestSha256": "85cfdcc88d6db8adb6144d156d1f0254e8b6ac264f8db1d67ccb7238c7d2f90c",
+    "partitionCount": 277,
+    "objectCount": 1108,
+    "storedBytes": 3518904941,
+    "remoteVerified": true
+  },
+  "localDataPruned": true
+}

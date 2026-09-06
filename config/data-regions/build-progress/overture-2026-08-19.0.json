@@ -1,21 +1,21 @@
 {
   "format": "comfortos-us-overture-build-progress-v1",
-  "generatedAt": "2026-09-06T17:57:40.804Z",
+  "generatedAt": "2026-09-06T19:19:37.665Z",
   "release": "2026-08-19.0",
   "summary": {
     "jurisdictionCount": 51,
-    "completedJurisdictionCount": 24,
-    "archivedJurisdictionCount": 24,
+    "completedJurisdictionCount": 25,
+    "archivedJurisdictionCount": 25,
     "plannedPartitionCount": 20758,
     "uniqueGridCellCount": 19036,
     "duplicateStateAssignmentCount": 1722,
-    "completedPartitionCount": 3528,
-    "archivedPartitionCount": 3527,
+    "completedPartitionCount": 3805,
+    "archivedPartitionCount": 3804,
     "invalidPartitionCount": 0,
-    "completionRatio": 0.16995857018980634,
-    "buildingCount": 74380952,
-    "usableHeightRatio": 0.744296147217906,
-    "storedBytes": 39618933651
+    "completionRatio": 0.1833028230079969,
+    "buildingCount": 81134607,
+    "usableHeightRatio": 0.7373348218720034,
+    "storedBytes": 43137838592
   },
   "jurisdictions": [
     {
@@ -332,13 +332,14 @@
     {
       "code": "NC",
       "name": "North Carolina",
-      "status": "pending",
+      "status": "archived",
       "plannedPartitionCount": 277,
-      "completedPartitionCount": 0,
+      "completedPartitionCount": 277,
       "invalidPartitionCount": 0,
-      "buildingCount": 0,
-      "usableHeightRatio": null,
-      "storedBytes": 0
+      "buildingCount": 6753655,
+      "usableHeightRatio": 0.6606667056578993,
+      "storedBytes": 3518904941,
+      "localDataPruned": true
     },
     {
       "code": "ND",
