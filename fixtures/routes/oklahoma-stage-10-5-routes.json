@@ -1,0 +1,20 @@
+[
+  {
+    "id": "ok-oklahoma-city-state-capitol-national-memorial",
+    "label": "Oklahoma State Capitol to Oklahoma City National Memorial",
+    "origin": { "latitude": 35.4922, "longitude": -97.5033 },
+    "destination": { "latitude": 35.4726, "longitude": -97.5171 }
+  },
+  {
+    "id": "ok-tulsa-gathering-place-philbrook",
+    "label": "Gathering Place to Philbrook Museum of Art",
+    "origin": { "latitude": 36.1265, "longitude": -95.9859 },
+    "destination": { "latitude": 36.1237, "longitude": -95.9717 }
+  },
+  {
+    "id": "ok-norman-north-oval-reaves-park",
+    "label": "University of Oklahoma North Oval to Reaves Park",
+    "origin": { "latitude": 35.2100, "longitude": -97.4457 },
+    "destination": { "latitude": 35.1984, "longitude": -97.4437 }
+  }
+]

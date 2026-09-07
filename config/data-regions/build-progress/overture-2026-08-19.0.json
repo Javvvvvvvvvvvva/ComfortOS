@@ -1,21 +1,21 @@
 {
   "format": "comfortos-us-overture-build-progress-v1",
-  "generatedAt": "2026-09-07T05:30:05.809Z",
+  "generatedAt": "2026-09-07T08:12:22.364Z",
   "release": "2026-08-19.0",
   "summary": {
     "jurisdictionCount": 51,
-    "completedJurisdictionCount": 30,
-    "archivedJurisdictionCount": 30,
+    "completedJurisdictionCount": 31,
+    "archivedJurisdictionCount": 31,
     "plannedPartitionCount": 20758,
     "uniqueGridCellCount": 19036,
     "duplicateStateAssignmentCount": 1722,
-    "completedPartitionCount": 5306,
-    "archivedPartitionCount": 5306,
+    "completedPartitionCount": 5645,
+    "archivedPartitionCount": 5645,
     "invalidPartitionCount": 0,
-    "completionRatio": 0.255612294055304,
-    "buildingCount": 112277501,
-    "usableHeightRatio": 0.7404749327293988,
-    "storedBytes": 59681429937
+    "completionRatio": 0.27194334714327006,
+    "buildingCount": 115130980,
+    "usableHeightRatio": 0.7394228208602064,
+    "storedBytes": 61199006078
   },
   "jurisdictions": [
     {
@@ -439,13 +439,14 @@
     {
       "code": "OK",
       "name": "Oklahoma",
-      "status": "pending",
+      "status": "archived",
       "plannedPartitionCount": 339,
-      "completedPartitionCount": 0,
+      "completedPartitionCount": 339,
       "invalidPartitionCount": 0,
-      "buildingCount": 0,
-      "usableHeightRatio": null,
-      "storedBytes": 0
+      "buildingCount": 2853479,
+      "usableHeightRatio": 0.6980247620536194,
+      "storedBytes": 1517576141,
+      "localDataPruned": true
     },
     {
       "code": "OR",

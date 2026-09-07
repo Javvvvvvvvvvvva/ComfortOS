@@ -1,0 +1,57 @@
+{
+  "format": "comfortos-us-state-archive-checkpoint-v1",
+  "createdAt": "2026-09-07T07:49:31.114Z",
+  "release": "2026-08-19.0",
+  "jurisdiction": {
+    "fips": "40",
+    "code": "OK",
+    "name": "Oklahoma"
+  },
+  "validation": [
+    {
+      "kind": "heat",
+      "createdAt": "2026-09-07T07:49:31.114Z",
+      "reportFile": "ok-heat-validation.json",
+      "reportSha256": "f5a6a00ef27045047effc873e1eb34ccf4205951798a7aafe40e2556bda0fa9f",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 524.6666666666666
+    },
+    {
+      "kind": "live",
+      "createdAt": "2026-09-07T07:49:14.717Z",
+      "reportFile": "ok-live-validation.json",
+      "reportSha256": "923847b7e8a9402651ed319a21d1b9768c1de5212490fed31cdf65cbd02ca1b0",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 1615.3333333333333
+    }
+  ],
+  "dataset": {
+    "buildingCount": 2853479,
+    "usableHeightCount": 1991799,
+    "usableHeightRatio": 0.6980247620536194
+  },
+  "archive": {
+    "provider": "cloudflare-r2",
+    "location": "comfortos-environment-data",
+    "prefix": "overture-buildings",
+    "stateManifestKey": "overture-buildings/2026-08-19.0/us/ok/state-archive-manifest.json",
+    "stateManifestSha256": "162ea2c82f4bba13f4203bfd7b280698843bbdeb8d3fb0ebb5fa6910cff4070d",
+    "partitionCount": 339,
+    "objectCount": 1356,
+    "storedBytes": 1517576141,
+    "remoteVerified": true
+  },
+  "localDataPruned": true
+}
