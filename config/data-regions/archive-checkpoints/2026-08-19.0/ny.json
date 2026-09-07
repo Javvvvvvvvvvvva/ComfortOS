@@ -1,0 +1,57 @@
+{
+  "format": "comfortos-us-state-archive-checkpoint-v1",
+  "createdAt": "2026-09-07T01:28:18.193Z",
+  "release": "2026-08-19.0",
+  "jurisdiction": {
+    "fips": "36",
+    "code": "NY",
+    "name": "New York"
+  },
+  "validation": [
+    {
+      "kind": "heat",
+      "createdAt": "2026-09-07T01:28:18.193Z",
+      "reportFile": "ny-heat-validation.json",
+      "reportSha256": "a6e0b22c1504fc14b0d5adf7d4ee1de0742df07ad03659a4affa9c81748d24ff",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 606.3333333333334
+    },
+    {
+      "kind": "live",
+      "createdAt": "2026-09-07T01:27:53.735Z",
+      "reportFile": "ny-live-validation.json",
+      "reportSha256": "40cf8739273942c7c6dc678458de7b72f4d265bae5061fd321aee4768bf46ca7",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 1454
+    }
+  ],
+  "dataset": {
+    "buildingCount": 8482317,
+    "usableHeightCount": 6667460,
+    "usableHeightRatio": 0.7860423042430505
+  },
+  "archive": {
+    "provider": "cloudflare-r2",
+    "location": "comfortos-environment-data",
+    "prefix": "overture-buildings",
+    "stateManifestKey": "overture-buildings/2026-08-19.0/us/ny/state-archive-manifest.json",
+    "stateManifestSha256": "f70ef766c77c62ad3a99770d20d0f1f80e3b235ce73731bb3cf5f28f43b3e9ac",
+    "partitionCount": 297,
+    "objectCount": 1188,
+    "storedBytes": 4482413621,
+    "remoteVerified": true
+  },
+  "localDataPruned": true
+}

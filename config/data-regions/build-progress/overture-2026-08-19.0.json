@@ -1,21 +1,21 @@
 {
   "format": "comfortos-us-overture-build-progress-v1",
-  "generatedAt": "2026-09-07T00:06:44.669Z",
+  "generatedAt": "2026-09-07T01:54:44.847Z",
   "release": "2026-08-19.0",
   "summary": {
     "jurisdictionCount": 51,
-    "completedJurisdictionCount": 27,
-    "archivedJurisdictionCount": 27,
+    "completedJurisdictionCount": 28,
+    "archivedJurisdictionCount": 28,
     "plannedPartitionCount": 20758,
     "uniqueGridCellCount": 19036,
     "duplicateStateAssignmentCount": 1722,
-    "completedPartitionCount": 4389,
-    "archivedPartitionCount": 4389,
+    "completedPartitionCount": 4686,
+    "archivedPartitionCount": 4686,
     "invalidPartitionCount": 0,
-    "completionRatio": 0.21143655458136623,
-    "buildingCount": 96187722,
-    "usableHeightRatio": 0.7378425491769105,
-    "storedBytes": 51155466131
+    "completionRatio": 0.2257442913575489,
+    "buildingCount": 104670039,
+    "usableHeightRatio": 0.7417485914952224,
+    "storedBytes": 55637879752
   },
   "jurisdictions": [
     {
@@ -414,13 +414,14 @@
     {
       "code": "NY",
       "name": "New York",
-      "status": "pending",
+      "status": "archived",
       "plannedPartitionCount": 297,
-      "completedPartitionCount": 0,
+      "completedPartitionCount": 297,
       "invalidPartitionCount": 0,
-      "buildingCount": 0,
-      "usableHeightRatio": null,
-      "storedBytes": 0
+      "buildingCount": 8482317,
+      "usableHeightRatio": 0.7860423042430505,
+      "storedBytes": 4482413621,
+      "localDataPruned": true
     },
     {
       "code": "OH",

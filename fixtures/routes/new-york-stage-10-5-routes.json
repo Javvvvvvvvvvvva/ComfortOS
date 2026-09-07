@@ -1,0 +1,20 @@
+[
+  {
+    "id": "ny-new-york-bethesda-terrace-times-square",
+    "label": "Bethesda Terrace to Times Square",
+    "origin": { "latitude": 40.7736, "longitude": -73.9712 },
+    "destination": { "latitude": 40.7580, "longitude": -73.9855 }
+  },
+  {
+    "id": "ny-albany-state-capitol-washington-park",
+    "label": "New York State Capitol to Washington Park",
+    "origin": { "latitude": 42.6525, "longitude": -73.7572 },
+    "destination": { "latitude": 42.6559, "longitude": -73.7713 }
+  },
+  {
+    "id": "ny-buffalo-city-hall-canalside",
+    "label": "Buffalo City Hall to Canalside",
+    "origin": { "latitude": 42.8864, "longitude": -78.8784 },
+    "destination": { "latitude": 42.8773, "longitude": -78.8739 }
+  }
+]

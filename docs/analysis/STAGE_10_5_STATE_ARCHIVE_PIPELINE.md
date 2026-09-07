@@ -1,7 +1,7 @@
 # Stage 10.5 - State Archive Pipeline
 
 Date: 2026-09-06
-Status: Live and verified for the first twenty-seven jurisdictions
+Status: Live and verified for the first twenty-eight jurisdictions
 
 ## Scope
 
@@ -63,16 +63,17 @@ debugging and inspection.
 | North Carolina | 277 | 1,109 | 3,518,904,941 | Verified and locally pruned |
 | Illinois | 289 | 1,157 | 3,694,201,828 | Verified and locally pruned |
 | Florida | 296 | 1,185 | 4,561,470,840 | Verified and locally pruned |
+| New York | 297 | 1,189 | 4,482,413,621 | Verified and locally pruned |
 
-All 17,556 data objects were rehashed locally, uploaded, downloaded from R2, and verified by exact
-byte count and SHA-256. The twenty-seven state archive manifests were uploaded last, for 17,583 remote
-objects in total. The fifty-four accepted validation reports cover 162 successful and comparable
+All 18,744 data objects were rehashed locally, uploaded, downloaded from R2, and verified by exact
+byte count and SHA-256. The twenty-eight state archive manifests were uploaded last, for 18,772 remote
+objects in total. The fifty-six accepted validation reports cover 168 successful and comparable
 route checks.
 
-The live archive contains 4,389 completed partitions, 96,187,722 buildings, and 51,155,466,131
+The live archive contains 4,686 completed partitions, 104,670,039 buildings, and 55,637,879,752
 stored bytes. Compact checkpoints are committed to Git, while the verified local payloads have
 been pruned. The nationwide audit retains those totals from the checkpoints and reports all
-twenty-seven jurisdictions as `archived`.
+twenty-eight jurisdictions as `archived`.
 
 Connecticut's 37-partition build contains 2,226,878 buildings with 67.71% usable height
 coverage. Hartford, New Haven, and Stamford each passed live NWS and controlled 38 C route
@@ -257,6 +258,15 @@ overlapping writes, and the canonical audit confirmed all 296 partitions with ze
 Transient official STAC failures recovered through bounded retry. All R2 objects passed remote
 byte-count and SHA-256 verification before local data was pruned.
 
+New York's 297-partition build contains 8,482,317 buildings with 78.60% usable height coverage.
+New York City, Albany, and Buffalo each passed live NWS and controlled 38 C route validation through
+managed Mapbox and the private HTTP Overture service. Live validation averaged 1,454 ms; controlled
+heat averaged 606 ms. The controlled heat run selected a comfort route distinct from the fastest
+route for one city. Four disjoint partition workers covered the complete state plan without
+overlapping writes, and the canonical audit confirmed all 297 partitions with zero invalid stores.
+Transient official STAC failures recovered through bounded retry. All R2 objects passed remote
+byte-count and SHA-256 verification before local data was pruned.
+
 ## Credential Verification
 
 The configured R2 account passed a live bucket health check and an isolated put, get,
@@ -275,4 +285,4 @@ R2_BUCKET=comfortos-environment-data
 
 ## Judgment
 
-STATE ARCHIVE PIPELINE LIVE; NEXT TARGET NEW YORK
+STATE ARCHIVE PIPELINE LIVE; NEXT TARGET IOWA
