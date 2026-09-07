@@ -1,21 +1,21 @@
 {
   "format": "comfortos-us-overture-build-progress-v1",
-  "generatedAt": "2026-09-06T21:11:54.296Z",
+  "generatedAt": "2026-09-07T00:06:44.669Z",
   "release": "2026-08-19.0",
   "summary": {
     "jurisdictionCount": 51,
-    "completedJurisdictionCount": 26,
-    "archivedJurisdictionCount": 26,
+    "completedJurisdictionCount": 27,
+    "archivedJurisdictionCount": 27,
     "plannedPartitionCount": 20758,
     "uniqueGridCellCount": 19036,
     "duplicateStateAssignmentCount": 1722,
-    "completedPartitionCount": 4093,
-    "archivedPartitionCount": 4093,
+    "completedPartitionCount": 4389,
+    "archivedPartitionCount": 4389,
     "invalidPartitionCount": 0,
-    "completionRatio": 0.19717699200308314,
-    "buildingCount": 87695621,
-    "usableHeightRatio": 0.7428884048839793,
-    "storedBytes": 46593995291
+    "completionRatio": 0.21143655458136623,
+    "buildingCount": 96187722,
+    "usableHeightRatio": 0.7378425491769105,
+    "storedBytes": 51155466131
   },
   "jurisdictions": [
     {
@@ -125,13 +125,14 @@
     {
       "code": "FL",
       "name": "Florida",
-      "status": "pending",
+      "status": "archived",
       "plannedPartitionCount": 296,
-      "completedPartitionCount": 0,
+      "completedPartitionCount": 296,
       "invalidPartitionCount": 0,
-      "buildingCount": 0,
-      "usableHeightRatio": null,
-      "storedBytes": 0
+      "buildingCount": 8492101,
+      "usableHeightRatio": 0.6857353674903301,
+      "storedBytes": 4561470840,
+      "localDataPruned": true
     },
     {
       "code": "GA",

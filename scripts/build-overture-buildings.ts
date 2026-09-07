@@ -11,6 +11,7 @@ async function main() {
   const regionConfig = options.regionConfig ?? `config/data-regions/${region}.json`;
   const outputDir =
     options.output ?? path.join(DEFAULT_OUTPUT_ROOT, `comfortos-overture-${region}-store`);
+  const ownsWorkDir = options.workDir === undefined;
   const workDir =
     options.workDir ??
     (await fs.mkdtemp(path.join(os.tmpdir(), `comfortos-overture-${region}-`)));
@@ -19,80 +20,88 @@ async function main() {
   const metadataPath = path.join(workDir, "overture-extraction-metadata.json");
 
   await fs.mkdir(workDir, { recursive: true });
-
-  const extraction = spawnSync(
-    ".venv/bin/python",
-    [
-      "scripts/extract-overture-buildings-duckdb.py",
-      "--region-config",
-      regionConfig,
-      "--output-geojsonseq",
-      rawPath,
-      "--metadata-output",
-      metadataPath,
-      "--release",
-      release,
-    ],
-    { stdio: "inherit" },
-  );
-
-  if (extraction.error && "code" in extraction.error && extraction.error.code === "ENOENT") {
-    throw new Error(
+  try {
+    const extraction = spawnSync(
+      ".venv/bin/python",
       [
-        "Python DuckDB environment is unavailable.",
-        "Create it with `python3 -m venv .venv` and `.venv/bin/pip install duckdb`.",
-        "No fixture fallback was used.",
-      ].join(" "),
+        "scripts/extract-overture-buildings-duckdb.py",
+        "--region-config",
+        regionConfig,
+        "--output-geojsonseq",
+        rawPath,
+        "--metadata-output",
+        metadataPath,
+        "--release",
+        release,
+      ],
+      { stdio: "inherit" },
     );
-  }
 
-  if (extraction.status !== 0) {
-    throw new Error("Real Overture extraction failed. No fixture fallback was used.");
-  }
+    if (extraction.error && "code" in extraction.error && extraction.error.code === "ENOENT") {
+      throw new Error(
+        [
+          "Python DuckDB environment is unavailable.",
+          "Create it with `python3 -m venv .venv` and `.venv/bin/pip install duckdb`.",
+          "No fixture fallback was used.",
+        ].join(" "),
+      );
+    }
 
-  const metadata = JSON.parse(await fs.readFile(metadataPath, "utf8")) as {
-    region: string;
-    release: string;
-    bbox: [number, number, number, number];
-    license: string;
-    sourceUrl: string;
-    sourceAccessMethod: string;
-    buildingPartCount: number;
-    invalidGeometryCount: number;
-  };
-  const ingest = spawnSync(
-    process.execPath,
-    [
-      "--import",
-      "tsx",
-      "scripts/ingest-overture-buildings.ts",
-      "--input",
-      rawPath,
-      "--output",
-      outputDir,
-      "--region",
-      metadata.region,
-      "--bounds",
-      metadata.bbox.join(","),
-      "--release",
-      metadata.release,
-      "--license",
-      metadata.license,
-      "--source-url",
-      metadata.sourceUrl,
-      "--source-access-method",
-      metadata.sourceAccessMethod,
-      "--building-part-count",
-      String(metadata.buildingPartCount),
-      "--invalid-geometry-count",
-      String(metadata.invalidGeometryCount),
-    ],
-    { stdio: "inherit" },
-  );
+    if (extraction.status !== 0) {
+      throw new Error("Real Overture extraction failed. No fixture fallback was used.");
+    }
 
-  if (ingest.status !== 0) {
-    throw new Error("Overture ingestion failed after download.");
+    const metadata = JSON.parse(await fs.readFile(metadataPath, "utf8")) as {
+      region: string;
+      release: string;
+      bbox: [number, number, number, number];
+      license: string;
+      sourceUrl: string;
+      sourceAccessMethod: string;
+      buildingPartCount: number;
+      invalidGeometryCount: number;
+    };
+    const ingest = spawnSync(
+      process.execPath,
+      [
+        "--import",
+        "tsx",
+        "scripts/ingest-overture-buildings.ts",
+        "--input",
+        rawPath,
+        "--output",
+        outputDir,
+        "--region",
+        metadata.region,
+        "--bounds",
+        metadata.bbox.join(","),
+        "--release",
+        metadata.release,
+        "--license",
+        metadata.license,
+        "--source-url",
+        metadata.sourceUrl,
+        "--source-access-method",
+        metadata.sourceAccessMethod,
+        "--building-part-count",
+        String(metadata.buildingPartCount),
+        "--invalid-geometry-count",
+        String(metadata.invalidGeometryCount),
+      ],
+      { stdio: "inherit" },
+    );
+
+    if (ingest.status !== 0) {
+      throw new Error("Overture ingestion failed after download.");
+    }
+  } finally {
+    await removeOwnedWorkDirectory(workDir, ownsWorkDir);
   }
+}
+
+export async function removeOwnedWorkDirectory(workDir: string, owned: boolean) {
+  if (!owned) return;
+  await fs.rm(workDir, { recursive: true, force: true });
 }
 
 function parseArgs(args: string[]) {
@@ -114,7 +123,9 @@ function toCamelCase(value: string) {
   return value.replace(/-([a-z])/g, (_, letter: string) => letter.toUpperCase());
 }
 
-main().catch((error) => {
-  console.error(error instanceof Error ? error.message : error);
-  process.exit(1);
-});
+if (process.argv[1]?.endsWith("build-overture-buildings.ts")) {
+  main().catch((error) => {
+    console.error(error instanceof Error ? error.message : error);
+    process.exit(1);
+  });
+}

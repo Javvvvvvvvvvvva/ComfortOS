@@ -1,0 +1,57 @@
+{
+  "format": "comfortos-us-state-archive-checkpoint-v1",
+  "createdAt": "2026-09-06T22:36:56.946Z",
+  "release": "2026-08-19.0",
+  "jurisdiction": {
+    "fips": "12",
+    "code": "FL",
+    "name": "Florida"
+  },
+  "validation": [
+    {
+      "kind": "heat",
+      "createdAt": "2026-09-06T22:36:56.946Z",
+      "reportFile": "fl-heat-validation.json",
+      "reportSha256": "80302febd8b849fb2128592c5141d428cef22835f30ca568ee361d35e0831cb5",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 347.6666666666667
+    },
+    {
+      "kind": "live",
+      "createdAt": "2026-09-06T22:36:37.486Z",
+      "reportFile": "fl-live-validation.json",
+      "reportSha256": "1fa074f77e4f216b236c3c5846a9ab5363bf9b3cefc2d19b65048a73bc808dc4",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 1364.6666666666667
+    }
+  ],
+  "dataset": {
+    "buildingCount": 8492101,
+    "usableHeightCount": 5823334,
+    "usableHeightRatio": 0.6857353674903301
+  },
+  "archive": {
+    "provider": "cloudflare-r2",
+    "location": "comfortos-environment-data",
+    "prefix": "overture-buildings",
+    "stateManifestKey": "overture-buildings/2026-08-19.0/us/fl/state-archive-manifest.json",
+    "stateManifestSha256": "7f8656452f49d9ca64f6de78fa254388d54f58f6271275347edc0e994184204b",
+    "partitionCount": 296,
+    "objectCount": 1184,
+    "storedBytes": 4561470840,
+    "remoteVerified": true
+  },
+  "localDataPruned": true
+}

@@ -1,0 +1,20 @@
+[
+  {
+    "id": "fl-miami-bayfront-park-brickell-city-centre",
+    "label": "Miami Bayfront Park to Brickell City Centre",
+    "origin": { "latitude": 25.7750, "longitude": -80.1860 },
+    "destination": { "latitude": 25.7663, "longitude": -80.1936 }
+  },
+  {
+    "id": "fl-tallahassee-state-capitol-cascades-park",
+    "label": "Florida State Capitol to Cascades Park",
+    "origin": { "latitude": 30.4381, "longitude": -84.2816 },
+    "destination": { "latitude": 30.4330, "longitude": -84.2774 }
+  },
+  {
+    "id": "fl-orlando-lake-eola-dr-phillips-center",
+    "label": "Orlando Lake Eola Park to Dr. Phillips Center",
+    "origin": { "latitude": 28.5431, "longitude": -81.3730 },
+    "destination": { "latitude": 28.5384, "longitude": -81.3770 }
+  }
+]
