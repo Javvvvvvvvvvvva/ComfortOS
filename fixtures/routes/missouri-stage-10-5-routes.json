@@ -1,0 +1,20 @@
+[
+  {
+    "id": "mo-jefferson-city-state-capitol-lincoln-university",
+    "label": "Missouri State Capitol to Lincoln University",
+    "origin": { "latitude": 38.5792, "longitude": -92.1729 },
+    "destination": { "latitude": 38.5659, "longitude": -92.1690 }
+  },
+  {
+    "id": "mo-st-louis-gateway-arch-citygarden",
+    "label": "Gateway Arch to Citygarden Sculpture Park",
+    "origin": { "latitude": 38.6247, "longitude": -90.1848 },
+    "destination": { "latitude": 38.6262, "longitude": -90.1944 }
+  },
+  {
+    "id": "mo-kansas-city-union-station-kauffman-center",
+    "label": "Kansas City Union Station to Kauffman Center",
+    "origin": { "latitude": 39.0853, "longitude": -94.5856 },
+    "destination": { "latitude": 39.0941, "longitude": -94.5877 }
+  }
+]

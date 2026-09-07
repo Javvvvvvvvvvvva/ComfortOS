@@ -1,0 +1,57 @@
+{
+  "format": "comfortos-us-state-archive-checkpoint-v1",
+  "createdAt": "2026-09-07T13:06:11.453Z",
+  "release": "2026-08-19.0",
+  "jurisdiction": {
+    "fips": "29",
+    "code": "MO",
+    "name": "Missouri"
+  },
+  "validation": [
+    {
+      "kind": "heat",
+      "createdAt": "2026-09-07T13:06:11.453Z",
+      "reportFile": "mo-heat-validation.json",
+      "reportSha256": "d7e35a49e1fcd023adf1dd45c0f297a9f3b3e59d92268739f5a8001c929d1fad",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 418.3333333333333
+    },
+    {
+      "kind": "live",
+      "createdAt": "2026-09-07T13:05:52.746Z",
+      "reportFile": "mo-live-validation.json",
+      "reportSha256": "4edfa4a5694939324b5471e7a98813ad5f00e9ea8615ad2d7c878930502cd310",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 1433
+    }
+  ],
+  "dataset": {
+    "buildingCount": 4352966,
+    "usableHeightCount": 3308437,
+    "usableHeightRatio": 0.7600420035442501
+  },
+  "archive": {
+    "provider": "cloudflare-r2",
+    "location": "comfortos-environment-data",
+    "prefix": "overture-buildings",
+    "stateManifestKey": "overture-buildings/2026-08-19.0/us/mo/state-archive-manifest.json",
+    "stateManifestSha256": "b8179ea93e726b5c7f3d9954d60fdd794716227aed3ed8f390a36598337c70d5",
+    "partitionCount": 363,
+    "objectCount": 1452,
+    "storedBytes": 2251772550,
+    "remoteVerified": true
+  },
+  "localDataPruned": true
+}

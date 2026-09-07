@@ -1,21 +1,21 @@
 {
   "format": "comfortos-us-overture-build-progress-v1",
-  "generatedAt": "2026-09-07T08:12:22.364Z",
+  "generatedAt": "2026-09-07T13:44:19.096Z",
   "release": "2026-08-19.0",
   "summary": {
     "jurisdictionCount": 51,
-    "completedJurisdictionCount": 31,
-    "archivedJurisdictionCount": 31,
+    "completedJurisdictionCount": 32,
+    "archivedJurisdictionCount": 32,
     "plannedPartitionCount": 20758,
     "uniqueGridCellCount": 19036,
     "duplicateStateAssignmentCount": 1722,
-    "completedPartitionCount": 5645,
-    "archivedPartitionCount": 5645,
+    "completedPartitionCount": 6008,
+    "archivedPartitionCount": 6008,
     "invalidPartitionCount": 0,
-    "completionRatio": 0.27194334714327006,
-    "buildingCount": 115130980,
-    "usableHeightRatio": 0.7394228208602064,
-    "storedBytes": 61199006078
+    "completionRatio": 0.2894305809808267,
+    "buildingCount": 119483946,
+    "usableHeightRatio": 0.7401740063054161,
+    "storedBytes": 63450778628
   },
   "jurisdictions": [
     {
@@ -301,13 +301,14 @@
     {
       "code": "MO",
       "name": "Missouri",
-      "status": "pending",
+      "status": "archived",
       "plannedPartitionCount": 363,
-      "completedPartitionCount": 0,
+      "completedPartitionCount": 363,
       "invalidPartitionCount": 0,
-      "buildingCount": 0,
-      "usableHeightRatio": null,
-      "storedBytes": 0
+      "buildingCount": 4352966,
+      "usableHeightRatio": 0.7600420035442501,
+      "storedBytes": 2251772550,
+      "localDataPruned": true
     },
     {
       "code": "MS",
