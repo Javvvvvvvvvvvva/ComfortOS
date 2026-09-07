@@ -1,21 +1,21 @@
 {
   "format": "comfortos-us-overture-build-progress-v1",
-  "generatedAt": "2026-09-07T01:54:44.847Z",
+  "generatedAt": "2026-09-07T04:18:10.519Z",
   "release": "2026-08-19.0",
   "summary": {
     "jurisdictionCount": 51,
-    "completedJurisdictionCount": 28,
-    "archivedJurisdictionCount": 28,
+    "completedJurisdictionCount": 29,
+    "archivedJurisdictionCount": 29,
     "plannedPartitionCount": 20758,
     "uniqueGridCellCount": 19036,
     "duplicateStateAssignmentCount": 1722,
-    "completedPartitionCount": 4686,
-    "archivedPartitionCount": 4686,
+    "completedPartitionCount": 4986,
+    "archivedPartitionCount": 4986,
     "invalidPartitionCount": 0,
-    "completionRatio": 0.2257442913575489,
-    "buildingCount": 104670039,
-    "usableHeightRatio": 0.7417485914952224,
-    "storedBytes": 55637879752
+    "completionRatio": 0.24019655072743037,
+    "buildingCount": 107653307,
+    "usableHeightRatio": 0.7395631701309464,
+    "storedBytes": 57214344153
   },
   "jurisdictions": [
     {
@@ -161,13 +161,14 @@
     {
       "code": "IA",
       "name": "Iowa",
-      "status": "pending",
+      "status": "archived",
       "plannedPartitionCount": 300,
-      "completedPartitionCount": 0,
+      "completedPartitionCount": 300,
       "invalidPartitionCount": 0,
-      "buildingCount": 0,
-      "usableHeightRatio": null,
-      "storedBytes": 0
+      "buildingCount": 2983268,
+      "usableHeightRatio": 0.6628861369478035,
+      "storedBytes": 1576464401,
+      "localDataPruned": true
     },
     {
       "code": "ID",

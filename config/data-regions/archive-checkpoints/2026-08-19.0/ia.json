@@ -1,0 +1,57 @@
+{
+  "format": "comfortos-us-state-archive-checkpoint-v1",
+  "createdAt": "2026-09-07T03:58:31.733Z",
+  "release": "2026-08-19.0",
+  "jurisdiction": {
+    "fips": "19",
+    "code": "IA",
+    "name": "Iowa"
+  },
+  "validation": [
+    {
+      "kind": "heat",
+      "createdAt": "2026-09-07T03:58:31.733Z",
+      "reportFile": "ia-heat-validation.json",
+      "reportSha256": "8b51a451668be09531fe83361220bfe533b133b351783a3323fb7f59e7a0698d",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 506.3333333333333
+    },
+    {
+      "kind": "live",
+      "createdAt": "2026-09-07T03:58:19.152Z",
+      "reportFile": "ia-live-validation.json",
+      "reportSha256": "ea01f50c0f76896643c7a650695f8e98ade47cf8b50fd78830ead4f5b088d26d",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 1452.6666666666667
+    }
+  ],
+  "dataset": {
+    "buildingCount": 2983268,
+    "usableHeightCount": 1977567,
+    "usableHeightRatio": 0.6628861369478035
+  },
+  "archive": {
+    "provider": "cloudflare-r2",
+    "location": "comfortos-environment-data",
+    "prefix": "overture-buildings",
+    "stateManifestKey": "overture-buildings/2026-08-19.0/us/ia/state-archive-manifest.json",
+    "stateManifestSha256": "1756ae2fbf0d404663d85994282637310a4de0836b946e20dcc23f5bdc52e5f9",
+    "partitionCount": 300,
+    "objectCount": 1200,
+    "storedBytes": 1576464401,
+    "remoteVerified": true
+  },
+  "localDataPruned": true
+}

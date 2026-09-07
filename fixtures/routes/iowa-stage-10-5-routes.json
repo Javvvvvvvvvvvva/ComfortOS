@@ -1,0 +1,20 @@
+[
+  {
+    "id": "ia-des-moines-state-capitol-pappajohn-sculpture-park",
+    "label": "Iowa State Capitol to Pappajohn Sculpture Park",
+    "origin": { "latitude": 41.5912, "longitude": -93.6037 },
+    "destination": { "latitude": 41.5856, "longitude": -93.6367 }
+  },
+  {
+    "id": "ia-cedar-rapids-newbo-greene-square",
+    "label": "NewBo City Market to Greene Square",
+    "origin": { "latitude": 41.9747, "longitude": -91.6657 },
+    "destination": { "latitude": 41.979, "longitude": -91.6688 }
+  },
+  {
+    "id": "ia-davenport-figge-vander-veer",
+    "label": "Figge Art Museum to Vander Veer Botanical Park",
+    "origin": { "latitude": 41.5209, "longitude": -90.5777 },
+    "destination": { "latitude": 41.5378, "longitude": -90.5745 }
+  }
+]
