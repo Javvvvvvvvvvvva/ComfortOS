@@ -1,0 +1,20 @@
+[
+  {
+    "id": "wi-milwaukee-city-hall-art-museum",
+    "label": "Milwaukee City Hall to Milwaukee Art Museum",
+    "origin": { "latitude": 43.0419, "longitude": -87.9065 },
+    "destination": { "latitude": 43.0391, "longitude": -87.8971 }
+  },
+  {
+    "id": "wi-madison-state-capitol-camp-randall",
+    "label": "Wisconsin State Capitol to Camp Randall Stadium",
+    "origin": { "latitude": 43.0747, "longitude": -89.3842 },
+    "destination": { "latitude": 43.0699, "longitude": -89.4125 }
+  },
+  {
+    "id": "wi-green-bay-citydeck-joannes-park",
+    "label": "CityDeck to Joannes Park",
+    "origin": { "latitude": 44.5167, "longitude": -88.0167 },
+    "destination": { "latitude": 44.5076, "longitude": -88.0011 }
+  }
+]

@@ -1,0 +1,57 @@
+{
+  "format": "comfortos-us-state-archive-checkpoint-v1",
+  "createdAt": "2026-09-07T05:08:18.678Z",
+  "release": "2026-08-19.0",
+  "jurisdiction": {
+    "fips": "55",
+    "code": "WI",
+    "name": "Wisconsin"
+  },
+  "validation": [
+    {
+      "kind": "heat",
+      "createdAt": "2026-09-07T05:08:18.678Z",
+      "reportFile": "wi-heat-validation.json",
+      "reportSha256": "119c5c0e247e3826c9cd2de9977302fe1f92f1e013427bb721662eafe4cdb99f",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 536.6666666666666
+    },
+    {
+      "kind": "live",
+      "createdAt": "2026-09-07T05:08:06.404Z",
+      "reportFile": "wi-live-validation.json",
+      "reportSha256": "ae95ecc946da8b084ee037f1d00e3cea96b7ce198b227696f5f45c5750e93675",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 1406.3333333333333
+    }
+  ],
+  "dataset": {
+    "buildingCount": 4624194,
+    "usableHeightCount": 3522254,
+    "usableHeightRatio": 0.7617011743019432
+  },
+  "archive": {
+    "provider": "cloudflare-r2",
+    "location": "comfortos-environment-data",
+    "prefix": "overture-buildings",
+    "stateManifestKey": "overture-buildings/2026-08-19.0/us/wi/state-archive-manifest.json",
+    "stateManifestSha256": "a9e7c87bed8f18cd7d5f17e9bc5b40b471ac2c925b81f369552d5adaef6f635d",
+    "partitionCount": 320,
+    "objectCount": 1280,
+    "storedBytes": 2467085784,
+    "remoteVerified": true
+  },
+  "localDataPruned": true
+}

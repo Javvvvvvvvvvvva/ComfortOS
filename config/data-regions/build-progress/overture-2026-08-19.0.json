@@ -1,21 +1,21 @@
 {
   "format": "comfortos-us-overture-build-progress-v1",
-  "generatedAt": "2026-09-07T04:18:10.519Z",
+  "generatedAt": "2026-09-07T05:30:05.809Z",
   "release": "2026-08-19.0",
   "summary": {
     "jurisdictionCount": 51,
-    "completedJurisdictionCount": 29,
-    "archivedJurisdictionCount": 29,
+    "completedJurisdictionCount": 30,
+    "archivedJurisdictionCount": 30,
     "plannedPartitionCount": 20758,
     "uniqueGridCellCount": 19036,
     "duplicateStateAssignmentCount": 1722,
-    "completedPartitionCount": 4986,
-    "archivedPartitionCount": 4986,
+    "completedPartitionCount": 5306,
+    "archivedPartitionCount": 5306,
     "invalidPartitionCount": 0,
-    "completionRatio": 0.24019655072743037,
-    "buildingCount": 107653307,
-    "usableHeightRatio": 0.7395631701309464,
-    "storedBytes": 57214344153
+    "completionRatio": 0.255612294055304,
+    "buildingCount": 112277501,
+    "usableHeightRatio": 0.7404749327293988,
+    "storedBytes": 59681429937
   },
   "jurisdictions": [
     {
@@ -577,13 +577,14 @@
     {
       "code": "WI",
       "name": "Wisconsin",
-      "status": "pending",
+      "status": "archived",
       "plannedPartitionCount": 320,
-      "completedPartitionCount": 0,
+      "completedPartitionCount": 320,
       "invalidPartitionCount": 0,
-      "buildingCount": 0,
-      "usableHeightRatio": null,
-      "storedBytes": 0
+      "buildingCount": 4624194,
+      "usableHeightRatio": 0.7617011743019432,
+      "storedBytes": 2467085784,
+      "localDataPruned": true
     },
     {
       "code": "WV",
