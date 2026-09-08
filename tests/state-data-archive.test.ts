@@ -79,6 +79,34 @@ test("state archival uploads, verifies, checkpoints, resumes, and prunes", async
   );
 });
 
+test("state archival syncs objects with bounded concurrency", async () => {
+  const fixture = await createFixture();
+  const filesystemStore = createFilesystemObjectStore(fixture.archiveRoot);
+  let activeInspections = 0;
+  let maximumActiveInspections = 0;
+  const store = {
+    ...filesystemStore,
+    async inspect(key: string) {
+      activeInspections += 1;
+      maximumActiveInspections = Math.max(
+        maximumActiveInspections,
+        activeInspections,
+      );
+      await new Promise((resolve) => setTimeout(resolve, 5));
+      try {
+        return await filesystemStore.inspect(key);
+      } finally {
+        activeInspections -= 1;
+      }
+    },
+  };
+
+  const result = await archiveState(fixture.options, store);
+
+  assert.equal(result.uploadedObjectCount, 5);
+  assert.equal(maximumActiveInspections, 4);
+});
+
 test("state archival refuses to overwrite a conflicting remote object", async () => {
   const fixture = await createFixture();
   const store = createFilesystemObjectStore(fixture.archiveRoot);

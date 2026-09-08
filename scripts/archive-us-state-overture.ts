@@ -21,6 +21,7 @@ const STORE_FILES = [
 
 const R2_VERIFICATION_ATTEMPTS = 5;
 const R2_RETRY_BASE_DELAY_MS = 1_000;
+const ARCHIVE_SYNC_CONCURRENCY = 4;
 
 type StatePlan = {
   format: "comfortos-us-state-building-plan-v1";
@@ -282,15 +283,27 @@ export async function archiveState(
     });
     reusedObjectCount = objects.length + 1;
   } else {
-    for (const object of objects) {
-      const localPath = path.join(
-        stateDataRoot,
-        object.partitionId,
-        object.file,
+    for (
+      let index = 0;
+      index < objects.length;
+      index += ARCHIVE_SYNC_CONCURRENCY
+    ) {
+      const results = await Promise.all(
+        objects
+          .slice(index, index + ARCHIVE_SYNC_CONCURRENCY)
+          .map((object) => {
+            const localPath = path.join(
+              stateDataRoot,
+              object.partitionId,
+              object.file,
+            );
+            return syncObject(store, object.key, localPath, object);
+          }),
       );
-      const result = await syncObject(store, object.key, localPath, object);
-      if (result === "uploaded") uploadedObjectCount += 1;
-      else reusedObjectCount += 1;
+      for (const result of results) {
+        if (result === "uploaded") uploadedObjectCount += 1;
+        else reusedObjectCount += 1;
+      }
     }
     const temporaryDirectory = await fs.mkdtemp(
       path.join(os.tmpdir(), "comfortos-state-archive-"),

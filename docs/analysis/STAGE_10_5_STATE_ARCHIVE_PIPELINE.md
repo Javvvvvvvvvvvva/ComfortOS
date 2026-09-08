@@ -19,7 +19,9 @@ the private HTTP Overture provider, successful building queries, and comparable 
 The command uploads with the R2 S3-compatible API and multipart support. Each new object is
 read back and checked against its exact byte count and SHA-256. Existing matching objects are
 reused for interrupted runs; an immutable key conflict stops the run. The state archive
-manifest is uploaded last.
+manifest is uploaded last. Object synchronization uses bounded four-object batches; every object
+still completes its preflight inspection and post-upload read-back verification before the next
+batch advances.
 
 Only after remote verification does the command write
 `config/data-regions/archive-checkpoints/<release>/<state>.json`. Local pruning additionally
