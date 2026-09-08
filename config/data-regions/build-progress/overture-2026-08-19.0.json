@@ -1,21 +1,21 @@
 {
   "format": "comfortos-us-overture-build-progress-v1",
-  "generatedAt": "2026-09-08T08:28:33.802Z",
+  "generatedAt": "2026-09-08T10:50:53.298Z",
   "release": "2026-08-19.0",
   "summary": {
     "jurisdictionCount": 51,
-    "completedJurisdictionCount": 36,
-    "archivedJurisdictionCount": 36,
+    "completedJurisdictionCount": 37,
+    "archivedJurisdictionCount": 37,
     "plannedPartitionCount": 20758,
     "uniqueGridCellCount": 19036,
     "duplicateStateAssignmentCount": 1722,
-    "completedPartitionCount": 7562,
-    "archivedPartitionCount": 7562,
+    "completedPartitionCount": 7965,
+    "archivedPartitionCount": 7965,
     "invalidPartitionCount": 0,
-    "completionRatio": 0.3642932845168128,
-    "buildingCount": 129454022,
-    "usableHeightRatio": 0.7420139947447906,
-    "storedBytes": 68679580376
+    "completionRatio": 0.3837074862703536,
+    "buildingCount": 134322855,
+    "usableHeightRatio": 0.7430712666135633,
+    "storedBytes": 71369384157
   },
   "jurisdictions": [
     {
@@ -572,13 +572,14 @@
     {
       "code": "WA",
       "name": "Washington",
-      "status": "pending",
+      "status": "archived",
       "plannedPartitionCount": 403,
-      "completedPartitionCount": 0,
+      "completedPartitionCount": 403,
       "invalidPartitionCount": 0,
-      "buildingCount": 0,
-      "usableHeightRatio": null,
-      "storedBytes": 0
+      "buildingCount": 4868833,
+      "usableHeightRatio": 0.7711823346580177,
+      "storedBytes": 2689803781,
+      "localDataPruned": true
     },
     {
       "code": "WI",

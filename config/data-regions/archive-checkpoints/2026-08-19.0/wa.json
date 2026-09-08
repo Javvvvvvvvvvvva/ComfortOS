@@ -1,0 +1,57 @@
+{
+  "format": "comfortos-us-state-archive-checkpoint-v1",
+  "createdAt": "2026-09-08T09:44:11.152Z",
+  "release": "2026-08-19.0",
+  "jurisdiction": {
+    "fips": "53",
+    "code": "WA",
+    "name": "Washington"
+  },
+  "validation": [
+    {
+      "kind": "heat",
+      "createdAt": "2026-09-08T09:44:11.152Z",
+      "reportFile": "wa-heat-validation.json",
+      "reportSha256": "c8abf5e816f6b6041c8e1347340519729c49fe9e82420c318a365aa4f4841de7",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 482
+    },
+    {
+      "kind": "live",
+      "createdAt": "2026-09-08T09:43:53.480Z",
+      "reportFile": "wa-live-validation.json",
+      "reportSha256": "da0c279e2b419fb2b66c5c4232aa4ed781ff62e55a576ec12380a5f1e54069fc",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 1872.3333333333333
+    }
+  ],
+  "dataset": {
+    "buildingCount": 4868833,
+    "usableHeightCount": 3754758,
+    "usableHeightRatio": 0.7711823346580177
+  },
+  "archive": {
+    "provider": "cloudflare-r2",
+    "location": "comfortos-environment-data",
+    "prefix": "overture-buildings",
+    "stateManifestKey": "overture-buildings/2026-08-19.0/us/wa/state-archive-manifest.json",
+    "stateManifestSha256": "bca8a429b5ae7a8cab82da7b319fd5e925a3923cd9cc03fe88c0ee0d3c775d0b",
+    "partitionCount": 403,
+    "objectCount": 1612,
+    "storedBytes": 2689803781,
+    "remoteVerified": true
+  },
+  "localDataPruned": true
+}

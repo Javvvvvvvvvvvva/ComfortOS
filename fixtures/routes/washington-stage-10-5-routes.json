@@ -1,0 +1,20 @@
+[
+  {
+    "id": "wa-seattle-pike-place-olympic-sculpture-park",
+    "label": "Pike Place Market to Olympic Sculpture Park",
+    "origin": { "latitude": 47.6094, "longitude": -122.3422 },
+    "destination": { "latitude": 47.6166, "longitude": -122.3553 }
+  },
+  {
+    "id": "wa-spokane-riverfront-park-gonzaga-university",
+    "label": "Riverfront Park to Gonzaga University",
+    "origin": { "latitude": 47.6607, "longitude": -117.4206 },
+    "destination": { "latitude": 47.6674, "longitude": -117.4025 }
+  },
+  {
+    "id": "wa-tacoma-union-station-wright-park",
+    "label": "Tacoma Union Station to Wright Park",
+    "origin": { "latitude": 47.2457, "longitude": -122.4352 },
+    "destination": { "latitude": 47.2624, "longitude": -122.4485 }
+  }
+]
