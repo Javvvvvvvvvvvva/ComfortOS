@@ -1,21 +1,21 @@
 {
   "format": "comfortos-us-overture-build-progress-v1",
-  "generatedAt": "2026-09-08T04:46:26.340Z",
+  "generatedAt": "2026-09-08T08:28:33.802Z",
   "release": "2026-08-19.0",
   "summary": {
     "jurisdictionCount": 51,
-    "completedJurisdictionCount": 35,
-    "archivedJurisdictionCount": 35,
+    "completedJurisdictionCount": 36,
+    "archivedJurisdictionCount": 36,
     "plannedPartitionCount": 20758,
     "uniqueGridCellCount": 19036,
     "duplicateStateAssignmentCount": 1722,
-    "completedPartitionCount": 7160,
-    "archivedPartitionCount": 7160,
+    "completedPartitionCount": 7562,
+    "archivedPartitionCount": 7562,
     "invalidPartitionCount": 0,
-    "completionRatio": 0.3449272569611716,
-    "buildingCount": 128050829,
-    "usableHeightRatio": 0.7423679701441058,
-    "storedBytes": 67902464331
+    "completionRatio": 0.3642932845168128,
+    "buildingCount": 129454022,
+    "usableHeightRatio": 0.7420139947447906,
+    "storedBytes": 68679580376
   },
   "jurisdictions": [
     {
@@ -536,13 +536,14 @@
     {
       "code": "UT",
       "name": "Utah",
-      "status": "pending",
+      "status": "archived",
       "plannedPartitionCount": 402,
-      "completedPartitionCount": 0,
+      "completedPartitionCount": 402,
       "invalidPartitionCount": 0,
-      "buildingCount": 0,
-      "usableHeightRatio": null,
-      "storedBytes": 0
+      "buildingCount": 1403193,
+      "usableHeightRatio": 0.7097113511826242,
+      "storedBytes": 777116045,
+      "localDataPruned": true
     },
     {
       "code": "VA",

@@ -1,0 +1,57 @@
+{
+  "format": "comfortos-us-state-archive-checkpoint-v1",
+  "createdAt": "2026-09-08T07:59:32.474Z",
+  "release": "2026-08-19.0",
+  "jurisdiction": {
+    "fips": "49",
+    "code": "UT",
+    "name": "Utah"
+  },
+  "validation": [
+    {
+      "kind": "heat",
+      "createdAt": "2026-09-08T07:59:32.474Z",
+      "reportFile": "ut-heat-validation.json",
+      "reportSha256": "3c367659c4269e5ea02c37924b3623221b0d767d28a7adc3ab10c38bbee7a70b",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 387.3333333333333
+    },
+    {
+      "kind": "live",
+      "createdAt": "2026-09-08T07:59:14.399Z",
+      "reportFile": "ut-live-validation.json",
+      "reportSha256": "a17f8b70aca0ac8a3c92b99f304b35dbac70320809a5c10c1d3ee3df32327bfb",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 1239.6666666666667
+    }
+  ],
+  "dataset": {
+    "buildingCount": 1403193,
+    "usableHeightCount": 995862,
+    "usableHeightRatio": 0.7097113511826242
+  },
+  "archive": {
+    "provider": "cloudflare-r2",
+    "location": "comfortos-environment-data",
+    "prefix": "overture-buildings",
+    "stateManifestKey": "overture-buildings/2026-08-19.0/us/ut/state-archive-manifest.json",
+    "stateManifestSha256": "874d7516fc9b97f90c109810c189b662e65140fd384feac111d1afcf9d3ea0c3",
+    "partitionCount": 402,
+    "objectCount": 1608,
+    "storedBytes": 777116045,
+    "remoteVerified": true
+  },
+  "localDataPruned": true
+}

@@ -1,0 +1,20 @@
+[
+  {
+    "id": "ut-salt-lake-capitol-city-creek-center",
+    "label": "Utah State Capitol to City Creek Center",
+    "origin": { "latitude": 40.7775, "longitude": -111.8882 },
+    "destination": { "latitude": 40.7687, "longitude": -111.8911 }
+  },
+  {
+    "id": "ut-provo-city-library-pioneer-park",
+    "label": "Provo City Library to Pioneer Park",
+    "origin": { "latitude": 40.2396, "longitude": -111.6585 },
+    "destination": { "latitude": 40.235, "longitude": -111.6665 }
+  },
+  {
+    "id": "ut-st-george-library-vernon-worthen-park",
+    "label": "St. George Library to Vernon Worthen Park",
+    "origin": { "latitude": 37.1048, "longitude": -113.5832 },
+    "destination": { "latitude": 37.1041, "longitude": -113.5761 }
+  }
+]
