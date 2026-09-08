@@ -1,21 +1,21 @@
 {
   "format": "comfortos-us-overture-build-progress-v1",
-  "generatedAt": "2026-09-07T13:44:19.096Z",
+  "generatedAt": "2026-09-08T01:48:09.224Z",
   "release": "2026-08-19.0",
   "summary": {
     "jurisdictionCount": 51,
-    "completedJurisdictionCount": 32,
-    "archivedJurisdictionCount": 32,
+    "completedJurisdictionCount": 33,
+    "archivedJurisdictionCount": 33,
     "plannedPartitionCount": 20758,
     "uniqueGridCellCount": 19036,
     "duplicateStateAssignmentCount": 1722,
-    "completedPartitionCount": 6008,
-    "archivedPartitionCount": 6008,
+    "completedPartitionCount": 6384,
+    "archivedPartitionCount": 6384,
     "invalidPartitionCount": 0,
-    "completionRatio": 0.2894305809808267,
-    "buildingCount": 119483946,
-    "usableHeightRatio": 0.7401740063054161,
-    "storedBytes": 63450778628
+    "completionRatio": 0.30754407939107814,
+    "buildingCount": 120997363,
+    "usableHeightRatio": 0.7392381766204277,
+    "storedBytes": 64256299297
   },
   "jurisdictions": [
     {
@@ -359,13 +359,14 @@
     {
       "code": "NE",
       "name": "Nebraska",
-      "status": "pending",
+      "status": "archived",
       "plannedPartitionCount": 376,
-      "completedPartitionCount": 0,
+      "completedPartitionCount": 376,
       "invalidPartitionCount": 0,
-      "buildingCount": 0,
-      "usableHeightRatio": null,
-      "storedBytes": 0
+      "buildingCount": 1513417,
+      "usableHeightRatio": 0.6653546246672265,
+      "storedBytes": 805520669,
+      "localDataPruned": true
     },
     {
       "code": "NH",

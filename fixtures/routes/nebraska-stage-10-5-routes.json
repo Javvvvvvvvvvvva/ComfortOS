@@ -1,0 +1,20 @@
+[
+  {
+    "id": "ne-omaha-durham-museum-gene-leahy-mall",
+    "label": "The Durham Museum to Gene Leahy Mall",
+    "origin": { "latitude": 41.2515, "longitude": -95.9282 },
+    "destination": { "latitude": 41.2576, "longitude": -95.9304 }
+  },
+  {
+    "id": "ne-lincoln-state-capitol-memorial-stadium",
+    "label": "Nebraska State Capitol to Memorial Stadium",
+    "origin": { "latitude": 40.8081, "longitude": -96.6998 },
+    "destination": { "latitude": 40.8206, "longitude": -96.7056 }
+  },
+  {
+    "id": "ne-grand-island-public-library-stolley-park",
+    "label": "Grand Island Public Library to Stolley Park",
+    "origin": { "latitude": 40.9218, "longitude": -98.3414 },
+    "destination": { "latitude": 40.9057, "longitude": -98.3426 }
+  }
+]

@@ -1,0 +1,57 @@
+{
+  "format": "comfortos-us-state-archive-checkpoint-v1",
+  "createdAt": "2026-09-07T19:05:29.255Z",
+  "release": "2026-08-19.0",
+  "jurisdiction": {
+    "fips": "31",
+    "code": "NE",
+    "name": "Nebraska"
+  },
+  "validation": [
+    {
+      "kind": "heat",
+      "createdAt": "2026-09-07T19:05:29.255Z",
+      "reportFile": "ne-heat-validation.json",
+      "reportSha256": "653b1e4de0b53017bd6a7fc0355bee6d1b317631faa7371394d3b297d618efc0",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 407.3333333333333
+    },
+    {
+      "kind": "live",
+      "createdAt": "2026-09-07T19:05:08.174Z",
+      "reportFile": "ne-live-validation.json",
+      "reportSha256": "32cd928deb97a61348891205279ca1f82328d45b817487c60089588d7e433414",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 2850.6666666666665
+    }
+  ],
+  "dataset": {
+    "buildingCount": 1513417,
+    "usableHeightCount": 1006959,
+    "usableHeightRatio": 0.6653546246672265
+  },
+  "archive": {
+    "provider": "cloudflare-r2",
+    "location": "comfortos-environment-data",
+    "prefix": "overture-buildings",
+    "stateManifestKey": "overture-buildings/2026-08-19.0/us/ne/state-archive-manifest.json",
+    "stateManifestSha256": "ea4ad56ae8573cf0d6309e352c0357a4630b808ee6904cf14491a499309f2d96",
+    "partitionCount": 376,
+    "objectCount": 1504,
+    "storedBytes": 805520669,
+    "remoteVerified": true
+  },
+  "localDataPruned": true
+}
