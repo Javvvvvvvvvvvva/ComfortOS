@@ -1,0 +1,57 @@
+{
+  "format": "comfortos-us-state-archive-checkpoint-v1",
+  "createdAt": "2026-09-08T15:21:35.559Z",
+  "release": "2026-08-19.0",
+  "jurisdiction": {
+    "fips": "20",
+    "code": "KS",
+    "name": "Kansas"
+  },
+  "validation": [
+    {
+      "kind": "heat",
+      "createdAt": "2026-09-08T15:21:35.559Z",
+      "reportFile": "ks-heat-validation.json",
+      "reportSha256": "f83072fcde23cfe2eb81de4c4ede43e308f83ea55a92a5f9740acd508972368d",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 450.3333333333333
+    },
+    {
+      "kind": "live",
+      "createdAt": "2026-09-08T15:20:15.136Z",
+      "reportFile": "ks-live-validation.json",
+      "reportSha256": "5190477559d3129816add2da8d43ed65c2a3b0784f3da2ec441afcb70b10062b",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 1478
+    }
+  ],
+  "dataset": {
+    "buildingCount": 2263955,
+    "usableHeightCount": 1533398,
+    "usableHeightRatio": 0.677309398817556
+  },
+  "archive": {
+    "provider": "cloudflare-r2",
+    "location": "comfortos-environment-data",
+    "prefix": "overture-buildings",
+    "stateManifestKey": "overture-buildings/2026-08-19.0/us/ks/state-archive-manifest.json",
+    "stateManifestSha256": "2f38c8faceeb7b259aa554fdaa071f3b3565aa6911b2c6dabf5af8680e41bd11",
+    "partitionCount": 425,
+    "objectCount": 1700,
+    "storedBytes": 1172589825,
+    "remoteVerified": true
+  },
+  "localDataPruned": true
+}

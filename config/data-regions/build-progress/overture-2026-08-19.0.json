@@ -1,21 +1,21 @@
 {
   "format": "comfortos-us-overture-build-progress-v1",
-  "generatedAt": "2026-09-08T12:36:31.463Z",
+  "generatedAt": "2026-09-08T15:31:38.945Z",
   "release": "2026-08-19.0",
   "summary": {
     "jurisdictionCount": 51,
-    "completedJurisdictionCount": 38,
-    "archivedJurisdictionCount": 38,
+    "completedJurisdictionCount": 39,
+    "archivedJurisdictionCount": 39,
     "plannedPartitionCount": 20758,
     "uniqueGridCellCount": 19036,
     "duplicateStateAssignmentCount": 1722,
-    "completedPartitionCount": 8378,
-    "archivedPartitionCount": 8378,
+    "completedPartitionCount": 8803,
+    "archivedPartitionCount": 8803,
     "invalidPartitionCount": 0,
-    "completionRatio": 0.40360343000289045,
-    "buildingCount": 135232813,
-    "usableHeightRatio": 0.7423010493762339,
-    "storedBytes": 71841989208
+    "completionRatio": 0.42407746411022257,
+    "buildingCount": 137496768,
+    "usableHeightRatio": 0.7412309284244413,
+    "storedBytes": 73014579033
   },
   "jurisdictions": [
     {
@@ -208,13 +208,14 @@
     {
       "code": "KS",
       "name": "Kansas",
-      "status": "pending",
+      "status": "archived",
       "plannedPartitionCount": 425,
-      "completedPartitionCount": 0,
+      "completedPartitionCount": 425,
       "invalidPartitionCount": 0,
-      "buildingCount": 0,
-      "usableHeightRatio": null,
-      "storedBytes": 0
+      "buildingCount": 2263955,
+      "usableHeightRatio": 0.677309398817556,
+      "storedBytes": 1172589825,
+      "localDataPruned": true
     },
     {
       "code": "KY",

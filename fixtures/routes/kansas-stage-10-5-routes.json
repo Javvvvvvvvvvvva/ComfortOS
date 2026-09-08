@@ -1,0 +1,20 @@
+[
+  {
+    "id": "ks-wichita-exploration-place-old-town-square",
+    "label": "Exploration Place to Old Town Square",
+    "origin": { "latitude": 37.6946, "longitude": -97.3439 },
+    "destination": { "latitude": 37.6885, "longitude": -97.3277 }
+  },
+  {
+    "id": "ks-topeka-state-capitol-public-library",
+    "label": "Kansas State Capitol to Topeka Public Library",
+    "origin": { "latitude": 39.048, "longitude": -95.678 },
+    "destination": { "latitude": 39.0444, "longitude": -95.6952 }
+  },
+  {
+    "id": "ks-lawrence-watson-library-south-park",
+    "label": "Watson Library to South Park",
+    "origin": { "latitude": 38.9587, "longitude": -95.2437 },
+    "destination": { "latitude": 38.963, "longitude": -95.2356 }
+  }
+]
