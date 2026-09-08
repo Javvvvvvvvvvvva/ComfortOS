@@ -1,21 +1,21 @@
 {
   "format": "comfortos-us-overture-build-progress-v1",
-  "generatedAt": "2026-09-08T10:50:53.298Z",
+  "generatedAt": "2026-09-08T12:36:31.463Z",
   "release": "2026-08-19.0",
   "summary": {
     "jurisdictionCount": 51,
-    "completedJurisdictionCount": 37,
-    "archivedJurisdictionCount": 37,
+    "completedJurisdictionCount": 38,
+    "archivedJurisdictionCount": 38,
     "plannedPartitionCount": 20758,
     "uniqueGridCellCount": 19036,
     "duplicateStateAssignmentCount": 1722,
-    "completedPartitionCount": 7965,
-    "archivedPartitionCount": 7965,
+    "completedPartitionCount": 8378,
+    "archivedPartitionCount": 8378,
     "invalidPartitionCount": 0,
-    "completionRatio": 0.3837074862703536,
-    "buildingCount": 134322855,
-    "usableHeightRatio": 0.7430712666135633,
-    "storedBytes": 71369384157
+    "completionRatio": 0.40360343000289045,
+    "buildingCount": 135232813,
+    "usableHeightRatio": 0.7423010493762339,
+    "storedBytes": 71841989208
   },
   "jurisdictions": [
     {
@@ -502,13 +502,14 @@
     {
       "code": "SD",
       "name": "South Dakota",
-      "status": "pending",
+      "status": "archived",
       "plannedPartitionCount": 413,
-      "completedPartitionCount": 0,
+      "completedPartitionCount": 413,
       "invalidPartitionCount": 0,
-      "buildingCount": 0,
-      "usableHeightRatio": null,
-      "storedBytes": 0
+      "buildingCount": 909958,
+      "usableHeightRatio": 0.6286059356585688,
+      "storedBytes": 472605051,
+      "localDataPruned": true
     },
     {
       "code": "TN",

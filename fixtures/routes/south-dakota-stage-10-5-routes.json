@@ -1,0 +1,20 @@
+[
+  {
+    "id": "sd-sioux-falls-falls-park-washington-pavilion",
+    "label": "Falls Park to Washington Pavilion",
+    "origin": { "latitude": 43.5601, "longitude": -96.7278 },
+    "destination": { "latitude": 43.5473, "longitude": -96.731 }
+  },
+  {
+    "id": "sd-pierre-state-capitol-steamboat-park",
+    "label": "South Dakota State Capitol to Steamboat Park",
+    "origin": { "latitude": 44.367, "longitude": -100.3464 },
+    "destination": { "latitude": 44.3637, "longitude": -100.3571 }
+  },
+  {
+    "id": "sd-rapid-city-journey-museum-main-street-square",
+    "label": "The Journey Museum to Main Street Square",
+    "origin": { "latitude": 44.0862, "longitude": -103.2184 },
+    "destination": { "latitude": 44.0804, "longitude": -103.2283 }
+  }
+]

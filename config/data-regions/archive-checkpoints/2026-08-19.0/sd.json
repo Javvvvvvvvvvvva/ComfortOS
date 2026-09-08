@@ -1,0 +1,57 @@
+{
+  "format": "comfortos-us-state-archive-checkpoint-v1",
+  "createdAt": "2026-09-08T12:28:28.219Z",
+  "release": "2026-08-19.0",
+  "jurisdiction": {
+    "fips": "46",
+    "code": "SD",
+    "name": "South Dakota"
+  },
+  "validation": [
+    {
+      "kind": "heat",
+      "createdAt": "2026-09-08T12:28:28.219Z",
+      "reportFile": "sd-heat-validation.json",
+      "reportSha256": "3c51695e294e66497cce623e57353dd21f2f453d91effbe86c31c08e1424b9ad",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 376
+    },
+    {
+      "kind": "live",
+      "createdAt": "2026-09-08T12:28:10.270Z",
+      "reportFile": "sd-live-validation.json",
+      "reportSha256": "1dabdf8c9dfd1d2930c483c961c6e87287f50fe401f66bba9d65dda8bb17bbd7",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 1301.6666666666667
+    }
+  ],
+  "dataset": {
+    "buildingCount": 909958,
+    "usableHeightCount": 572005,
+    "usableHeightRatio": 0.6286059356585688
+  },
+  "archive": {
+    "provider": "cloudflare-r2",
+    "location": "comfortos-environment-data",
+    "prefix": "overture-buildings",
+    "stateManifestKey": "overture-buildings/2026-08-19.0/us/sd/state-archive-manifest.json",
+    "stateManifestSha256": "4e41773f728c95b357ae1a9593137ee20c2df2a8321ce99fb50e833284f1f3a1",
+    "partitionCount": 413,
+    "objectCount": 1652,
+    "storedBytes": 472605051,
+    "remoteVerified": true
+  },
+  "localDataPruned": true
+}
