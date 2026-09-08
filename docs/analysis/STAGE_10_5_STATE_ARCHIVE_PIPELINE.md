@@ -1,7 +1,7 @@
 # Stage 10.5 - State Archive Pipeline
 
 Date: 2026-09-07
-Status: Live and verified for the first thirty-three jurisdictions
+Status: Live and verified for the first thirty-four jurisdictions
 
 ## Scope
 
@@ -69,16 +69,17 @@ debugging and inspection.
 | Oklahoma | 339 | 1,357 | 1,517,576,141 | Verified and locally pruned |
 | Missouri | 363 | 1,453 | 2,251,772,550 | Verified and locally pruned |
 | Nebraska | 376 | 1,505 | 805,520,669 | Verified and locally pruned |
+| Michigan | 378 | 1,513 | 3,212,568,079 | Verified and locally pruned |
 
-All 25,536 data objects were rehashed locally, uploaded, downloaded from R2, and verified by exact
-byte count and SHA-256. The thirty-three state archive manifests were uploaded last, for 25,569 remote
-objects in total. The sixty-six accepted validation reports cover 198 successful and comparable
+All 27,048 data objects were rehashed locally, uploaded, downloaded from R2, and verified by exact
+byte count and SHA-256. The thirty-four state archive manifests were uploaded last, for 27,082 remote
+objects in total. The sixty-eight accepted validation reports cover 204 successful and comparable
 route checks.
 
-The live archive contains 6,384 completed partitions, 120,997,363 buildings, and 64,256,299,297
+The live archive contains 6,762 completed partitions, 127,216,142 buildings, and 67,468,867,376
 stored bytes. Compact checkpoints are committed to Git, while the verified local payloads have
 been pruned. The nationwide audit retains those totals from the checkpoints and reports all
-thirty-three jurisdictions as `archived`.
+thirty-four jurisdictions as `archived`.
 
 Connecticut's 37-partition build contains 2,226,878 buildings with 67.71% usable height
 coverage. Hartford, New Haven, and Stamford each passed live NWS and controlled 38 C route
@@ -311,6 +312,13 @@ overlapping writes, and the canonical audit confirmed all 376 partitions with ze
 Transient official STAC failures recovered through bounded retry. All R2 objects passed remote
 byte-count and SHA-256 verification before local data was pruned.
 
+Michigan's 378-partition build contains 6,218,779 buildings with 84.76% usable height coverage.
+Detroit, Lansing, and Grand Rapids each passed live NWS and controlled 38 C route validation through
+managed Mapbox and the private HTTP Overture service. Live validation averaged 1,469 ms; controlled
+heat averaged 731 ms. Four disjoint partition workers covered the complete state plan without
+overlapping writes, and the canonical audit confirmed all 378 partitions with zero invalid stores.
+All R2 objects passed remote byte-count and SHA-256 verification before local data was pruned.
+
 ## Credential Verification
 
 The configured R2 account passed a live bucket health check and an isolated put, get,
@@ -329,4 +337,4 @@ R2_BUCKET=comfortos-environment-data
 
 ## Judgment
 
-STATE ARCHIVE PIPELINE LIVE; NEXT TARGET MICHIGAN
+STATE ARCHIVE PIPELINE LIVE; NEXT TARGET NORTH DAKOTA

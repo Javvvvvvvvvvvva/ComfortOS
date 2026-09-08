@@ -1,0 +1,20 @@
+[
+  {
+    "id": "mi-detroit-campus-martius-eastern-market",
+    "label": "Campus Martius Park to Eastern Market",
+    "origin": { "latitude": 42.3317, "longitude": -83.0466 },
+    "destination": { "latitude": 42.3488, "longitude": -83.0417 }
+  },
+  {
+    "id": "mi-lansing-state-capitol-potter-park-zoo",
+    "label": "Michigan State Capitol to Potter Park Zoo",
+    "origin": { "latitude": 42.7336, "longitude": -84.5554 },
+    "destination": { "latitude": 42.7166, "longitude": -84.5293 }
+  },
+  {
+    "id": "mi-grand-rapids-public-museum-meyer-may-house",
+    "label": "Grand Rapids Public Museum to Meyer May House",
+    "origin": { "latitude": 42.9689, "longitude": -85.6765 },
+    "destination": { "latitude": 42.9548, "longitude": -85.6605 }
+  }
+]

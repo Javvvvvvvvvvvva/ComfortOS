@@ -1,21 +1,21 @@
 {
   "format": "comfortos-us-overture-build-progress-v1",
-  "generatedAt": "2026-09-08T01:48:09.224Z",
+  "generatedAt": "2026-09-08T03:20:29.910Z",
   "release": "2026-08-19.0",
   "summary": {
     "jurisdictionCount": 51,
-    "completedJurisdictionCount": 33,
-    "archivedJurisdictionCount": 33,
+    "completedJurisdictionCount": 34,
+    "archivedJurisdictionCount": 34,
     "plannedPartitionCount": 20758,
     "uniqueGridCellCount": 19036,
     "duplicateStateAssignmentCount": 1722,
-    "completedPartitionCount": 6384,
-    "archivedPartitionCount": 6384,
+    "completedPartitionCount": 6762,
+    "archivedPartitionCount": 6762,
     "invalidPartitionCount": 0,
-    "completionRatio": 0.30754407939107814,
-    "buildingCount": 120997363,
-    "usableHeightRatio": 0.7392381766204277,
-    "storedBytes": 64256299297
+    "completionRatio": 0.32575392619712884,
+    "buildingCount": 127216142,
+    "usableHeightRatio": 0.7445351471199307,
+    "storedBytes": 67468867376
   },
   "jurisdictions": [
     {
@@ -279,13 +279,14 @@
     {
       "code": "MI",
       "name": "Michigan",
-      "status": "pending",
+      "status": "archived",
       "plannedPartitionCount": 378,
-      "completedPartitionCount": 0,
+      "completedPartitionCount": 378,
       "invalidPartitionCount": 0,
-      "buildingCount": 0,
-      "usableHeightRatio": null,
-      "storedBytes": 0
+      "buildingCount": 6218779,
+      "usableHeightRatio": 0.847597092612553,
+      "storedBytes": 3212568079,
+      "localDataPruned": true
     },
     {
       "code": "MN",

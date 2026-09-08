@@ -1,0 +1,57 @@
+{
+  "format": "comfortos-us-state-archive-checkpoint-v1",
+  "createdAt": "2026-09-08T02:53:06.855Z",
+  "release": "2026-08-19.0",
+  "jurisdiction": {
+    "fips": "26",
+    "code": "MI",
+    "name": "Michigan"
+  },
+  "validation": [
+    {
+      "kind": "heat",
+      "createdAt": "2026-09-08T02:53:06.855Z",
+      "reportFile": "mi-heat-validation.json",
+      "reportSha256": "4b88ec48cc9b45816c423a44d8d9c192b2e2a5663b32bf20d30a16e23fee01fa",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 731
+    },
+    {
+      "kind": "live",
+      "createdAt": "2026-09-08T02:52:50.545Z",
+      "reportFile": "mi-live-validation.json",
+      "reportSha256": "4878d80c1512eef20ff8acd2cad8119e57ec7d5591cbc0283c5b1bcdebcde5bd",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 1468.6666666666667
+    }
+  ],
+  "dataset": {
+    "buildingCount": 6218779,
+    "usableHeightCount": 5271019,
+    "usableHeightRatio": 0.847597092612553
+  },
+  "archive": {
+    "provider": "cloudflare-r2",
+    "location": "comfortos-environment-data",
+    "prefix": "overture-buildings",
+    "stateManifestKey": "overture-buildings/2026-08-19.0/us/mi/state-archive-manifest.json",
+    "stateManifestSha256": "89a64b049886fba976a46cee4c3b36c6209e9c5759dca1d0adc13f873f14e586",
+    "partitionCount": 378,
+    "objectCount": 1512,
+    "storedBytes": 3212568079,
+    "remoteVerified": true
+  },
+  "localDataPruned": true
+}
