@@ -1,21 +1,21 @@
 {
   "format": "comfortos-us-overture-build-progress-v1",
-  "generatedAt": "2026-09-08T15:31:38.945Z",
+  "generatedAt": "2026-09-08T21:54:53.385Z",
   "release": "2026-08-19.0",
   "summary": {
     "jurisdictionCount": 51,
-    "completedJurisdictionCount": 39,
-    "archivedJurisdictionCount": 39,
+    "completedJurisdictionCount": 40,
+    "archivedJurisdictionCount": 40,
     "plannedPartitionCount": 20758,
     "uniqueGridCellCount": 19036,
     "duplicateStateAssignmentCount": 1722,
-    "completedPartitionCount": 8803,
-    "archivedPartitionCount": 8803,
+    "completedPartitionCount": 9266,
+    "archivedPartitionCount": 9266,
     "invalidPartitionCount": 0,
-    "completionRatio": 0.42407746411022257,
-    "buildingCount": 137496768,
-    "usableHeightRatio": 0.7412309284244413,
-    "storedBytes": 73014579033
+    "completionRatio": 0.44638211773773967,
+    "buildingCount": 138790131,
+    "usableHeightRatio": 0.7409893142906537,
+    "storedBytes": 73695335895
   },
   "jurisdictions": [
     {
@@ -173,13 +173,14 @@
     {
       "code": "ID",
       "name": "Idaho",
-      "status": "pending",
+      "status": "archived",
       "plannedPartitionCount": 463,
-      "completedPartitionCount": 0,
+      "completedPartitionCount": 463,
       "invalidPartitionCount": 0,
-      "buildingCount": 0,
-      "usableHeightRatio": null,
-      "storedBytes": 0
+      "buildingCount": 1293363,
+      "usableHeightRatio": 0.7153034376273327,
+      "storedBytes": 680756862,
+      "localDataPruned": true
     },
     {
       "code": "IL",

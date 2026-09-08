@@ -1,0 +1,20 @@
+[
+  {
+    "id": "id-boise-state-capitol-albertsons-stadium",
+    "label": "Idaho State Capitol to Albertsons Stadium",
+    "origin": { "latitude": 43.6178, "longitude": -116.1996 },
+    "destination": { "latitude": 43.6028, "longitude": -116.1958 }
+  },
+  {
+    "id": "id-idaho-falls-museum-river-walk",
+    "label": "Museum of Idaho to Idaho Falls River Walk",
+    "origin": { "latitude": 43.4904, "longitude": -112.0338 },
+    "destination": { "latitude": 43.4931, "longitude": -112.0453 }
+  },
+  {
+    "id": "id-twin-falls-city-hall-college-southern-idaho",
+    "label": "Twin Falls City Hall to College of Southern Idaho",
+    "origin": { "latitude": 42.5629, "longitude": -114.4609 },
+    "destination": { "latitude": 42.5805, "longitude": -114.473 }
+  }
+]

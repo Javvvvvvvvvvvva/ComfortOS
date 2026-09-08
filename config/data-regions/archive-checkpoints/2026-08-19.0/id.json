@@ -1,0 +1,57 @@
+{
+  "format": "comfortos-us-state-archive-checkpoint-v1",
+  "createdAt": "2026-09-08T20:49:34.519Z",
+  "release": "2026-08-19.0",
+  "jurisdiction": {
+    "fips": "16",
+    "code": "ID",
+    "name": "Idaho"
+  },
+  "validation": [
+    {
+      "kind": "heat",
+      "createdAt": "2026-09-08T20:49:34.519Z",
+      "reportFile": "id-heat-validation.json",
+      "reportSha256": "b90d40378b7fa49d4d9c9f0be37983d2f1681a37e3e6c2c780b865d3ad0ae563",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 563
+    },
+    {
+      "kind": "live",
+      "createdAt": "2026-09-08T20:49:14.909Z",
+      "reportFile": "id-live-validation.json",
+      "reportSha256": "a29bc027e543d8fe932ce791bd2007ac6617992b93a7a094b09628637610638d",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 1504.6666666666667
+    }
+  ],
+  "dataset": {
+    "buildingCount": 1293363,
+    "usableHeightCount": 925147,
+    "usableHeightRatio": 0.7153034376273327
+  },
+  "archive": {
+    "provider": "cloudflare-r2",
+    "location": "comfortos-environment-data",
+    "prefix": "overture-buildings",
+    "stateManifestKey": "overture-buildings/2026-08-19.0/us/id/state-archive-manifest.json",
+    "stateManifestSha256": "181b6c9e965f1f3f7b10b92fca81e2450b183cf434162c91c85eb8d7937dcead",
+    "partitionCount": 463,
+    "objectCount": 1852,
+    "storedBytes": 680756862,
+    "remoteVerified": true
+  },
+  "localDataPruned": true
+}
