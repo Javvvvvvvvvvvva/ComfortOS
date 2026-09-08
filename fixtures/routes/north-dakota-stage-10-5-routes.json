@@ -1,0 +1,20 @@
+[
+  {
+    "id": "nd-fargo-plains-art-museum-island-park",
+    "label": "Plains Art Museum to Island Park",
+    "origin": { "latitude": 46.8775, "longitude": -96.7895 },
+    "destination": { "latitude": 46.8705, "longitude": -96.7875 }
+  },
+  {
+    "id": "nd-bismarck-state-capitol-event-center",
+    "label": "North Dakota State Capitol to Bismarck Event Center",
+    "origin": { "latitude": 46.8208, "longitude": -100.7833 },
+    "destination": { "latitude": 46.8059, "longitude": -100.7837 }
+  },
+  {
+    "id": "nd-grand-forks-town-square-und-memorial-union",
+    "label": "Grand Forks Town Square to UND Memorial Union",
+    "origin": { "latitude": 47.9258, "longitude": -97.0326 },
+    "destination": { "latitude": 47.9217, "longitude": -97.0705 }
+  }
+]

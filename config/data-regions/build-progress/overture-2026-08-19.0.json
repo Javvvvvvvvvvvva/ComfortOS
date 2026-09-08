@@ -1,21 +1,21 @@
 {
   "format": "comfortos-us-overture-build-progress-v1",
-  "generatedAt": "2026-09-08T03:20:29.910Z",
+  "generatedAt": "2026-09-08T04:46:26.340Z",
   "release": "2026-08-19.0",
   "summary": {
     "jurisdictionCount": 51,
-    "completedJurisdictionCount": 34,
-    "archivedJurisdictionCount": 34,
+    "completedJurisdictionCount": 35,
+    "archivedJurisdictionCount": 35,
     "plannedPartitionCount": 20758,
     "uniqueGridCellCount": 19036,
     "duplicateStateAssignmentCount": 1722,
-    "completedPartitionCount": 6762,
-    "archivedPartitionCount": 6762,
+    "completedPartitionCount": 7160,
+    "archivedPartitionCount": 7160,
     "invalidPartitionCount": 0,
-    "completionRatio": 0.32575392619712884,
-    "buildingCount": 127216142,
-    "usableHeightRatio": 0.7445351471199307,
-    "storedBytes": 67468867376
+    "completionRatio": 0.3449272569611716,
+    "buildingCount": 128050829,
+    "usableHeightRatio": 0.7423679701441058,
+    "storedBytes": 67902464331
   },
   "jurisdictions": [
     {
@@ -349,13 +349,14 @@
     {
       "code": "ND",
       "name": "North Dakota",
-      "status": "pending",
+      "status": "archived",
       "plannedPartitionCount": 398,
-      "completedPartitionCount": 0,
+      "completedPartitionCount": 398,
       "invalidPartitionCount": 0,
-      "buildingCount": 0,
-      "usableHeightRatio": null,
-      "storedBytes": 0
+      "buildingCount": 834687,
+      "usableHeightRatio": 0.4120646421952181,
+      "storedBytes": 433596955,
+      "localDataPruned": true
     },
     {
       "code": "NE",

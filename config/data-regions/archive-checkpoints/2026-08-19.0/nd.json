@@ -1,0 +1,57 @@
+{
+  "format": "comfortos-us-state-archive-checkpoint-v1",
+  "createdAt": "2026-09-08T04:23:03.381Z",
+  "release": "2026-08-19.0",
+  "jurisdiction": {
+    "fips": "38",
+    "code": "ND",
+    "name": "North Dakota"
+  },
+  "validation": [
+    {
+      "kind": "heat",
+      "createdAt": "2026-09-08T04:23:03.381Z",
+      "reportFile": "nd-heat-validation.json",
+      "reportSha256": "8bbaee8b1b46c3c848f22743fe3552786e25312e53633ca8745fdd6d94160d07",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 452.6666666666667
+    },
+    {
+      "kind": "live",
+      "createdAt": "2026-09-08T04:22:25.051Z",
+      "reportFile": "nd-live-validation.json",
+      "reportSha256": "be8731a631079c756a890d52a9064372b2ac76cedbc144fe57157780770a7338",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 1287
+    }
+  ],
+  "dataset": {
+    "buildingCount": 834687,
+    "usableHeightCount": 343945,
+    "usableHeightRatio": 0.4120646421952181
+  },
+  "archive": {
+    "provider": "cloudflare-r2",
+    "location": "comfortos-environment-data",
+    "prefix": "overture-buildings",
+    "stateManifestKey": "overture-buildings/2026-08-19.0/us/nd/state-archive-manifest.json",
+    "stateManifestSha256": "38c7ed8bc46643ca48d81935d0e2c6b796a8371139aef68a236b7a0450629b5d",
+    "partitionCount": 398,
+    "objectCount": 1592,
+    "storedBytes": 433596955,
+    "remoteVerified": true
+  },
+  "localDataPruned": true
+}
