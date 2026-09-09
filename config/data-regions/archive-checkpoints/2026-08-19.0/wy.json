@@ -1,0 +1,57 @@
+{
+  "format": "comfortos-us-state-archive-checkpoint-v1",
+  "createdAt": "2026-09-09T05:15:41.541Z",
+  "release": "2026-08-19.0",
+  "jurisdiction": {
+    "fips": "56",
+    "code": "WY",
+    "name": "Wyoming"
+  },
+  "validation": [
+    {
+      "kind": "heat",
+      "createdAt": "2026-09-09T05:15:41.541Z",
+      "reportFile": "wy-heat-validation.json",
+      "reportSha256": "7a92e3b2ca643d4c6c18c33af11dd47d1c605d4a999ffc23734db0d4a6410e95",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 390.3333333333333
+    },
+    {
+      "kind": "live",
+      "createdAt": "2026-09-09T05:15:34.185Z",
+      "reportFile": "wy-live-validation.json",
+      "reportSha256": "fc4baa8341f322c4bbfbd1076ae88bf73de40e18e768569d960aacb7794c8b2f",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 1261.6666666666667
+    }
+  ],
+  "dataset": {
+    "buildingCount": 530285,
+    "usableHeightCount": 250193,
+    "usableHeightRatio": 0.4718085557766107
+  },
+  "archive": {
+    "provider": "cloudflare-r2",
+    "location": "comfortos-environment-data",
+    "prefix": "overture-buildings",
+    "stateManifestKey": "overture-buildings/2026-08-19.0/us/wy/state-archive-manifest.json",
+    "stateManifestSha256": "2ccaad85875f18d040b03b9f1f65b73331cd6efa77f994b269807f4eb31eafea",
+    "partitionCount": 500,
+    "objectCount": 2000,
+    "storedBytes": 272499454,
+    "remoteVerified": true
+  },
+  "localDataPruned": true
+}

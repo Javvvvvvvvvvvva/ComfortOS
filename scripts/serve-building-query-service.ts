@@ -16,6 +16,7 @@ const storeRoots = splitConfiguredPaths(
   process.env.BUILDING_LOCAL_OVERTURE_STORE_ROOTS,
 );
 const port = Number(process.env.BUILDING_QUERY_SERVICE_PORT ?? process.env.PORT ?? 8787);
+const host = process.env.BUILDING_QUERY_SERVICE_HOST ?? "0.0.0.0";
 const serviceToken =
   process.env.ENVIRONMENT_QUERY_SERVICE_TOKEN ??
   process.env.BUILDING_QUERY_SERVICE_TOKEN ??
@@ -205,8 +206,10 @@ if (
     }
   });
 
-  server.listen(port, () => {
-    console.log(`ComfortOS environment query service listening on port ${port}`);
+  server.listen(port, host, () => {
+    console.log(
+      `ComfortOS environment query service listening on ${host}:${port}`,
+    );
   });
 }
 

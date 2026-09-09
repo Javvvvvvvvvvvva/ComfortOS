@@ -1,21 +1,21 @@
 {
   "format": "comfortos-us-overture-build-progress-v1",
-  "generatedAt": "2026-09-09T02:59:30.017Z",
+  "generatedAt": "2026-09-09T05:24:01.593Z",
   "release": "2026-08-19.0",
   "summary": {
     "jurisdictionCount": 51,
-    "completedJurisdictionCount": 41,
-    "archivedJurisdictionCount": 41,
+    "completedJurisdictionCount": 42,
+    "archivedJurisdictionCount": 42,
     "plannedPartitionCount": 20758,
     "uniqueGridCellCount": 19036,
     "duplicateStateAssignmentCount": 1722,
-    "completedPartitionCount": 9735,
-    "archivedPartitionCount": 9735,
+    "completedPartitionCount": 10235,
+    "archivedPartitionCount": 10235,
     "invalidPartitionCount": 0,
-    "completionRatio": 0.4689758165526544,
-    "buildingCount": 142452991,
-    "usableHeightRatio": 0.7413545497265129,
-    "storedBytes": 75609008337
+    "completionRatio": 0.4930629155024569,
+    "buildingCount": 142983276,
+    "usableHeightRatio": 0.7403548789859872,
+    "storedBytes": 75881507791
   },
   "jurisdictions": [
     {
@@ -612,13 +612,14 @@
     {
       "code": "WY",
       "name": "Wyoming",
-      "status": "pending",
+      "status": "archived",
       "plannedPartitionCount": 500,
-      "completedPartitionCount": 0,
+      "completedPartitionCount": 500,
       "invalidPartitionCount": 0,
-      "buildingCount": 0,
-      "usableHeightRatio": null,
-      "storedBytes": 0
+      "buildingCount": 530285,
+      "usableHeightRatio": 0.4718085557766107,
+      "storedBytes": 272499454,
+      "localDataPruned": true
     }
   ]
 }
