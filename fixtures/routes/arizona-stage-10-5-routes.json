@@ -1,0 +1,20 @@
+[
+  {
+    "id": "az-phoenix-burton-barr-civic-space-park",
+    "label": "Burton Barr Central Library to Civic Space Park",
+    "origin": { "latitude": 33.4635, "longitude": -112.0739 },
+    "destination": { "latitude": 33.4528, "longitude": -112.0732 }
+  },
+  {
+    "id": "az-tucson-main-library-himmel-park",
+    "label": "University of Arizona Main Library to Himmel Park",
+    "origin": { "latitude": 32.231, "longitude": -110.9508 },
+    "destination": { "latitude": 32.2145, "longitude": -110.9409 }
+  },
+  {
+    "id": "az-flagstaff-downtown-library-thorpe-park",
+    "label": "Flagstaff City-Coconino County Library to Thorpe Park",
+    "origin": { "latitude": 35.1991, "longitude": -111.649 },
+    "destination": { "latitude": 35.2055, "longitude": -111.6598 }
+  }
+]

@@ -20,6 +20,7 @@ const STORE_FILES = [
 ] as const;
 
 const R2_VERIFICATION_ATTEMPTS = 5;
+const R2_UPLOAD_ATTEMPTS = 5;
 const R2_RETRY_BASE_DELAY_MS = 1_000;
 const ARCHIVE_SYNC_CONCURRENCY = 4;
 
@@ -630,21 +631,39 @@ export function createR2ObjectStore(options: {
     },
     async putFile(key, filePath, object) {
       try {
-        const upload = new Upload({
-          client,
-          params: {
-            Bucket: options.bucket,
-            Key: key,
-            Body: createReadStream(filePath),
-            ContentLength: object.sizeBytes,
-            ContentType: contentType(filePath),
-            Metadata: { sha256: object.sha256 },
+        await retryTransientOperation(
+          async () => {
+            const body = createReadStream(filePath);
+            try {
+              const upload = new Upload({
+                client,
+                params: {
+                  Bucket: options.bucket,
+                  Key: key,
+                  Body: body,
+                  ContentLength: object.sizeBytes,
+                  ContentType: contentType(filePath),
+                  Metadata: { sha256: object.sha256 },
+                },
+                queueSize: 2,
+                partSize: 16 * 1024 * 1024,
+                leavePartsOnError: false,
+              });
+              await upload.done();
+            } finally {
+              body.destroy();
+            }
           },
-          queueSize: 2,
-          partSize: 16 * 1024 * 1024,
-          leavePartsOnError: false,
-        });
-        await upload.done();
+          {
+            attempts: R2_UPLOAD_ATTEMPTS,
+            baseDelayMs: R2_RETRY_BASE_DELAY_MS,
+            onRetry: (attempt, delayMs) => {
+              console.warn(
+                `R2 upload request failed; retrying in ${delayMs / 1_000}s (${attempt}/${R2_UPLOAD_ATTEMPTS}).`,
+              );
+            },
+          },
+        );
       } catch (error) {
         throw new Error(`R2 upload failed for ${key}.`, { cause: error });
       }

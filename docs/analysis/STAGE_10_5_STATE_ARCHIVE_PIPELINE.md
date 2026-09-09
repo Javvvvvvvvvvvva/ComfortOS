@@ -1,7 +1,7 @@
 # Stage 10.5 - State Archive Pipeline
 
 Date: 2026-09-09
-Status: Live and verified for the first forty-three jurisdictions
+Status: Live and verified for the first forty-four jurisdictions
 
 ## Scope
 
@@ -21,7 +21,8 @@ read back and checked against its exact byte count and SHA-256. Existing matchin
 reused for interrupted runs; an immutable key conflict stops the run. The state archive
 manifest is uploaded last. Object synchronization uses bounded four-object batches; every object
 still completes its preflight inspection and post-upload read-back verification before the next
-batch advances.
+batch advances. R2 upload and read-back requests both use bounded exponential retry so a transient
+object request does not restart the entire state archive.
 
 Only after remote verification does the command write
 `config/data-regions/archive-checkpoints/<release>/<state>.json`. Local pruning additionally
@@ -85,16 +86,17 @@ network interface.
 | Minnesota | 469 | 1,877 | 1,913,672,442 | Verified and locally pruned |
 | Wyoming | 500 | 2,001 | 272,499,454 | Verified and locally pruned |
 | Oregon | 510 | 2,041 | 1,416,637,101 | Verified and locally pruned |
+| Arizona | 511 | 2,045 | 1,964,699,620 | Verified and locally pruned |
 
-All 42,980 data objects were rehashed locally, uploaded, downloaded from R2, and verified by exact
-byte count and SHA-256. The forty-three state archive manifests were uploaded last, for 43,023 remote
-objects in total. The eighty-six accepted validation reports cover 258 successful and comparable
+All 45,024 data objects were rehashed locally, uploaded, downloaded from R2, and verified by exact
+byte count and SHA-256. The forty-four state archive manifests were uploaded last, for 45,068 remote
+objects in total. The eighty-eight accepted validation reports cover 264 successful and comparable
 route checks.
 
-The live archive contains 10,745 completed partitions, 145,580,909 buildings, and 77,298,144,892
+The live archive contains 11,256 completed partitions, 149,261,100 buildings, and 79,262,844,512
 stored bytes. Compact checkpoints are committed to Git, while the verified local payloads have
 been pruned. The nationwide audit retains those totals from the checkpoints and reports all
-forty-three jurisdictions as `archived`.
+forty-four jurisdictions as `archived`.
 
 Connecticut's 37-partition build contains 2,226,878 buildings with 67.71% usable height
 coverage. Hartford, New Haven, and Stamford each passed live NWS and controlled 38 C route
@@ -403,6 +405,16 @@ overlapping writes, and the canonical audit confirmed all 510 partitions with ze
 One transient official STAC failure recovered through bounded retry without fixture fallback. All
 2,041 R2 objects passed remote byte-count and SHA-256 verification before local data was pruned.
 
+Arizona's 511-partition build contains 3,680,191 buildings with 71.60% usable height coverage.
+Phoenix, Tucson, and Flagstaff each passed live NWS and controlled 38 C route validation through
+managed Mapbox and the private HTTP Overture service. Live validation averaged 2,292 ms; controlled
+heat averaged 1,229 ms. Four disjoint resumable workers covered the complete state plan despite
+intermittent official STAC and Overture S3 DNS failures, without fixture fallback. The first live
+route attempt also encountered a transient Mapbox timeout; managed provider health returned ready
+before the accepted retry. The canonical audit confirmed all 511 partitions with zero invalid
+stores. The archive resumed after two transient object upload failures, reused 859 verified objects,
+uploaded 1,186 remaining objects, and verified all 2,045 R2 objects before local data was pruned.
+
 ## Credential Verification
 
 The configured R2 account passed a live bucket health check and an isolated put, get,
@@ -421,4 +433,4 @@ R2_BUCKET=comfortos-environment-data
 
 ## Judgment
 
-STATE ARCHIVE PIPELINE LIVE; NEXT TARGET ARIZONA
+STATE ARCHIVE PIPELINE LIVE; NEXT TARGET COLORADO

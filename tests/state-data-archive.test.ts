@@ -140,7 +140,7 @@ test("state archival dry-run validates all local checksums without uploading", a
   await assert.rejects(fs.stat(fixture.archiveRoot), { code: "ENOENT" });
 });
 
-test("R2 verification retries transient failures with bounded backoff", async () => {
+test("R2 operations retry transient failures with bounded backoff", async () => {
   let attempts = 0;
   const retries: Array<[number, number]> = [];
   const result = await retryTransientOperation(

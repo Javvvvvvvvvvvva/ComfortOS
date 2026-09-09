@@ -1,0 +1,57 @@
+{
+  "format": "comfortos-us-state-archive-checkpoint-v1",
+  "createdAt": "2026-09-09T21:28:36.751Z",
+  "release": "2026-08-19.0",
+  "jurisdiction": {
+    "fips": "04",
+    "code": "AZ",
+    "name": "Arizona"
+  },
+  "validation": [
+    {
+      "kind": "heat",
+      "createdAt": "2026-09-09T21:28:36.751Z",
+      "reportFile": "az-heat-validation.json",
+      "reportSha256": "13fbd9d8b6eea6cfc518fa090201059437f96970e666b09208df0b47cc92348b",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 1229
+    },
+    {
+      "kind": "live",
+      "createdAt": "2026-09-09T21:28:13.923Z",
+      "reportFile": "az-live-validation.json",
+      "reportSha256": "0667d48ace5c780f3fa1d81171b30945f40277213252408050e48830e50da078",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 2291.6666666666665
+    }
+  ],
+  "dataset": {
+    "buildingCount": 3680191,
+    "usableHeightCount": 2634955,
+    "usableHeightRatio": 0.7159832193492132
+  },
+  "archive": {
+    "provider": "cloudflare-r2",
+    "location": "comfortos-environment-data",
+    "prefix": "overture-buildings",
+    "stateManifestKey": "overture-buildings/2026-08-19.0/us/az/state-archive-manifest.json",
+    "stateManifestSha256": "584133c4126fb23b3fef4a4b76183f8248d2f46def9ce626b9f5187628e05c2e",
+    "partitionCount": 511,
+    "objectCount": 2044,
+    "storedBytes": 1964699620,
+    "remoteVerified": true
+  },
+  "localDataPruned": true
+}

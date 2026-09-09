@@ -1,21 +1,21 @@
 {
   "format": "comfortos-us-overture-build-progress-v1",
-  "generatedAt": "2026-09-09T08:41:34.594Z",
+  "generatedAt": "2026-09-09T23:49:51.875Z",
   "release": "2026-08-19.0",
   "summary": {
     "jurisdictionCount": 51,
-    "completedJurisdictionCount": 43,
-    "archivedJurisdictionCount": 43,
+    "completedJurisdictionCount": 44,
+    "archivedJurisdictionCount": 44,
     "plannedPartitionCount": 20758,
     "uniqueGridCellCount": 19036,
     "duplicateStateAssignmentCount": 1722,
-    "completedPartitionCount": 10745,
-    "archivedPartitionCount": 10745,
+    "completedPartitionCount": 11256,
+    "archivedPartitionCount": 11256,
     "invalidPartitionCount": 0,
-    "completionRatio": 0.5176317564312555,
-    "buildingCount": 145580909,
-    "usableHeightRatio": 0.7411129298553837,
-    "storedBytes": 77298144892
+    "completionRatio": 0.5422487715579536,
+    "buildingCount": 149261100,
+    "usableHeightRatio": 0.7404933301442908,
+    "storedBytes": 79262844512
   },
   "jurisdictions": [
     {
@@ -56,13 +56,14 @@
     {
       "code": "AZ",
       "name": "Arizona",
-      "status": "pending",
+      "status": "archived",
       "plannedPartitionCount": 511,
-      "completedPartitionCount": 0,
+      "completedPartitionCount": 511,
       "invalidPartitionCount": 0,
-      "buildingCount": 0,
-      "usableHeightRatio": null,
-      "storedBytes": 0
+      "buildingCount": 3680191,
+      "usableHeightRatio": 0.7159832193492132,
+      "storedBytes": 1964699620,
+      "localDataPruned": true
     },
     {
       "code": "CA",
