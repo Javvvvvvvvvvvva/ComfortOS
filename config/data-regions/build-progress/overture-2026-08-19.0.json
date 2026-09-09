@@ -1,21 +1,21 @@
 {
   "format": "comfortos-us-overture-build-progress-v1",
-  "generatedAt": "2026-09-09T05:24:01.593Z",
+  "generatedAt": "2026-09-09T08:41:34.594Z",
   "release": "2026-08-19.0",
   "summary": {
     "jurisdictionCount": 51,
-    "completedJurisdictionCount": 42,
-    "archivedJurisdictionCount": 42,
+    "completedJurisdictionCount": 43,
+    "archivedJurisdictionCount": 43,
     "plannedPartitionCount": 20758,
     "uniqueGridCellCount": 19036,
     "duplicateStateAssignmentCount": 1722,
-    "completedPartitionCount": 10235,
-    "archivedPartitionCount": 10235,
+    "completedPartitionCount": 10745,
+    "archivedPartitionCount": 10745,
     "invalidPartitionCount": 0,
-    "completionRatio": 0.4930629155024569,
-    "buildingCount": 142983276,
-    "usableHeightRatio": 0.7403548789859872,
-    "storedBytes": 75881507791
+    "completionRatio": 0.5176317564312555,
+    "buildingCount": 145580909,
+    "usableHeightRatio": 0.7411129298553837,
+    "storedBytes": 77298144892
   },
   "jurisdictions": [
     {
@@ -458,13 +458,14 @@
     {
       "code": "OR",
       "name": "Oregon",
-      "status": "pending",
+      "status": "archived",
       "plannedPartitionCount": 510,
-      "completedPartitionCount": 0,
+      "completedPartitionCount": 510,
       "invalidPartitionCount": 0,
-      "buildingCount": 0,
-      "usableHeightRatio": null,
-      "storedBytes": 0
+      "buildingCount": 2597633,
+      "usableHeightRatio": 0.7828388382808503,
+      "storedBytes": 1416637101,
+      "localDataPruned": true
     },
     {
       "code": "PA",

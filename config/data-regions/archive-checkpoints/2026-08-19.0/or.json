@@ -1,0 +1,57 @@
+{
+  "format": "comfortos-us-state-archive-checkpoint-v1",
+  "createdAt": "2026-09-09T08:30:37.258Z",
+  "release": "2026-08-19.0",
+  "jurisdiction": {
+    "fips": "41",
+    "code": "OR",
+    "name": "Oregon"
+  },
+  "validation": [
+    {
+      "kind": "heat",
+      "createdAt": "2026-09-09T08:30:37.258Z",
+      "reportFile": "or-heat-validation.json",
+      "reportSha256": "52e643c87ae014fae0d293c21d016e26d9ddb5259d1ca5eefb4330f541b2f9ae",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 402
+    },
+    {
+      "kind": "live",
+      "createdAt": "2026-09-09T08:30:27.270Z",
+      "reportFile": "or-live-validation.json",
+      "reportSha256": "e4d0ebf4c483096695c99bd36fbe9832d80ae33447a7be147734bed3a560a930",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 1696
+    }
+  ],
+  "dataset": {
+    "buildingCount": 2597633,
+    "usableHeightCount": 2033528,
+    "usableHeightRatio": 0.7828388382808503
+  },
+  "archive": {
+    "provider": "cloudflare-r2",
+    "location": "comfortos-environment-data",
+    "prefix": "overture-buildings",
+    "stateManifestKey": "overture-buildings/2026-08-19.0/us/or/state-archive-manifest.json",
+    "stateManifestSha256": "8888e7e5ab788f32c6fca2dfe7e33646ebe880fc647a05cba859d059aad51ef5",
+    "partitionCount": 510,
+    "objectCount": 2040,
+    "storedBytes": 1416637101,
+    "remoteVerified": true
+  },
+  "localDataPruned": true
+}

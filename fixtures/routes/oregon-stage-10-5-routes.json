@@ -1,0 +1,20 @@
+[
+  {
+    "id": "or-portland-central-library-waterfront-park",
+    "label": "Central Library to Tom McCall Waterfront Park",
+    "origin": { "latitude": 45.519, "longitude": -122.683 },
+    "destination": { "latitude": 45.5165, "longitude": -122.6707 }
+  },
+  {
+    "id": "or-eugene-downtown-library-alton-baker-park",
+    "label": "Eugene Public Library to Alton Baker Park",
+    "origin": { "latitude": 44.0504, "longitude": -123.0928 },
+    "destination": { "latitude": 44.0588, "longitude": -123.0728 }
+  },
+  {
+    "id": "or-bend-downtown-library-old-mill",
+    "label": "Downtown Bend Library to Old Mill District",
+    "origin": { "latitude": 44.0569, "longitude": -121.3153 },
+    "destination": { "latitude": 44.0453, "longitude": -121.3134 }
+  }
+]
