@@ -1,0 +1,20 @@
+[
+  {
+    "id": "mn-minneapolis-central-library-walker-art-center",
+    "label": "Minneapolis Central Library to Walker Art Center",
+    "origin": { "latitude": 44.9805, "longitude": -93.2701 },
+    "destination": { "latitude": 44.9682, "longitude": -93.2886 }
+  },
+  {
+    "id": "mn-saint-paul-state-capitol-union-depot",
+    "label": "Minnesota State Capitol to Saint Paul Union Depot",
+    "origin": { "latitude": 44.9551, "longitude": -93.1022 },
+    "destination": { "latitude": 44.947, "longitude": -93.0868 }
+  },
+  {
+    "id": "mn-duluth-public-library-canal-park",
+    "label": "Duluth Public Library to Canal Park",
+    "origin": { "latitude": 46.7831, "longitude": -92.1065 },
+    "destination": { "latitude": 46.779, "longitude": -92.0926 }
+  }
+]

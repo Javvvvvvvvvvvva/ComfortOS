@@ -1,0 +1,57 @@
+{
+  "format": "comfortos-us-state-archive-checkpoint-v1",
+  "createdAt": "2026-09-09T02:47:23.286Z",
+  "release": "2026-08-19.0",
+  "jurisdiction": {
+    "fips": "27",
+    "code": "MN",
+    "name": "Minnesota"
+  },
+  "validation": [
+    {
+      "kind": "heat",
+      "createdAt": "2026-09-09T02:47:23.286Z",
+      "reportFile": "mn-heat-validation.json",
+      "reportSha256": "7a438e6c78d65b42b7ed05d66f11432950f9810e67f94d86bbaffa8e0f7db3d1",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 598
+    },
+    {
+      "kind": "live",
+      "createdAt": "2026-09-09T02:47:09.720Z",
+      "reportFile": "mn-live-validation.json",
+      "reportSha256": "601ceff129989da2610b5e77adf811948f87b35bf7e97ab5d3dca93ce7dae861",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 1530.3333333333333
+    }
+  ],
+  "dataset": {
+    "buildingCount": 3662860,
+    "usableHeightCount": 2766169,
+    "usableHeightRatio": 0.7551937556990985
+  },
+  "archive": {
+    "provider": "cloudflare-r2",
+    "location": "comfortos-environment-data",
+    "prefix": "overture-buildings",
+    "stateManifestKey": "overture-buildings/2026-08-19.0/us/mn/state-archive-manifest.json",
+    "stateManifestSha256": "d33739ce875df5fcd1a5bc4e882149ff17e361e9cda51ea8d2f9e9a1114f90e4",
+    "partitionCount": 469,
+    "objectCount": 1876,
+    "storedBytes": 1913672442,
+    "remoteVerified": true
+  },
+  "localDataPruned": true
+}

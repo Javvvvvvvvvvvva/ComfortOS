@@ -1,21 +1,21 @@
 {
   "format": "comfortos-us-overture-build-progress-v1",
-  "generatedAt": "2026-09-08T21:54:53.385Z",
+  "generatedAt": "2026-09-09T02:59:30.017Z",
   "release": "2026-08-19.0",
   "summary": {
     "jurisdictionCount": 51,
-    "completedJurisdictionCount": 40,
-    "archivedJurisdictionCount": 40,
+    "completedJurisdictionCount": 41,
+    "archivedJurisdictionCount": 41,
     "plannedPartitionCount": 20758,
     "uniqueGridCellCount": 19036,
     "duplicateStateAssignmentCount": 1722,
-    "completedPartitionCount": 9266,
-    "archivedPartitionCount": 9266,
+    "completedPartitionCount": 9735,
+    "archivedPartitionCount": 9735,
     "invalidPartitionCount": 0,
-    "completionRatio": 0.44638211773773967,
-    "buildingCount": 138790131,
-    "usableHeightRatio": 0.7409893142906537,
-    "storedBytes": 73695335895
+    "completionRatio": 0.4689758165526544,
+    "buildingCount": 142452991,
+    "usableHeightRatio": 0.7413545497265129,
+    "storedBytes": 75609008337
   },
   "jurisdictions": [
     {
@@ -293,13 +293,14 @@
     {
       "code": "MN",
       "name": "Minnesota",
-      "status": "pending",
+      "status": "archived",
       "plannedPartitionCount": 469,
-      "completedPartitionCount": 0,
+      "completedPartitionCount": 469,
       "invalidPartitionCount": 0,
-      "buildingCount": 0,
-      "usableHeightRatio": null,
-      "storedBytes": 0
+      "buildingCount": 3662860,
+      "usableHeightRatio": 0.7551937556990985,
+      "storedBytes": 1913672442,
+      "localDataPruned": true
     },
     {
       "code": "MO",
