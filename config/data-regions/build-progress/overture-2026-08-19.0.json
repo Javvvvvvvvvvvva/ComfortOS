@@ -1,21 +1,21 @@
 {
   "format": "comfortos-us-overture-build-progress-v1",
-  "generatedAt": "2026-09-10T10:11:42.483Z",
+  "generatedAt": "2026-09-10T17:04:07.641Z",
   "release": "2026-08-19.0",
   "summary": {
     "jurisdictionCount": 51,
-    "completedJurisdictionCount": 46,
-    "archivedJurisdictionCount": 46,
+    "completedJurisdictionCount": 47,
+    "archivedJurisdictionCount": 47,
     "plannedPartitionCount": 20758,
     "uniqueGridCellCount": 19036,
     "duplicateStateAssignmentCount": 1722,
-    "completedPartitionCount": 12282,
-    "archivedPartitionCount": 12282,
+    "completedPartitionCount": 12811,
+    "archivedPartitionCount": 12811,
     "invalidPartitionCount": 0,
-    "completionRatio": 0.5916754986029482,
-    "buildingCount": 153429020,
-    "usableHeightRatio": 0.7392169877641139,
-    "storedBytes": 81577673108
+    "completionRatio": 0.6171596492918393,
+    "buildingCount": 154829718,
+    "usableHeightRatio": 0.7375865336136568,
+    "storedBytes": 82329316438
   },
   "jurisdictions": [
     {
@@ -402,13 +402,14 @@
     {
       "code": "NM",
       "name": "New Mexico",
-      "status": "pending",
+      "status": "archived",
       "plannedPartitionCount": 529,
-      "completedPartitionCount": 0,
+      "completedPartitionCount": 529,
       "invalidPartitionCount": 0,
-      "buildingCount": 0,
-      "usableHeightRatio": null,
-      "storedBytes": 0
+      "buildingCount": 1400698,
+      "usableHeightRatio": 0.5589905889777811,
+      "storedBytes": 751643330,
+      "localDataPruned": true
     },
     {
       "code": "NV",

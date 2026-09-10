@@ -1,0 +1,57 @@
+{
+  "format": "comfortos-us-state-archive-checkpoint-v1",
+  "createdAt": "2026-09-10T16:16:25.177Z",
+  "release": "2026-08-19.0",
+  "jurisdiction": {
+    "fips": "35",
+    "code": "NM",
+    "name": "New Mexico"
+  },
+  "validation": [
+    {
+      "kind": "heat",
+      "createdAt": "2026-09-10T16:16:25.177Z",
+      "reportFile": "nm-heat-validation.json",
+      "reportSha256": "c1ec1a19b272fe01fed85ce3841af22f1b18ee3455ccb8ed3cab66fe58d9e489",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 1162.3333333333333
+    },
+    {
+      "kind": "live",
+      "createdAt": "2026-09-10T16:14:33.944Z",
+      "reportFile": "nm-live-validation.json",
+      "reportSha256": "e0cb4afc17f4e844031d2dc2fc8863a4d7182945f7bcaf2e99144c3548b7f598",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 1967.6666666666667
+    }
+  ],
+  "dataset": {
+    "buildingCount": 1400698,
+    "usableHeightCount": 782977,
+    "usableHeightRatio": 0.5589905889777811
+  },
+  "archive": {
+    "provider": "cloudflare-r2",
+    "location": "comfortos-environment-data",
+    "prefix": "overture-buildings",
+    "stateManifestKey": "overture-buildings/2026-08-19.0/us/nm/state-archive-manifest.json",
+    "stateManifestSha256": "d42bf9dacff511cfc0f02d2fbb6f1238cab18a287dd61b1ddd6765e865e35855",
+    "partitionCount": 529,
+    "objectCount": 2116,
+    "storedBytes": 751643330,
+    "remoteVerified": true
+  },
+  "localDataPruned": true
+}

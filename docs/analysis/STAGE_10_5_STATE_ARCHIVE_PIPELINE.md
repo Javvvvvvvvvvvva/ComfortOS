@@ -1,7 +1,7 @@
 # Stage 10.5 - State Archive Pipeline
 
-Date: 2026-09-09
-Status: Live and verified for the first forty-six jurisdictions
+Date: 2026-09-10
+Status: Live and verified for the first forty-seven jurisdictions
 
 ## Scope
 
@@ -89,16 +89,17 @@ network interface.
 | Arizona | 511 | 2,045 | 1,964,699,620 | Verified and locally pruned |
 | Colorado | 513 | 2,053 | 1,601,096,580 | Verified and locally pruned |
 | Nevada | 513 | 2,053 | 713,732,016 | Verified and locally pruned |
+| New Mexico | 529 | 2,117 | 751,643,330 | Verified and locally pruned |
 
-All 49,128 data objects were rehashed locally, uploaded, downloaded from R2, and verified by exact
-byte count and SHA-256. The forty-six state archive manifests were uploaded last, for 49,174 remote
-objects in total. The ninety-two accepted validation reports cover 276 successful and comparable
+All 51,244 data objects were rehashed locally, uploaded, downloaded from R2, and verified by exact
+byte count and SHA-256. The forty-seven state archive manifests were uploaded last, for 51,291 remote
+objects in total. The ninety-four accepted validation reports cover 282 successful and comparable
 route checks.
 
-The live archive contains 12,282 completed partitions, 153,429,020 buildings, and 81,577,673,108
+The live archive contains 12,811 completed partitions, 154,829,718 buildings, and 82,329,316,438
 stored bytes. Compact checkpoints are committed to Git, while the verified local payloads have
 been pruned. The nationwide audit retains those totals from the checkpoints and reports all
-forty-six jurisdictions as `archived`.
+forty-seven jurisdictions as `archived`.
 
 Connecticut's 37-partition build contains 2,226,878 buildings with 67.71% usable height
 coverage. Hartford, New Haven, and Stamford each passed live NWS and controlled 38 C route
@@ -433,6 +434,15 @@ fixture fallback, and the canonical audit confirmed all 513 partitions with zero
 Two transient R2 read-back requests recovered through bounded retry. All 2,053 R2 objects passed
 remote byte-count and SHA-256 verification before local data was pruned.
 
+New Mexico's 529-partition build contains 1,400,698 buildings with 55.90% usable height coverage.
+Albuquerque, Santa Fe, and Las Cruces each passed live NWS and controlled 38 C route validation
+through managed Mapbox and the private HTTP Overture service. Live validation averaged 1,968 ms;
+controlled heat averaged 1,162 ms. Four disjoint resumable workers covered the complete state plan
+without fixture fallback, and the canonical audit confirmed all 529 partitions with zero invalid
+stores. Transient official STAC, R2 upload, and R2 read-back requests recovered through bounded
+retry. All 2,117 R2 objects passed remote byte-count and SHA-256 verification before local data was
+pruned.
+
 ## Credential Verification
 
 The configured R2 account passed a live bucket health check and an isolated put, get,
@@ -451,4 +461,4 @@ R2_BUCKET=comfortos-environment-data
 
 ## Judgment
 
-STATE ARCHIVE PIPELINE LIVE; NEXT TARGET NEW MEXICO
+STATE ARCHIVE PIPELINE LIVE; NEXT TARGET CALIFORNIA

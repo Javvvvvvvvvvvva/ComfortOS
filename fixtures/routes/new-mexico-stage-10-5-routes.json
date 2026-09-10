@@ -1,0 +1,20 @@
+[
+  {
+    "id": "nm-albuquerque-main-library-old-town-plaza",
+    "label": "Albuquerque Main Library to Old Town Plaza",
+    "origin": { "latitude": 35.0844, "longitude": -106.648 },
+    "destination": { "latitude": 35.0955, "longitude": -106.6698 }
+  },
+  {
+    "id": "nm-santa-fe-main-library-railyard-park",
+    "label": "Santa Fe Main Library to Railyard Park",
+    "origin": { "latitude": 35.6863, "longitude": -105.937 },
+    "destination": { "latitude": 35.681, "longitude": -105.9487 }
+  },
+  {
+    "id": "nm-las-cruces-branigan-library-young-park",
+    "label": "Branigan Memorial Library to Young Park",
+    "origin": { "latitude": 32.3115, "longitude": -106.7788 },
+    "destination": { "latitude": 32.3099, "longitude": -106.7608 }
+  }
+]
