@@ -1,0 +1,57 @@
+{
+  "format": "comfortos-us-state-archive-checkpoint-v1",
+  "createdAt": "2026-09-10T09:35:29.350Z",
+  "release": "2026-08-19.0",
+  "jurisdiction": {
+    "fips": "32",
+    "code": "NV",
+    "name": "Nevada"
+  },
+  "validation": [
+    {
+      "kind": "heat",
+      "createdAt": "2026-09-10T09:35:29.350Z",
+      "reportFile": "nv-heat-validation.json",
+      "reportSha256": "6c623fff374cbf93bb3bebd90d2ddf50fd8edf77d1af70464f6392c295f5e805",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 997
+    },
+    {
+      "kind": "live",
+      "createdAt": "2026-09-10T09:35:09.715Z",
+      "reportFile": "nv-live-validation.json",
+      "reportSha256": "f523182eb859cd1ba206c3fd63dd7761f86e3fdc7036088875ea4d2d92adcb37",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 2597
+    }
+  ],
+  "dataset": {
+    "buildingCount": 1272844,
+    "usableHeightCount": 929594,
+    "usableHeightRatio": 0.7303283041755313
+  },
+  "archive": {
+    "provider": "cloudflare-r2",
+    "location": "comfortos-environment-data",
+    "prefix": "overture-buildings",
+    "stateManifestKey": "overture-buildings/2026-08-19.0/us/nv/state-archive-manifest.json",
+    "stateManifestSha256": "4f4880db297d21a329fe029a053621a09bff2436ecfdbcad6f5ff53a0b6d42db",
+    "partitionCount": 513,
+    "objectCount": 2052,
+    "storedBytes": 713732016,
+    "remoteVerified": true
+  },
+  "localDataPruned": true
+}

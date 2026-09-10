@@ -1,0 +1,20 @@
+[
+  {
+    "id": "nv-las-vegas-clark-library-unlv-lied-library",
+    "label": "Clark County Library to UNLV Lied Library",
+    "origin": { "latitude": 36.1182, "longitude": -115.1459 },
+    "destination": { "latitude": 36.1077, "longitude": -115.1426 }
+  },
+  {
+    "id": "nv-reno-downtown-library-idlewild-park",
+    "label": "Downtown Reno Library to Idlewild Park",
+    "origin": { "latitude": 39.524, "longitude": -119.8108 },
+    "destination": { "latitude": 39.522, "longitude": -119.835 }
+  },
+  {
+    "id": "nv-carson-city-library-mills-park",
+    "label": "Carson City Library to Mills Park",
+    "origin": { "latitude": 39.1639, "longitude": -119.7677 },
+    "destination": { "latitude": 39.1719, "longitude": -119.7594 }
+  }
+]

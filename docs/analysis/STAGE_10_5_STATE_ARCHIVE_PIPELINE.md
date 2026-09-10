@@ -1,7 +1,7 @@
 # Stage 10.5 - State Archive Pipeline
 
 Date: 2026-09-09
-Status: Live and verified for the first forty-five jurisdictions
+Status: Live and verified for the first forty-six jurisdictions
 
 ## Scope
 
@@ -88,16 +88,17 @@ network interface.
 | Oregon | 510 | 2,041 | 1,416,637,101 | Verified and locally pruned |
 | Arizona | 511 | 2,045 | 1,964,699,620 | Verified and locally pruned |
 | Colorado | 513 | 2,053 | 1,601,096,580 | Verified and locally pruned |
+| Nevada | 513 | 2,053 | 713,732,016 | Verified and locally pruned |
 
-All 47,076 data objects were rehashed locally, uploaded, downloaded from R2, and verified by exact
-byte count and SHA-256. The forty-five state archive manifests were uploaded last, for 47,121 remote
-objects in total. The ninety accepted validation reports cover 270 successful and comparable
+All 49,128 data objects were rehashed locally, uploaded, downloaded from R2, and verified by exact
+byte count and SHA-256. The forty-six state archive manifests were uploaded last, for 49,174 remote
+objects in total. The ninety-two accepted validation reports cover 276 successful and comparable
 route checks.
 
-The live archive contains 11,769 completed partitions, 152,156,176 buildings, and 80,863,941,092
+The live archive contains 12,282 completed partitions, 153,429,020 buildings, and 81,577,673,108
 stored bytes. Compact checkpoints are committed to Git, while the verified local payloads have
 been pruned. The nationwide audit retains those totals from the checkpoints and reports all
-forty-five jurisdictions as `archived`.
+forty-six jurisdictions as `archived`.
 
 Connecticut's 37-partition build contains 2,226,878 buildings with 67.71% usable height
 coverage. Hartford, New Haven, and Stamford each passed live NWS and controlled 38 C route
@@ -424,6 +425,14 @@ without fixture fallback, and the canonical audit confirmed all 513 partitions w
 stores. All 2,053 R2 objects passed remote byte-count and SHA-256 verification before local data was
 pruned.
 
+Nevada's 513-partition build contains 1,272,844 buildings with 73.03% usable height coverage.
+Las Vegas, Reno, and Carson City each passed live NWS and controlled 38 C route validation through
+managed Mapbox and the private HTTP Overture service. Live validation averaged 2,597 ms; controlled
+heat averaged 997 ms. Four disjoint resumable workers covered the complete state plan without
+fixture fallback, and the canonical audit confirmed all 513 partitions with zero invalid stores.
+Two transient R2 read-back requests recovered through bounded retry. All 2,053 R2 objects passed
+remote byte-count and SHA-256 verification before local data was pruned.
+
 ## Credential Verification
 
 The configured R2 account passed a live bucket health check and an isolated put, get,
@@ -442,4 +451,4 @@ R2_BUCKET=comfortos-environment-data
 
 ## Judgment
 
-STATE ARCHIVE PIPELINE LIVE; NEXT TARGET NEVADA
+STATE ARCHIVE PIPELINE LIVE; NEXT TARGET NEW MEXICO

@@ -1,21 +1,21 @@
 {
   "format": "comfortos-us-overture-build-progress-v1",
-  "generatedAt": "2026-09-10T05:00:20.893Z",
+  "generatedAt": "2026-09-10T10:11:42.483Z",
   "release": "2026-08-19.0",
   "summary": {
     "jurisdictionCount": 51,
-    "completedJurisdictionCount": 45,
-    "archivedJurisdictionCount": 45,
+    "completedJurisdictionCount": 46,
+    "archivedJurisdictionCount": 46,
     "plannedPartitionCount": 20758,
     "uniqueGridCellCount": 19036,
     "duplicateStateAssignmentCount": 1722,
-    "completedPartitionCount": 11769,
-    "archivedPartitionCount": 11769,
+    "completedPartitionCount": 12282,
+    "archivedPartitionCount": 12282,
     "invalidPartitionCount": 0,
-    "completionRatio": 0.5669621350804509,
-    "buildingCount": 152156176,
-    "usableHeightRatio": 0.7392913449665034,
-    "storedBytes": 80863941092
+    "completionRatio": 0.5916754986029482,
+    "buildingCount": 153429020,
+    "usableHeightRatio": 0.7392169877641139,
+    "storedBytes": 81577673108
   },
   "jurisdictions": [
     {
@@ -413,13 +413,14 @@
     {
       "code": "NV",
       "name": "Nevada",
-      "status": "pending",
+      "status": "archived",
       "plannedPartitionCount": 513,
-      "completedPartitionCount": 0,
+      "completedPartitionCount": 513,
       "invalidPartitionCount": 0,
-      "buildingCount": 0,
-      "usableHeightRatio": null,
-      "storedBytes": 0
+      "buildingCount": 1272844,
+      "usableHeightRatio": 0.7303283041755313,
+      "storedBytes": 713732016,
+      "localDataPruned": true
     },
     {
       "code": "NY",
