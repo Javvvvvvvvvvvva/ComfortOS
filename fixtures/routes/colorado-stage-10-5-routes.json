@@ -1,0 +1,20 @@
+[
+  {
+    "id": "co-denver-central-library-union-station",
+    "label": "Denver Central Library to Denver Union Station",
+    "origin": { "latitude": 39.7372, "longitude": -104.9884 },
+    "destination": { "latitude": 39.7527, "longitude": -105.0001 }
+  },
+  {
+    "id": "co-colorado-springs-penrose-library-beautiful-park",
+    "label": "Penrose Library to America the Beautiful Park",
+    "origin": { "latitude": 38.837, "longitude": -104.826 },
+    "destination": { "latitude": 38.8317, "longitude": -104.8313 }
+  },
+  {
+    "id": "co-fort-collins-old-town-library-csu-oval",
+    "label": "Old Town Library to Colorado State University Oval",
+    "origin": { "latitude": 40.5858, "longitude": -105.0768 },
+    "destination": { "latitude": 40.5765, "longitude": -105.0809 }
+  }
+]

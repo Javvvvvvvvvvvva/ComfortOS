@@ -1,21 +1,21 @@
 {
   "format": "comfortos-us-overture-build-progress-v1",
-  "generatedAt": "2026-09-09T23:49:51.875Z",
+  "generatedAt": "2026-09-10T05:00:20.893Z",
   "release": "2026-08-19.0",
   "summary": {
     "jurisdictionCount": 51,
-    "completedJurisdictionCount": 44,
-    "archivedJurisdictionCount": 44,
+    "completedJurisdictionCount": 45,
+    "archivedJurisdictionCount": 45,
     "plannedPartitionCount": 20758,
     "uniqueGridCellCount": 19036,
     "duplicateStateAssignmentCount": 1722,
-    "completedPartitionCount": 11256,
-    "archivedPartitionCount": 11256,
+    "completedPartitionCount": 11769,
+    "archivedPartitionCount": 11769,
     "invalidPartitionCount": 0,
-    "completionRatio": 0.5422487715579536,
-    "buildingCount": 149261100,
-    "usableHeightRatio": 0.7404933301442908,
-    "storedBytes": 79262844512
+    "completionRatio": 0.5669621350804509,
+    "buildingCount": 152156176,
+    "usableHeightRatio": 0.7392913449665034,
+    "storedBytes": 80863941092
   },
   "jurisdictions": [
     {
@@ -79,13 +79,14 @@
     {
       "code": "CO",
       "name": "Colorado",
-      "status": "pending",
+      "status": "archived",
       "plannedPartitionCount": 513,
-      "completedPartitionCount": 0,
+      "completedPartitionCount": 513,
       "invalidPartitionCount": 0,
-      "buildingCount": 0,
-      "usableHeightRatio": null,
-      "storedBytes": 0
+      "buildingCount": 2895076,
+      "usableHeightRatio": 0.6773207335489638,
+      "storedBytes": 1601096580,
+      "localDataPruned": true
     },
     {
       "code": "CT",

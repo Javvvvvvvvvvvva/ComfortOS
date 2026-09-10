@@ -1,0 +1,57 @@
+{
+  "format": "comfortos-us-state-archive-checkpoint-v1",
+  "createdAt": "2026-09-10T04:03:22.853Z",
+  "release": "2026-08-19.0",
+  "jurisdiction": {
+    "fips": "08",
+    "code": "CO",
+    "name": "Colorado"
+  },
+  "validation": [
+    {
+      "kind": "heat",
+      "createdAt": "2026-09-10T04:03:22.853Z",
+      "reportFile": "co-heat-validation.json",
+      "reportSha256": "e11cc2be8180e6a8dd89ed654f85efa942346e3b027bbe37c60a3dfbf6bddc34",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 604.6666666666666
+    },
+    {
+      "kind": "live",
+      "createdAt": "2026-09-10T04:03:07.734Z",
+      "reportFile": "co-live-validation.json",
+      "reportSha256": "c135aded911c33607365b1993f6ad9d90913c9e150ea858d732ed42d1ce7a207",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 2191.3333333333335
+    }
+  ],
+  "dataset": {
+    "buildingCount": 2895076,
+    "usableHeightCount": 1960895,
+    "usableHeightRatio": 0.6773207335489638
+  },
+  "archive": {
+    "provider": "cloudflare-r2",
+    "location": "comfortos-environment-data",
+    "prefix": "overture-buildings",
+    "stateManifestKey": "overture-buildings/2026-08-19.0/us/co/state-archive-manifest.json",
+    "stateManifestSha256": "fe6b0a3add5e3e937201b716273594d108bb20c8d6adf448635502e721e96823",
+    "partitionCount": 513,
+    "objectCount": 2052,
+    "storedBytes": 1601096580,
+    "remoteVerified": true
+  },
+  "localDataPruned": true
+}
