@@ -1,0 +1,57 @@
+{
+  "format": "comfortos-us-state-archive-checkpoint-v1",
+  "createdAt": "2026-09-11T17:34:57.872Z",
+  "release": "2026-08-19.0",
+  "jurisdiction": {
+    "fips": "30",
+    "code": "MT",
+    "name": "Montana"
+  },
+  "validation": [
+    {
+      "kind": "heat",
+      "createdAt": "2026-09-11T17:34:57.872Z",
+      "reportFile": "mt-heat-validation.json",
+      "reportSha256": "3875cdc2ffe27019d6c0cfd9b297bf9dd03321c250aa681ccda2c7ff00f295b4",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 599.3333333333334
+    },
+    {
+      "kind": "live",
+      "createdAt": "2026-09-11T17:34:38.193Z",
+      "reportFile": "mt-live-validation.json",
+      "reportSha256": "319c96552cb7409e49d1241186c82cef9502b6fbef9ee082addb1201c5d682d5",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 1790.6666666666667
+    }
+  ],
+  "dataset": {
+    "buildingCount": 991381,
+    "usableHeightCount": 610197,
+    "usableHeightRatio": 0.6155020118400494
+  },
+  "archive": {
+    "provider": "cloudflare-r2",
+    "location": "comfortos-environment-data",
+    "prefix": "overture-buildings",
+    "stateManifestKey": "overture-buildings/2026-08-19.0/us/mt/state-archive-manifest.json",
+    "stateManifestSha256": "486db1e0b1d5134b60730064cb4a5eb71fe4373b98d1b8a1ba2bb470d2e2e333",
+    "partitionCount": 783,
+    "objectCount": 3132,
+    "storedBytes": 510246024,
+    "remoteVerified": true
+  },
+  "localDataPruned": true
+}

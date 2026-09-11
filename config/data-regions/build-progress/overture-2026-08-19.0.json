@@ -1,21 +1,21 @@
 {
   "format": "comfortos-us-overture-build-progress-v1",
-  "generatedAt": "2026-09-11T08:45:51.209Z",
+  "generatedAt": "2026-09-11T18:23:42.735Z",
   "release": "2026-08-19.0",
   "summary": {
     "jurisdictionCount": 51,
-    "completedJurisdictionCount": 48,
-    "archivedJurisdictionCount": 48,
+    "completedJurisdictionCount": 49,
+    "archivedJurisdictionCount": 49,
     "plannedPartitionCount": 20758,
     "uniqueGridCellCount": 19036,
     "duplicateStateAssignmentCount": 1722,
-    "completedPartitionCount": 13588,
-    "archivedPartitionCount": 13588,
+    "completedPartitionCount": 14371,
+    "archivedPartitionCount": 14371,
     "invalidPartitionCount": 0,
-    "completionRatio": 0.6545910010598324,
-    "buildingCount": 169886919,
-    "usableHeightRatio": 0.7429287536846789,
-    "storedBytes": 91111616721
+    "completionRatio": 0.692311398015223,
+    "buildingCount": 170878300,
+    "usableHeightRatio": 0.7421894646657885,
+    "storedBytes": 91621862745
   },
   "jurisdictions": [
     {
@@ -332,13 +332,14 @@
     {
       "code": "MT",
       "name": "Montana",
-      "status": "pending",
+      "status": "archived",
       "plannedPartitionCount": 783,
-      "completedPartitionCount": 0,
+      "completedPartitionCount": 783,
       "invalidPartitionCount": 0,
-      "buildingCount": 0,
-      "usableHeightRatio": null,
-      "storedBytes": 0
+      "buildingCount": 991381,
+      "usableHeightRatio": 0.6155020118400494,
+      "storedBytes": 510246024,
+      "localDataPruned": true
     },
     {
       "code": "NC",

@@ -1,7 +1,7 @@
 # Stage 10.5 - State Archive Pipeline
 
 Date: 2026-09-11
-Status: Live and verified for the first forty-eight jurisdictions
+Status: Live and verified for the first forty-nine jurisdictions
 
 ## Scope
 
@@ -96,16 +96,17 @@ network interface.
 | Nevada | 513 | 2,053 | 713,732,016 | Verified and locally pruned |
 | New Mexico | 529 | 2,117 | 751,643,330 | Verified and locally pruned |
 | California | 777 | 3,109 | 8,782,300,283 | Verified and locally pruned |
+| Montana | 783 | 3,133 | 510,246,024 | Verified and locally pruned |
 
-All 54,352 data objects were rehashed locally, uploaded, downloaded from R2, and verified by exact
-byte count and SHA-256. The forty-eight state archive manifests were uploaded last, for 54,400 remote
-objects in total. The ninety-six accepted validation reports cover 288 successful and comparable
+All 57,484 data objects were rehashed locally, uploaded, downloaded from R2, and verified by exact
+byte count and SHA-256. The forty-nine state archive manifests were uploaded last, for 57,533 remote
+objects in total. The ninety-eight accepted validation reports cover 294 successful and comparable
 route checks.
 
-The live archive contains 13,588 completed partitions, 169,886,919 buildings, and 91,111,616,721
+The live archive contains 14,371 completed partitions, 170,878,300 buildings, and 91,621,862,745
 stored bytes. Compact checkpoints are committed to Git, while the verified local payloads have
 been pruned. The nationwide audit retains those totals from the checkpoints and reports all
-forty-eight jurisdictions as `archived`.
+forty-nine jurisdictions as `archived`.
 
 Connecticut's 37-partition build contains 2,226,878 buildings with 67.71% usable height
 coverage. Hartford, New Haven, and Stamford each passed live NWS and controlled 38 C route
@@ -460,6 +461,15 @@ GeoJSONSeq ingestion completed those stores in 5.5 and 5.8 seconds without incre
 Transient R2 upload and read-back requests recovered through bounded retry. All 3,109 R2 objects
 passed remote byte-count and SHA-256 verification before local data was pruned.
 
+Montana's 783-partition build contains 991,381 buildings with 61.55% usable height coverage. Helena,
+Billings, and Missoula each passed live NWS and controlled 38 C route validation through managed
+Mapbox and the private HTTP Overture service. Live validation averaged 1,791 ms; controlled heat
+averaged 599 ms. Four disjoint resumable workers covered the complete state plan without fixture
+fallback. A shared upstream interruption was recovered without repeating completed partitions, and
+the canonical audit confirmed all 783 partitions with zero invalid stores. Transient R2 upload and
+read-back requests recovered through bounded retry. All 3,133 R2 objects passed remote byte-count
+and SHA-256 verification before local data was pruned.
+
 ## Credential Verification
 
 The configured R2 account passed a live bucket health check and an isolated put, get,
@@ -478,4 +488,4 @@ R2_BUCKET=comfortos-environment-data
 
 ## Judgment
 
-STATE ARCHIVE PIPELINE LIVE; NEXT TARGET MONTANA
+STATE ARCHIVE PIPELINE LIVE; NEXT TARGET TEXAS
