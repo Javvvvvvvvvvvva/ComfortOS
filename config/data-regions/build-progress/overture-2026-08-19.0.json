@@ -1,21 +1,21 @@
 {
   "format": "comfortos-us-overture-build-progress-v1",
-  "generatedAt": "2026-09-10T17:04:07.641Z",
+  "generatedAt": "2026-09-11T08:45:51.209Z",
   "release": "2026-08-19.0",
   "summary": {
     "jurisdictionCount": 51,
-    "completedJurisdictionCount": 47,
-    "archivedJurisdictionCount": 47,
+    "completedJurisdictionCount": 48,
+    "archivedJurisdictionCount": 48,
     "plannedPartitionCount": 20758,
     "uniqueGridCellCount": 19036,
     "duplicateStateAssignmentCount": 1722,
-    "completedPartitionCount": 12811,
-    "archivedPartitionCount": 12811,
+    "completedPartitionCount": 13588,
+    "archivedPartitionCount": 13588,
     "invalidPartitionCount": 0,
-    "completionRatio": 0.6171596492918393,
-    "buildingCount": 154829718,
-    "usableHeightRatio": 0.7375865336136568,
-    "storedBytes": 82329316438
+    "completionRatio": 0.6545910010598324,
+    "buildingCount": 169886919,
+    "usableHeightRatio": 0.7429287536846789,
+    "storedBytes": 91111616721
   },
   "jurisdictions": [
     {
@@ -68,13 +68,14 @@
     {
       "code": "CA",
       "name": "California",
-      "status": "pending",
+      "status": "archived",
       "plannedPartitionCount": 777,
-      "completedPartitionCount": 0,
+      "completedPartitionCount": 777,
       "invalidPartitionCount": 0,
-      "buildingCount": 0,
-      "usableHeightRatio": null,
-      "storedBytes": 0
+      "buildingCount": 15057201,
+      "usableHeightRatio": 0.7978615680298085,
+      "storedBytes": 8782300283,
+      "localDataPruned": true
     },
     {
       "code": "CO",

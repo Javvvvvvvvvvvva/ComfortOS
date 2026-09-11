@@ -1,0 +1,57 @@
+{
+  "format": "comfortos-us-state-archive-checkpoint-v1",
+  "createdAt": "2026-09-11T02:04:59.304Z",
+  "release": "2026-08-19.0",
+  "jurisdiction": {
+    "fips": "06",
+    "code": "CA",
+    "name": "California"
+  },
+  "validation": [
+    {
+      "kind": "heat",
+      "createdAt": "2026-09-11T02:04:59.304Z",
+      "reportFile": "ca-heat-validation.json",
+      "reportSha256": "7e766c0d628c57706bfbc1224a065dc7314d9f4dfa8ae5c14c4ff7fd3c506046",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 788
+    },
+    {
+      "kind": "live",
+      "createdAt": "2026-09-11T02:04:42.679Z",
+      "reportFile": "ca-live-validation.json",
+      "reportSha256": "d7ed25a16b924c5b7092991d4e9bd6afa4f5cfcdc246b8c4be43a9353b9e5f8b",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 2510
+    }
+  ],
+  "dataset": {
+    "buildingCount": 15057201,
+    "usableHeightCount": 12013562,
+    "usableHeightRatio": 0.7978615680298085
+  },
+  "archive": {
+    "provider": "cloudflare-r2",
+    "location": "comfortos-environment-data",
+    "prefix": "overture-buildings",
+    "stateManifestKey": "overture-buildings/2026-08-19.0/us/ca/state-archive-manifest.json",
+    "stateManifestSha256": "fc9865c6ec61ea5140621208bc44addd974d9bc06660a5237a90f7f261978006",
+    "partitionCount": 777,
+    "objectCount": 3108,
+    "storedBytes": 8782300283,
+    "remoteVerified": true
+  },
+  "localDataPruned": true
+}

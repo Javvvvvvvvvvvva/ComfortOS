@@ -21,6 +21,7 @@ import {
 } from "@/lib/environment/buildings/providers/multiRegionOvertureBuildingProvider";
 import {
   buildBuildingOffsets,
+  ingestOvertureBuildingFile,
   normalizeOvertureFeature,
 } from "@/scripts/ingest-overture-buildings";
 import { indexOvertureBuildingStore } from "@/scripts/index-overture-building-store";
@@ -111,6 +112,51 @@ test("building offset index preserves UTF-8 byte positions", () => {
     BigInt(Buffer.byteLength(lines[0]) + 1),
   );
   assert.equal(offsets.readUInt32LE(20), Buffer.byteLength(lines[1]));
+});
+
+test("Overture ingestion streams GeoJSONSeq into an indexed checksummed store", async () => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), "comfortos-streaming-ingest-"));
+  const inputPath = path.join(root, "buildings.geojsonseq");
+  const outputDir = path.join(root, "store");
+  const features = [
+    overtureFeature("first", -118.255, 34.05, 12),
+    overtureFeature("한글", -118.254, 34.051, 9),
+    overtureFeature("outside", -122.42, 37.77, 15),
+  ];
+  await fs.writeFile(
+    inputPath,
+    `${features.map((feature) => JSON.stringify(feature)).join("\n")}\n`,
+    "utf8",
+  );
+
+  const { manifest } = await ingestOvertureBuildingFile({
+    inputPath,
+    outputDir,
+    region: "streaming-test",
+    bounds: { west: -118.3, south: 34, east: -118.2, north: 34.1 },
+    tileSizeDegrees: 0.005,
+    release: "test-release",
+  });
+  const provider = new LocalOvertureBuildingProvider({ storeDir: outputDir });
+  const buildings = await provider.getBuildings({
+    west: -118.3,
+    south: 34,
+    east: -118.2,
+    north: 34.1,
+  });
+  const outputFiles = await fs.readdir(outputDir);
+
+  assert.equal(manifest.buildingCount, 2);
+  assert.equal(manifest.explicitHeightCount, 2);
+  assert.deepEqual(buildings.map((building) => building.id), [
+    "overture:first",
+    "overture:한글",
+  ]);
+  assert.equal(
+    (await fs.readFile(path.join(outputDir, "building-offsets.bin"))).length,
+    24,
+  );
+  assert.equal(outputFiles.some((file) => file.includes(".tmp-")), false);
 });
 
 test("indexed Overture store queries records without loading the building collection", async () => {
@@ -496,6 +542,25 @@ function sampleBuilding(id: string, longitude: number, latitude: number) {
     source: "fixture",
     confidence: 1,
     heightSource: "provider" as const,
+  };
+}
+
+function overtureFeature(
+  id: string,
+  longitude: number,
+  latitude: number,
+  height: number,
+): Feature {
+  return {
+    type: "Feature",
+    id,
+    properties: { id, height },
+    geometry: polygon([
+      [longitude, latitude],
+      [longitude + 0.0005, latitude],
+      [longitude + 0.0005, latitude + 0.0005],
+      [longitude, latitude + 0.0005],
+    ]),
   };
 }
 

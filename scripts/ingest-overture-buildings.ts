@@ -1,6 +1,10 @@
 import fs from "node:fs/promises";
+import { createReadStream, createWriteStream, type WriteStream } from "node:fs";
 import path from "node:path";
 import { createHash } from "node:crypto";
+import { once } from "node:events";
+import { finished } from "node:stream/promises";
+import { createInterface } from "node:readline";
 import type { Feature, MultiPolygon, Polygon } from "geojson";
 import { normalizeBuildingHeight } from "@/lib/environment/buildings/height";
 import type { BoundingBox, Building } from "@/lib/environment/buildings/types";
@@ -12,6 +16,19 @@ import {
 
 type JsonRecord = Record<string, unknown>;
 type StoredBuilding = Building & { bbox: BoundingBox };
+type IngestOptions = {
+  inputPath: string;
+  outputDir: string;
+  region: string;
+  bounds: BoundingBox | null;
+  tileSizeDegrees: number;
+  release?: string;
+  license?: string;
+  sourceUrl?: string;
+  sourceAccessMethod?: string;
+  buildingPartCount?: number;
+  invalidGeometryCount?: number;
+};
 
 const DEFAULT_TILE_SIZE_DEGREES = 0.005;
 const BUILDING_OFFSETS_FILE = "building-offsets.bin";
@@ -31,73 +48,163 @@ async function main() {
     throw new Error("--tile-size-degrees must be a positive number.");
   }
 
-  const startedAt = performance.now();
-  const buildings = (await readFeatures(inputPath))
-    .flatMap((feature) => normalizeOvertureFeature(feature))
-    .filter((building) => !bounds || intersectsBounds(building.bbox, bounds));
-  const tileIndex = buildTileIndex(buildings, tileSizeDegrees);
-  const buildingLines = buildings.map((building) => JSON.stringify(building));
-  const buildingsText = buildingLines.length ? `${buildingLines.join("\n")}\n` : "";
-  const buildingOffsets = buildBuildingOffsets(buildingLines);
-  const tileIndexText = `${JSON.stringify(tileIndex)}\n`;
-  const manifest: LocalOvertureStoreManifest = {
-    format: "comfortos-local-building-store-v1",
-    source: "overture-buildings",
-    provider: "Overture Maps",
+  const result = await ingestOvertureBuildingFile({
+    inputPath,
+    outputDir,
+    region,
+    bounds,
+    tileSizeDegrees,
     release: options.release,
-    theme: "buildings",
-    type: "building",
-    bbox: bounds ? [bounds.west, bounds.south, bounds.east, bounds.north] : undefined,
     license: options.license,
     sourceUrl: options.sourceUrl,
     sourceAccessMethod: options.sourceAccessMethod,
-    buildingPartCount: options.buildingPartCount ? Number(options.buildingPartCount) : undefined,
+    buildingPartCount: options.buildingPartCount
+      ? Number(options.buildingPartCount)
+      : undefined,
     invalidGeometryCount: options.invalidGeometryCount
       ? Number(options.invalidGeometryCount)
       : undefined,
-    createdAt: new Date().toISOString(),
-    region,
-    tileSizeDegrees,
-    buildingCount: buildings.length,
-    explicitHeightCount: buildings.filter((building) => building.heightSource === "provider").length,
-    floorDerivedHeightCount: buildings.filter((building) => building.heightSource === "floors-derived").length,
-    unknownHeightCount: buildings.filter((building) => building.heightSource === "unknown").length,
-    indexedAt: new Date().toISOString(),
-    randomAccessIndex: {
-      file: BUILDING_OFFSETS_FILE,
-      format: "uint64le-offset-uint32le-length-v1",
-      recordSizeBytes: BUILDING_OFFSET_RECORD_SIZE,
-    },
-    checksums: {
-      buildingsSha256: sha256(buildingsText),
-      tileIndexSha256: sha256(tileIndexText),
-      buildingOffsetsSha256: sha256(buildingOffsets),
-    },
-  };
-
-  await fs.mkdir(outputDir, { recursive: true });
-  await Promise.all([
-    fs.writeFile(path.join(outputDir, "buildings.jsonl"), buildingsText, "utf8"),
-    fs.writeFile(path.join(outputDir, "tile-index.json"), tileIndexText, "utf8"),
-    fs.writeFile(path.join(outputDir, BUILDING_OFFSETS_FILE), buildingOffsets),
-  ]);
-  await fs.writeFile(
-    path.join(outputDir, "manifest.json"),
-    `${JSON.stringify(manifest, null, 2)}\n`,
-    "utf8",
-  );
+  });
 
   console.log(
     JSON.stringify(
       {
-        ...manifest,
-        ingestionMs: Math.round(performance.now() - startedAt),
+        ...result.manifest,
+        ingestionMs: result.ingestionMs,
         outputDir,
       },
       null,
       2,
     ),
   );
+}
+
+export async function ingestOvertureBuildingFile(options: IngestOptions) {
+  const startedAt = performance.now();
+  const suffix = `.tmp-${process.pid}-${Date.now()}`;
+  const buildingsPath = path.join(options.outputDir, "buildings.jsonl");
+  const offsetsPath = path.join(options.outputDir, BUILDING_OFFSETS_FILE);
+  const tileIndexPath = path.join(options.outputDir, "tile-index.json");
+  const manifestPath = path.join(options.outputDir, "manifest.json");
+  const buildingsTempPath = `${buildingsPath}${suffix}`;
+  const offsetsTempPath = `${offsetsPath}${suffix}`;
+  const tileIndexTempPath = `${tileIndexPath}${suffix}`;
+  const manifestTempPath = `${manifestPath}${suffix}`;
+  const tempPaths = [
+    buildingsTempPath,
+    offsetsTempPath,
+    tileIndexTempPath,
+    manifestTempPath,
+  ];
+
+  await fs.mkdir(options.outputDir, { recursive: true });
+  const buildingsWriter = createWriteStream(buildingsTempPath);
+  const offsetsWriter = createWriteStream(offsetsTempPath);
+  const buildingsHash = createHash("sha256");
+  const offsetsHash = createHash("sha256");
+  const tileIndex: Record<string, number[]> = {};
+  let buildingCount = 0;
+  let explicitHeightCount = 0;
+  let floorDerivedHeightCount = 0;
+  let unknownHeightCount = 0;
+  let byteOffset = 0;
+
+  try {
+    for await (const feature of iterateFeatures(options.inputPath)) {
+      for (const building of normalizeOvertureFeature(feature)) {
+        if (options.bounds && !intersectsBounds(building.bbox, options.bounds)) continue;
+
+        const line = JSON.stringify(building);
+        const byteLength = Buffer.byteLength(line, "utf8");
+        const offsetRecord = Buffer.allocUnsafe(BUILDING_OFFSET_RECORD_SIZE);
+        offsetRecord.writeBigUInt64LE(BigInt(byteOffset), 0);
+        offsetRecord.writeUInt32LE(byteLength, 8);
+
+        buildingsHash.update(line).update("\n");
+        offsetsHash.update(offsetRecord);
+        await Promise.all([
+          writeChunk(buildingsWriter, `${line}\n`),
+          writeChunk(offsetsWriter, offsetRecord),
+        ]);
+
+        for (const tileKey of tileKeysForBounds(building.bbox, options.tileSizeDegrees)) {
+          tileIndex[tileKey] ??= [];
+          tileIndex[tileKey].push(buildingCount);
+        }
+
+        buildingCount += 1;
+        byteOffset += byteLength + 1;
+        if (building.heightSource === "provider") explicitHeightCount += 1;
+        else if (building.heightSource === "floors-derived") floorDerivedHeightCount += 1;
+        else unknownHeightCount += 1;
+      }
+    }
+
+    buildingsWriter.end();
+    offsetsWriter.end();
+    await Promise.all([finished(buildingsWriter), finished(offsetsWriter)]);
+
+    const tileIndexText = `${JSON.stringify(tileIndex)}\n`;
+    const timestamp = new Date().toISOString();
+    const manifest: LocalOvertureStoreManifest = {
+      format: "comfortos-local-building-store-v1",
+      source: "overture-buildings",
+      provider: "Overture Maps",
+      release: options.release,
+      theme: "buildings",
+      type: "building",
+      bbox: options.bounds
+        ? [options.bounds.west, options.bounds.south, options.bounds.east, options.bounds.north]
+        : undefined,
+      license: options.license,
+      sourceUrl: options.sourceUrl,
+      sourceAccessMethod: options.sourceAccessMethod,
+      buildingPartCount: options.buildingPartCount,
+      invalidGeometryCount: options.invalidGeometryCount,
+      createdAt: timestamp,
+      region: options.region,
+      tileSizeDegrees: options.tileSizeDegrees,
+      buildingCount,
+      explicitHeightCount,
+      floorDerivedHeightCount,
+      unknownHeightCount,
+      indexedAt: timestamp,
+      randomAccessIndex: {
+        file: BUILDING_OFFSETS_FILE,
+        format: "uint64le-offset-uint32le-length-v1",
+        recordSizeBytes: BUILDING_OFFSET_RECORD_SIZE,
+      },
+      checksums: {
+        buildingsSha256: buildingsHash.digest("hex"),
+        tileIndexSha256: sha256(tileIndexText),
+        buildingOffsetsSha256: offsetsHash.digest("hex"),
+      },
+    };
+
+    await fs.writeFile(tileIndexTempPath, tileIndexText, "utf8");
+    await Promise.all([
+      fs.rename(buildingsTempPath, buildingsPath),
+      fs.rename(offsetsTempPath, offsetsPath),
+      fs.rename(tileIndexTempPath, tileIndexPath),
+    ]);
+    await fs.writeFile(manifestTempPath, `${JSON.stringify(manifest, null, 2)}\n`, "utf8");
+    await fs.rename(manifestTempPath, manifestPath);
+
+    return {
+      manifest,
+      ingestionMs: Math.round(performance.now() - startedAt),
+    };
+  } catch (error) {
+    buildingsWriter.destroy();
+    offsetsWriter.destroy();
+    await Promise.allSettled(tempPaths.map((tempPath) => fs.rm(tempPath, { force: true })));
+    throw error;
+  }
+}
+
+async function writeChunk(stream: WriteStream, chunk: string | Buffer) {
+  if (stream.write(chunk)) return;
+  await once(stream, "drain");
 }
 
 function sha256(value: string | Buffer) {
@@ -159,45 +266,41 @@ export function normalizeOvertureFeature(feature: Feature): StoredBuilding[] {
   return [building];
 }
 
-async function readFeatures(inputPath: string): Promise<Feature[]> {
-  const text = await fs.readFile(inputPath, "utf8");
-  const trimmed = text.trim();
-  if (!trimmed) return [];
+async function* iterateFeatures(inputPath: string): AsyncGenerator<Feature> {
+  const handle = await fs.open(inputPath, "r");
+  const prefixBuffer = Buffer.alloc(64 * 1024);
+  const { bytesRead } = await handle.read(prefixBuffer, 0, prefixBuffer.length, 0);
+  await handle.close();
+  const prefix = prefixBuffer.subarray(0, bytesRead).toString("utf8").trimStart();
+  if (!prefix) return;
 
-  if (trimmed.startsWith("{")) {
-    try {
-      const parsed = JSON.parse(trimmed) as unknown;
-      const root = asRecord(parsed);
-      if (root.type === "FeatureCollection" && Array.isArray(root.features)) {
-        return root.features.flatMap((feature) => {
-          const normalized = asFeature(feature);
-          return normalized ? [normalized] : [];
-        });
+  const firstLine = prefix.split(/\r?\n/, 1)[0]?.trim();
+  const isDocument =
+    firstLine === "{" || /"type"\s*:\s*"FeatureCollection"/.test(prefix);
+  if (isDocument) {
+    const parsed = JSON.parse(await fs.readFile(inputPath, "utf8")) as unknown;
+    const root = asRecord(parsed);
+    if (root.type === "FeatureCollection" && Array.isArray(root.features)) {
+      for (const value of root.features) {
+        const feature = asFeature(value);
+        if (feature) yield feature;
       }
-      const feature = asFeature(parsed);
-      return feature ? [feature] : [];
-    } catch {
-      // GeoJSONSeq/NDJSON also starts with "{", but contains one feature per line.
+      return;
     }
+    const feature = asFeature(parsed);
+    if (feature) yield feature;
+    return;
   }
 
-  return trimmed.split("\n").flatMap((line) => {
+  const input = createReadStream(inputPath, { encoding: "utf8" });
+  const lines = createInterface({ input, crlfDelay: Infinity });
+  for await (const rawLine of lines) {
+    const trimmed = rawLine.trim();
+    const line = trimmed.charCodeAt(0) === 0x1e ? trimmed.slice(1).trimStart() : trimmed;
+    if (!line) continue;
     const feature = asFeature(JSON.parse(line) as unknown);
-    return feature ? [feature] : [];
-  });
-}
-
-function buildTileIndex(buildings: StoredBuilding[], tileSizeDegrees: number) {
-  const index: Record<string, number[]> = {};
-
-  buildings.forEach((building, buildingIndex) => {
-    for (const tileKey of tileKeysForBounds(building.bbox, tileSizeDegrees)) {
-      index[tileKey] ??= [];
-      index[tileKey].push(buildingIndex);
-    }
-  });
-
-  return index;
+    if (feature) yield feature;
+  }
 }
 
 function normalizeFootprint(geometry: unknown): Polygon | MultiPolygon | null {
