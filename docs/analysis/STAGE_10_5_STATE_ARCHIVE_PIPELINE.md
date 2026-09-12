@@ -1,7 +1,7 @@
 # Stage 10.5 - State Archive Pipeline
 
 Date: 2026-09-11
-Status: Live and verified for the first forty-nine jurisdictions
+Status: Live and verified for the first fifty jurisdictions
 
 ## Scope
 
@@ -39,6 +39,12 @@ The building ingester processes GeoJSONSeq incrementally, writes building record
 offsets with backpressure, and keeps only the tile index in memory. Data files are atomically moved
 into place before the manifest is written last. This prevents dense urban partitions from amplifying
 multiple in-memory copies of the source and output while preserving the existing store contract.
+
+Successful public Overture STAC JSON responses are cached atomically in the operating system's
+temporary directory. The mutable root catalog expires after five minutes, while release-specific
+catalog and item documents for the pinned release are reused. This removes repeated metadata fetches
+across thousands of partitions without caching building payloads, changing spatial filtering, or
+bypassing per-partition checksums.
 
 The private environment query service accepts `BUILDING_QUERY_SERVICE_HOST`, allowing local
 validation processes to bind explicitly to `127.0.0.1` instead of exposing the service on every
@@ -97,16 +103,17 @@ network interface.
 | New Mexico | 529 | 2,117 | 751,643,330 | Verified and locally pruned |
 | California | 777 | 3,109 | 8,782,300,283 | Verified and locally pruned |
 | Montana | 783 | 3,133 | 510,246,024 | Verified and locally pruned |
+| Texas | 1,156 | 4,625 | 7,792,727,788 | Verified and locally pruned |
 
-All 57,484 data objects were rehashed locally, uploaded, downloaded from R2, and verified by exact
-byte count and SHA-256. The forty-nine state archive manifests were uploaded last, for 57,533 remote
-objects in total. The ninety-eight accepted validation reports cover 294 successful and comparable
+All 62,108 data objects were rehashed locally, uploaded, downloaded from R2, and verified by exact
+byte count and SHA-256. The fifty state archive manifests were uploaded last, for 62,158 remote
+objects in total. The one hundred accepted validation reports cover 300 successful and comparable
 route checks.
 
-The live archive contains 14,371 completed partitions, 170,878,300 buildings, and 91,621,862,745
+The live archive contains 15,527 completed partitions, 185,811,411 buildings, and 99,414,590,533
 stored bytes. Compact checkpoints are committed to Git, while the verified local payloads have
-been pruned. The nationwide audit retains those totals from the checkpoints and reports all
-forty-nine jurisdictions as `archived`.
+been pruned. The nationwide audit retains those totals from the checkpoints and reports all fifty
+jurisdictions as `archived`.
 
 Connecticut's 37-partition build contains 2,226,878 buildings with 67.71% usable height
 coverage. Hartford, New Haven, and Stamford each passed live NWS and controlled 38 C route
@@ -470,6 +477,16 @@ the canonical audit confirmed all 783 partitions with zero invalid stores. Trans
 read-back requests recovered through bounded retry. All 3,133 R2 objects passed remote byte-count
 and SHA-256 verification before local data was pruned.
 
+Texas's 1,156-partition build contains 14,933,111 buildings with 66.42% usable height coverage.
+Austin, Houston, and Dallas each passed live NWS and controlled 38 C route validation through
+managed Mapbox and the private HTTP Overture service. Live validation averaged 2,392 ms; controlled
+heat averaged 793 ms. Four disjoint resumable workers covered the complete state plan without
+fixture fallback, and the canonical audit confirmed all 1,156 partitions with zero invalid stores.
+An atomic shared STAC metadata cache removed repeated public catalog fetches after the initial
+requests while preserving official Parquet extraction and per-partition checksums. Transient STAC,
+R2 upload, and R2 read-back requests recovered through bounded retry. All 4,625 R2 objects passed
+remote byte-count and SHA-256 verification before local data was pruned.
+
 ## Credential Verification
 
 The configured R2 account passed a live bucket health check and an isolated put, get,
@@ -488,4 +505,4 @@ R2_BUCKET=comfortos-environment-data
 
 ## Judgment
 
-STATE ARCHIVE PIPELINE LIVE; NEXT TARGET TEXAS
+STATE ARCHIVE PIPELINE LIVE; NEXT TARGET ALASKA

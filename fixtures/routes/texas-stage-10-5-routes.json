@@ -1,0 +1,20 @@
+[
+  {
+    "id": "tx-austin-central-library-state-capitol",
+    "label": "Austin Central Library to Texas State Capitol",
+    "origin": { "latitude": 30.2656, "longitude": -97.7519 },
+    "destination": { "latitude": 30.2747, "longitude": -97.7404 }
+  },
+  {
+    "id": "tx-houston-central-library-discovery-green",
+    "label": "Houston Central Library to Discovery Green",
+    "origin": { "latitude": 29.7594, "longitude": -95.3697 },
+    "destination": { "latitude": 29.7533, "longitude": -95.3598 }
+  },
+  {
+    "id": "tx-dallas-central-library-klyde-warren-park",
+    "label": "Dallas Central Library to Klyde Warren Park",
+    "origin": { "latitude": 32.778, "longitude": -96.7956 },
+    "destination": { "latitude": 32.7894, "longitude": -96.8019 }
+  }
+]

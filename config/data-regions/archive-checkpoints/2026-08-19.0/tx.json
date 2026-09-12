@@ -1,0 +1,57 @@
+{
+  "format": "comfortos-us-state-archive-checkpoint-v1",
+  "createdAt": "2026-09-11T19:56:20.712Z",
+  "release": "2026-08-19.0",
+  "jurisdiction": {
+    "fips": "48",
+    "code": "TX",
+    "name": "Texas"
+  },
+  "validation": [
+    {
+      "kind": "heat",
+      "createdAt": "2026-09-11T19:56:20.712Z",
+      "reportFile": "tx-heat-validation.json",
+      "reportSha256": "c8b5386ec7593bb89a3c846d38ab7c2b66fb15f4741947721c708fdaf6d8c1da",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 793.3333333333334
+    },
+    {
+      "kind": "live",
+      "createdAt": "2026-09-11T19:54:18.459Z",
+      "reportFile": "tx-live-validation.json",
+      "reportSha256": "b71a24720d4f65d7fea572d1756d02bb39777d82eb17377d53511bf47cc22828",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 2392.3333333333335
+    }
+  ],
+  "dataset": {
+    "buildingCount": 14933111,
+    "usableHeightCount": 9918881,
+    "usableHeightRatio": 0.6642206704282851
+  },
+  "archive": {
+    "provider": "cloudflare-r2",
+    "location": "comfortos-environment-data",
+    "prefix": "overture-buildings",
+    "stateManifestKey": "overture-buildings/2026-08-19.0/us/tx/state-archive-manifest.json",
+    "stateManifestSha256": "e8192be8838da5b6b72d935c9044cdac94bcf5e1083cc0ac78eb7c1f16606f66",
+    "partitionCount": 1156,
+    "objectCount": 4624,
+    "storedBytes": 7792727788,
+    "remoteVerified": true
+  },
+  "localDataPruned": true
+}

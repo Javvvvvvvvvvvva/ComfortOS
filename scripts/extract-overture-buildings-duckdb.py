@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 import argparse
+import hashlib
 import json
+import os
 import sys
+import tempfile
 import time
 import urllib.request
 from pathlib import Path
@@ -13,6 +16,13 @@ import duckdb
 STAC_ROOT = "https://stac.overturemaps.org/catalog.json"
 STAC_FETCH_ATTEMPTS = 5
 STAC_FETCH_TIMEOUT_SECONDS = 30
+STAC_ROOT_CACHE_SECONDS = 300
+STAC_CACHE_DIR = Path(
+    os.environ.get(
+        "COMFORTOS_OVERTURE_STAC_CACHE_DIR",
+        Path(tempfile.gettempdir()) / "comfortos-overture-stac-cache",
+    )
+)
 
 
 def main():
@@ -260,6 +270,10 @@ def extract_buildings(assets, bbox, output_path):
 
 
 def fetch_json(url):
+    cached = read_cached_json(url)
+    if cached is not None:
+        return cached
+
     request = urllib.request.Request(
         url,
         headers={
@@ -273,7 +287,9 @@ def fetch_json(url):
                 request,
                 timeout=STAC_FETCH_TIMEOUT_SECONDS,
             ) as response:
-                return json.load(response)
+                payload = json.load(response)
+                write_cached_json(url, payload)
+                return payload
         except Exception:
             if attempt == STAC_FETCH_ATTEMPTS:
                 raise
@@ -284,6 +300,37 @@ def fetch_json(url):
                 file=sys.stderr,
             )
             time.sleep(delay_seconds)
+
+
+def stac_cache_path(url):
+    cache_key = hashlib.sha256(url.encode("utf-8")).hexdigest()
+    return STAC_CACHE_DIR / f"{cache_key}.json"
+
+
+def read_cached_json(url):
+    cache_path = stac_cache_path(url)
+    try:
+        if (
+            url == STAC_ROOT
+            and time.time() - cache_path.stat().st_mtime > STAC_ROOT_CACHE_SECONDS
+        ):
+            return None
+        return json.loads(cache_path.read_text())
+    except (FileNotFoundError, json.JSONDecodeError, OSError):
+        return None
+
+
+def write_cached_json(url, payload):
+    cache_path = stac_cache_path(url)
+    temporary_path = cache_path.with_suffix(
+        f".{os.getpid()}.{time.time_ns()}.tmp"
+    )
+    try:
+        cache_path.parent.mkdir(parents=True, exist_ok=True)
+        temporary_path.write_text(json.dumps(payload, separators=(",", ":")))
+        os.replace(temporary_path, cache_path)
+    except OSError:
+        temporary_path.unlink(missing_ok=True)
 
 
 def intersects(left, right):

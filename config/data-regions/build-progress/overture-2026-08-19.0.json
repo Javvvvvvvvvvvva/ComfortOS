@@ -1,21 +1,21 @@
 {
   "format": "comfortos-us-overture-build-progress-v1",
-  "generatedAt": "2026-09-11T18:23:42.735Z",
+  "generatedAt": "2026-09-12T02:39:04.567Z",
   "release": "2026-08-19.0",
   "summary": {
     "jurisdictionCount": 51,
-    "completedJurisdictionCount": 49,
-    "archivedJurisdictionCount": 49,
+    "completedJurisdictionCount": 50,
+    "archivedJurisdictionCount": 50,
     "plannedPartitionCount": 20758,
     "uniqueGridCellCount": 19036,
     "duplicateStateAssignmentCount": 1722,
-    "completedPartitionCount": 14371,
-    "archivedPartitionCount": 14371,
+    "completedPartitionCount": 15527,
+    "archivedPartitionCount": 15527,
     "invalidPartitionCount": 0,
-    "completionRatio": 0.692311398015223,
-    "buildingCount": 170878300,
-    "usableHeightRatio": 0.7421894646657885,
-    "storedBytes": 91621862745
+    "completionRatio": 0.7480007707871664,
+    "buildingCount": 185811411,
+    "usableHeightRatio": 0.7359233443418607,
+    "storedBytes": 99414590533
   },
   "jurisdictions": [
     {
@@ -536,13 +536,14 @@
     {
       "code": "TX",
       "name": "Texas",
-      "status": "pending",
+      "status": "archived",
       "plannedPartitionCount": 1156,
-      "completedPartitionCount": 0,
+      "completedPartitionCount": 1156,
       "invalidPartitionCount": 0,
-      "buildingCount": 0,
-      "usableHeightRatio": null,
-      "storedBytes": 0
+      "buildingCount": 14933111,
+      "usableHeightRatio": 0.6642206704282851,
+      "storedBytes": 7792727788,
+      "localDataPruned": true
     },
     {
       "code": "UT",
