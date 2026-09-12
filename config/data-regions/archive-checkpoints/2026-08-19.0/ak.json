@@ -1,0 +1,57 @@
+{
+  "format": "comfortos-us-state-archive-checkpoint-v1",
+  "createdAt": "2026-09-12T05:22:22.563Z",
+  "release": "2026-08-19.0",
+  "jurisdiction": {
+    "fips": "02",
+    "code": "AK",
+    "name": "Alaska"
+  },
+  "validation": [
+    {
+      "kind": "heat",
+      "createdAt": "2026-09-12T05:22:22.563Z",
+      "reportFile": "ak-heat-validation.json",
+      "reportSha256": "9831c1da39ad19cb79bd5e12489d0d46503720bc5bafb0a421dcc778a1b64efe",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 974.3333333333334
+    },
+    {
+      "kind": "live",
+      "createdAt": "2026-09-12T05:22:08.905Z",
+      "reportFile": "ak-live-validation.json",
+      "reportSha256": "269fc023bfc5e24ba3119a931b697c95fb8f7d389b51c4ed2c8d37ae514f6b9b",
+      "routingProvider": {
+        "id": "mapbox-directions-walking",
+        "mode": "managed",
+        "endpointFamily": "Directions API v5"
+      },
+      "buildingProviderMode": "http-overture",
+      "routeCount": 3,
+      "averageElapsedMs": 1303
+    }
+  ],
+  "dataset": {
+    "buildingCount": 232240,
+    "usableHeightCount": 82639,
+    "usableHeightRatio": 0.35583448157078884
+  },
+  "archive": {
+    "provider": "cloudflare-r2",
+    "location": "comfortos-environment-data",
+    "prefix": "overture-buildings",
+    "stateManifestKey": "overture-buildings/2026-08-19.0/us/ak/state-archive-manifest.json",
+    "stateManifestSha256": "05e296b97799a6535ef61327eac89907627e1e9c769d5d784021d95a1c72a011",
+    "partitionCount": 5231,
+    "objectCount": 20924,
+    "storedBytes": 126851946,
+    "remoteVerified": true
+  },
+  "localDataPruned": true
+}

@@ -18,6 +18,29 @@ SPEC.loader.exec_module(EXTRACTOR)
 
 
 class OvertureExtractorRetryTest(unittest.TestCase):
+    def test_extract_buildings_records_stac_confirmed_empty_region(self):
+        with tempfile.TemporaryDirectory() as output_dir:
+            output_path = Path(output_dir) / "buildings.geojsonseq"
+
+            result = EXTRACTOR.extract_buildings(
+                [],
+                (179.75, 51.75, 180.0, 52.0),
+                output_path,
+            )
+
+            self.assertEqual(output_path.read_text(), "")
+            self.assertEqual(
+                result,
+                {
+                    "extractedBuildingCount": 0,
+                    "duckDbExplicitHeightCount": 0,
+                    "duckDbFloorCountAvailable": 0,
+                    "buildingPartCount": 0,
+                    "invalidGeometryCount": 0,
+                    "sourceDatasets": [],
+                },
+            )
+
     def test_fetch_json_retries_transient_disconnects(self):
         responses = [
             ConnectionResetError("reset"),

@@ -124,6 +124,17 @@ query-service partition registry
 
 This avoids a manually curated file per state. State boundaries are administrative, but ComfortOS queries are spatial.
 
+Pinned-release STAC catalog and item responses may be cached atomically in the operating system's
+temporary directory. Mutable root catalog entries must expire; release-specific entries are
+immutable for the pinned build. The cache only removes repeated metadata requests and never replaces
+GeoParquet extraction or partition checksums.
+
+A partition is empty only when the complete official STAC item index, or the official GeoParquet
+metadata fallback, successfully resolves and reports no intersecting building assets. Such a
+partition is stored explicitly with zero counts, empty-file checksums, and source-access provenance.
+Catalog, network, or metadata failures remain hard failures and must never be converted into empty
+data or fixture fallback.
+
 ## On-Demand Region Ingestion Concept
 
 Future workflow:

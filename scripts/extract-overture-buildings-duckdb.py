@@ -35,15 +35,21 @@ def main():
     if collection_url:
         item_urls = collection_item_urls(collection_url)
         assets = intersecting_assets(item_urls, (west, south, east, north))
-        source_access_method = "DuckDB httpfs+spatial reading official Overture cloud-hosted GeoParquet assets resolved from STAC"
+        source_access_method = (
+            "DuckDB httpfs+spatial reading official Overture cloud-hosted GeoParquet assets resolved from STAC"
+            if assets
+            else "Official Overture STAC building asset index confirmed no intersecting assets"
+        )
     else:
         assets = intersecting_assets_from_parquet_metadata(
             release_glob(release),
             (west, south, east, north),
         )
-        source_access_method = "DuckDB httpfs+spatial reading official Overture cloud-hosted GeoParquet release glob after STAC catalog lookup was unavailable"
-    if not assets:
-        raise RuntimeError("Real Overture extraction failed. No intersecting building assets were found. No fixture fallback was used.")
+        source_access_method = (
+            "DuckDB httpfs+spatial reading official Overture cloud-hosted GeoParquet release glob after STAC catalog lookup was unavailable"
+            if assets
+            else "Official Overture GeoParquet metadata confirmed no intersecting assets after STAC catalog lookup was unavailable"
+        )
 
     output_path = Path(args.output_geojsonseq)
     output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -188,6 +194,17 @@ def intersecting_assets_from_parquet_metadata(parquet_glob, bbox):
 
 
 def extract_buildings(assets, bbox, output_path):
+    if not assets:
+        output_path.write_text("")
+        return {
+            "extractedBuildingCount": 0,
+            "duckDbExplicitHeightCount": 0,
+            "duckDbFloorCountAvailable": 0,
+            "buildingPartCount": 0,
+            "invalidGeometryCount": 0,
+            "sourceDatasets": [],
+        }
+
     west, south, east, north = bbox
     envelope_wkt = f"POLYGON(({west} {south},{east} {south},{east} {north},{west} {north},{west} {south}))"
     con = duckdb.connect()

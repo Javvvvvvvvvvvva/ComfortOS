@@ -1,7 +1,7 @@
 # Stage 10.5 - State Archive Pipeline
 
 Date: 2026-09-11
-Status: Live and verified for the first fifty jurisdictions
+Status: Complete and verified for all fifty states and the District of Columbia
 
 ## Scope
 
@@ -104,16 +104,17 @@ network interface.
 | California | 777 | 3,109 | 8,782,300,283 | Verified and locally pruned |
 | Montana | 783 | 3,133 | 510,246,024 | Verified and locally pruned |
 | Texas | 1,156 | 4,625 | 7,792,727,788 | Verified and locally pruned |
+| Alaska | 5,231 | 20,925 | 126,851,946 | Verified and locally pruned |
 
-All 62,108 data objects were rehashed locally, uploaded, downloaded from R2, and verified by exact
-byte count and SHA-256. The fifty state archive manifests were uploaded last, for 62,158 remote
-objects in total. The one hundred accepted validation reports cover 300 successful and comparable
+All 83,032 data objects were rehashed locally, uploaded, downloaded from R2, and verified by exact
+byte count and SHA-256. The fifty-one state archive manifests were uploaded last, for 83,083 remote
+objects in total. The 102 accepted validation reports cover 306 successful and comparable
 route checks.
 
-The live archive contains 15,527 completed partitions, 185,811,411 buildings, and 99,414,590,533
+The live archive contains all 20,758 planned partitions, 186,043,651 buildings, and 99,541,442,479
 stored bytes. Compact checkpoints are committed to Git, while the verified local payloads have
-been pruned. The nationwide audit retains those totals from the checkpoints and reports all fifty
-jurisdictions as `archived`.
+been pruned. The nationwide audit retains those totals from the checkpoints, reports all fifty-one
+jurisdictions as `archived`, and leaves zero partitions selected by the rollout dry run.
 
 Connecticut's 37-partition build contains 2,226,878 buildings with 67.71% usable height
 coverage. Hartford, New Haven, and Stamford each passed live NWS and controlled 38 C route
@@ -487,6 +488,17 @@ requests while preserving official Parquet extraction and per-partition checksum
 R2 upload, and R2 read-back requests recovered through bounded retry. All 4,625 R2 objects passed
 remote byte-count and SHA-256 verification before local data was pruned.
 
+Alaska's 5,231-partition build contains 232,240 buildings with 35.58% usable height coverage.
+Anchorage, Fairbanks, and Juneau each passed live NWS and controlled 38 C route validation through
+managed Mapbox and the private HTTP Overture service. Live validation averaged 1,303 ms; controlled
+heat averaged 974 ms. Four disjoint resumable workers covered the complete state plan without
+fixture fallback, and the canonical audit confirmed all 5,231 partitions with zero invalid stores.
+The final date-line partition had no intersecting building asset after every official STAC item was
+successfully evaluated. The extractor now records this provenance in a checksummed empty store while
+continuing to fail on catalog or network errors. Transient R2 upload and read-back requests recovered
+through bounded retry. All 20,925 R2 objects passed remote byte-count and SHA-256 verification before
+local data was pruned.
+
 ## Credential Verification
 
 The configured R2 account passed a live bucket health check and an isolated put, get,
@@ -505,4 +517,4 @@ R2_BUCKET=comfortos-environment-data
 
 ## Judgment
 
-STATE ARCHIVE PIPELINE LIVE; NEXT TARGET ALASKA
+NATIONWIDE STATE ARCHIVE COMPLETE; DEPLOYMENT NOT STARTED
