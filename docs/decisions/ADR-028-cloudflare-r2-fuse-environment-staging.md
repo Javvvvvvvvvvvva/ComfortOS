@@ -1,7 +1,7 @@
 # ADR-028 - Cloudflare R2 FUSE Environment Staging
 
 Date: 2026-09-13
-Status: Proposed
+Status: Accepted
 
 ## Context
 
@@ -16,7 +16,7 @@ building file on every cold container instance also exceeds the service timeout.
 pipeline already downloads and SHA-256 verifies every uploaded object before it commits the
 remote state manifest, but relying on that verification requires an explicit trust boundary.
 
-## Proposed Decision
+## Decision
 
 Evaluate one Cloudflare Container staging deployment with these constraints:
 
@@ -29,14 +29,20 @@ Evaluate one Cloudflare Container staging deployment with these constraints:
 - In this R2-only mode, trust the whole building-file checksum verified during archival
   instead of streaming the full object before random-access reads. Keep full runtime
   verification as the default for durable-volume and development stores.
-- Route requests to one named container during the benchmark so warm-cache measurements
-  are interpretable.
+- Route requests to one deployment-ID-keyed container during normal operation so warm-cache
+  measurements are interpretable and rollout generations cannot share a stale singleton.
+- Permit two instances so the active and immediately previous deployment can overlap during
+  a rollback; direct traffic to only the active deployment ID.
+- Do not expose HTTP readiness until a checksum-verified remote partition manifest and its
+  tile, offset, and building objects have all been read. Supervise both FUSE and Node after
+  startup so mount failure terminates the service instead of leaving false health.
 - Pass only the R2 credentials and environment-service bearer token as Worker secrets.
 - Require the nationwide bundle audit, authenticated smoke test, cold/warm latency gate,
   R2 operation metrics, and rollback rehearsal before accepting this ADR.
 
-This proposal does not supersede ADR-027. A conventional host with adequate durable volume
-remains the accepted deployment model until the R2 FUSE benchmark is complete.
+This decision does not supersede ADR-027. A conventional host with adequate durable volume
+remains the fallback deployment model and a production option; this ADR accepts Cloudflare
+R2 FUSE for the nationwide staging environment.
 
 ## Acceptance Evidence Required
 
@@ -62,10 +68,10 @@ remains the accepted deployment model until the R2 FUSE benchmark is complete.
 - Actual deployment requires a Cloudflare-authenticated Wrangler session, Workers Paid
   plan access to Containers, and a local Docker-compatible builder.
 
-## Local Validation
+## Validation
 
 The 2026-09-13 local native-container rehearsal passed the bundle and nine-region service
-gates. The 36,866,892-byte deployment bundle loaded in 302 ms in the latest audit; nine cold/warm R2-backed
+gates. The 36,867,631-byte deployment bundle loaded in 251 ms in the latest audit; nine cold/warm R2-backed
 queries reported 3,957 ms cold p95 and 46 ms warm p95. Content-checksum deduplication removed
 1,722 duplicate border stores from the runtime provider set without changing the 20,758-entry
 audit catalog.
@@ -75,9 +81,27 @@ ComfortOS API with 35/35 comparable candidates and a 2,451 ms maximum response t
 verified the pinned Overture release and managed Mapbox metadata but does not substitute for
 the native Cloudflare deployment evidence required above.
 
-This evidence is encouraging but does not accept the ADR. Native Cloudflare AMD64 latency,
-R2 operation counts, container active duration, read-only runtime credentials, and rollback
-evidence are still required.
+The native Cloudflare AMD64 deployment passed all required evidence on 2026-09-13:
+
+- health reported release `2026-08-19.0`, 51 jurisdictions, and 20,758 stores;
+- unauthenticated private requests returned `401`, response scans found no configured
+  credential, and Cloudflare live logs redacted the Authorization header;
+- the dedicated runtime key read R2 but received `403 AccessDenied` for a write probe;
+- the final 30-request benchmark across nine regions produced 1,200 ms overall p95,
+  1,396 ms cold p95, 181 ms warm p95, and 1,396 ms maximum latency;
+- the final app smoke passed 9/9 regions and 35/35 comparable candidates with 45 managed
+  Mapbox requests and no public OSRM fallback;
+- Cloudflare Analytics recorded 20 Class A operations and a conservative 84 Class B
+  operations in the final deployment/validation window;
+- container billing telemetry recorded about 3,405 aggregate active instance-seconds and
+  77.10 CPU seconds for the day-of-validation deployment/rollback work; and
+- an immutable `rc1 -> rc2 -> rc1` rehearsal completed its Cloudflare rollout and served
+  successful building queries after rollback.
+
+The full evidence and cost calculation are recorded in
+`docs/analysis/STAGE_11_NATIONWIDE_DATA_ACTIVATION.md`. ADR-028 is accepted for staging, not
+as approval to bypass the remaining production legal, observability, security, browser, or
+mobile gates.
 
 ## References
 

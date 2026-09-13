@@ -253,6 +253,15 @@ if (
           : /timed out/i.test(message)
             ? 504
             : 500;
+      if (status >= 500) {
+        console.error(
+          JSON.stringify({
+            event: "environment_query_failed",
+            status,
+            ...classifyEnvironmentQueryFailure(error),
+          }),
+        );
+      }
       return sendJson(
         response,
         status,
@@ -267,6 +276,23 @@ if (
       `ComfortOS environment query service listening on ${host}:${port}`,
     );
   });
+}
+
+export function classifyEnvironmentQueryFailure(error: unknown) {
+  const name = error instanceof Error ? error.name : "UnknownError";
+  const code =
+    error && typeof error === "object" && "code" in error
+      ? String((error as NodeJS.ErrnoException).code ?? "unknown")
+      : "unknown";
+  const message = error instanceof Error ? error.message : "";
+  const reason = /checksum mismatch/i.test(message)
+    ? "checksum-mismatch"
+    : /timed out/i.test(message)
+      ? "timeout"
+      : code !== "unknown"
+        ? "runtime-error"
+        : "unexpected-error";
+  return { name, code, reason };
 }
 
 export function parseBuildingServiceBbox(value: string | null): BoundingBox {

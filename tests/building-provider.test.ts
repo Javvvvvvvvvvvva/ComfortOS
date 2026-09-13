@@ -8,6 +8,7 @@ import { CachedBuildingProvider } from "@/lib/environment/buildings/cache";
 import type { Building, BuildingProvider } from "@/lib/environment/buildings/types";
 import {
   assertNoFixtureBuildingProviderInProduction,
+  buildingQueryServiceTimeoutMs,
   createConfiguredBuildingProvider,
 } from "@/lib/environment/buildings/providers/configuredBuildingProvider";
 import { HttpBuildingProvider } from "@/lib/environment/buildings/providers/httpBuildingProvider";
@@ -26,8 +27,9 @@ import {
 } from "@/scripts/ingest-overture-buildings";
 import { indexOvertureBuildingStore } from "@/scripts/index-overture-building-store";
 import {
-  assertEnvironmentServiceAuthentication,
   assertBboxWithinLimit,
+  assertEnvironmentServiceAuthentication,
+  classifyEnvironmentQueryFailure,
   discoverBuildingStoreDirs,
   isAuthorizedServiceRequest,
   parseBuildingServiceBbox,
@@ -341,6 +343,13 @@ test("configured HTTP Overture provider is explicit and requires a service URL",
   }
 });
 
+test("building query service timeout matches the Stage 11 cold-start gate", () => {
+  assert.equal(buildingQueryServiceTimeoutMs(undefined), 8_000);
+  assert.equal(buildingQueryServiceTimeoutMs("12000"), 12_000);
+  assert.equal(buildingQueryServiceTimeoutMs("0"), 8_000);
+  assert.equal(buildingQueryServiceTimeoutMs("not-a-number"), 8_000);
+});
+
 test("building query service validates bbox parameters", () => {
   assert.deepEqual(parseBuildingServiceBbox("-93.267,44.976,-93.264,44.979"), {
     west: -93.267,
@@ -375,6 +384,25 @@ test("building query service supports private bearer authentication", () => {
     true,
   );
   assert.equal(isAuthorizedServiceRequest("Bearer wrong", "service-secret"), false);
+});
+
+test("environment query diagnostics expose only error categories", () => {
+  const runtimeError = Object.assign(new Error("secret filesystem path"), {
+    code: "EIO",
+  });
+  assert.deepEqual(classifyEnvironmentQueryFailure(runtimeError), {
+    name: "Error",
+    code: "EIO",
+    reason: "runtime-error",
+  });
+  assert.deepEqual(
+    classifyEnvironmentQueryFailure(new Error("checksum mismatch at private path")),
+    {
+      name: "Error",
+      code: "unknown",
+      reason: "checksum-mismatch",
+    },
+  );
 });
 
 test("production environment service refuses to start without authentication", () => {

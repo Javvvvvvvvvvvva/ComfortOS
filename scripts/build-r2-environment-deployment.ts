@@ -70,7 +70,7 @@ async function main() {
       {
         class_name: "EnvironmentContainer",
         image: "./Dockerfile.environment-service-r2",
-        max_instances: 1,
+        max_instances: 2,
         instance_type: "standard-1",
       },
     ],
@@ -91,6 +91,7 @@ async function main() {
     vars: {
       R2_ACCOUNT_ID: accountId,
       R2_BUCKET_NAME: bucket,
+      ENVIRONMENT_DEPLOYMENT_ID: deploymentId,
       ENVIRONMENT_RELEASE: release,
     },
     observability: {

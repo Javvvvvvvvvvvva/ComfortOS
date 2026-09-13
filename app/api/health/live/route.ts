@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { buildingQueryServiceTimeoutMs } from "@/lib/environment/buildings/providers/configuredBuildingProvider";
 import { createConfiguredRoutingProvider } from "@/lib/routing/providers/configuredRoutingProvider";
 import { RoutingService } from "@/lib/routing/service";
 import { buildMapboxStaticTileUrl } from "@/lib/map/basemap";
@@ -137,7 +138,7 @@ async function checkBuildings(signal: AbortSignal): Promise<LiveCheck> {
           : undefined,
         signal,
       },
-      5_000,
+      buildingQueryServiceTimeoutMs(),
     );
     return liveCheck(response.ok, startedAt, mode, true);
   } catch {

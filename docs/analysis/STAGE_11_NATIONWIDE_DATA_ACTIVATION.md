@@ -1,7 +1,7 @@
 # Stage 11 - Nationwide Data Activation
 
 Date: 2026-09-13
-Status: **LOCAL R2 CONTAINER VALIDATED; CLOUDFLARE LIVE BENCHMARK PENDING**
+Status: **CLOUDFLARE R2 FUSE STAGING ACCEPTED; PRODUCTION RELEASE GATES REMAIN**
 
 ## Objective
 
@@ -39,6 +39,14 @@ workstation and does not begin a production rollout.
 - Provide a nine-region application smoke gate that verifies managed routing, live health,
   release metadata, environmental capability, comparable candidates, and credential
   non-exposure through the real application API.
+- Configure Worker secrets from local-only runtime credentials without exposing secret
+  values in process arguments or generated Wrangler configuration.
+- Route each immutable deployment ID to its own Container Durable Object and synchronize
+  that routing key after rollback.
+- Permit the active and immediately previous deployment to overlap during a rollback while
+  sending application traffic to only the active deployment ID.
+- Treat the R2 mount as ready only after a checksum-verified remote partition, tile index,
+  offset index, and building object can be read, then supervise both FUSE and Node processes.
 
 ## Nationwide Evidence
 
@@ -71,7 +79,7 @@ Deterministic tests cover:
 - selected partition-manifest checksum rejection; and
 - catalog-backed provider metadata without nationwide manifest discovery.
 
-The complete suite passes 242/242 tests together with Node and Cloudflare Worker TypeScript,
+The complete suite passes 244/244 tests together with Node and Cloudflare Worker TypeScript,
 ESLint, and the dedicated environment-service bundle build.
 
 ## Cloudflare Staging Finding
@@ -82,15 +90,13 @@ documented read-only R2 FUSE path instead. The container image includes only the
 deployment manifest and checksum-addressed nationwide catalog. `tigrisfs` is pinned to
 version 1.2.2 and its Linux AMD64 archive SHA-256.
 
-This is a proposed experiment under ADR-028, not a production architecture change. Object
-storage FUSE does not promise SSD-like performance. A local native-container probe confirmed
-that repeating the full building-file hash causes an 8-second timeout, so the R2-only runtime
-trusts the upload-time whole-object verification while retaining manifest and index checks.
-Live cold/warm latency and R2 operation amplification must decide whether the experiment is
-accepted or rejected.
+This experiment is accepted for the nationwide staging environment under ADR-028. It does
+not by itself approve an external production release. The R2-only runtime trusts the
+upload-time whole-object verification while retaining manifest and index checks because a
+full building-file rehash is incompatible with the request latency gate.
 
-The verified bundle is 36,866,892 bytes, loads its catalog in 302 ms in the latest local
-audit, and uses 89,962,456 bytes of additional heap. Content-checksum deduplication preserves
+The verified bundle is 36,867,631 bytes, loads its catalog in 251 ms in the latest local
+audit, and uses 90,144,224 bytes of additional heap. Content-checksum deduplication preserves
 all 20,758 catalog records while reducing the runtime provider set to 19,036 unique stores; 1,722
 cross-jurisdiction border records point to identical Overture content.
 
@@ -115,25 +121,87 @@ bundle; shadow hulls are generated deterministically in the existing local proje
 covered by geometry regression tests. Node and worker execution now produce the same
 available shade capability.
 
-The AMD64 image itself builds successfully and is approximately 79.7 MB. TigrisFS crashed
-when that AMD64 image was executed through QEMU on the ARM development machine after a
-successful mount; the native ARM64 build did not. Cloudflare must therefore validate the
-production image on native AMD64 rather than treating the local emulation crash as a provider
-result.
+The native Cloudflare AMD64 deployment is live at
+`https://comfortos-environment-staging.comfortos-staging-57d4f904.workers.dev`.
+The final active deployment is `us-2026-08-19.0-r2-fuse-rc1`, Worker version
+`d42827cf-5351-421b-848a-f81ed6b8b9a5`, and container image digest
+`sha256:afd44e6f4b5f123bd0f4ee8adef53f36f0df84811bb0bad4e4c9fda610218dfb`.
 
-## Remaining External Work
+Health reports release `2026-08-19.0`, 51 jurisdictions, and 20,758 stores. The final
+three-round benchmark made 30 service requests across Minneapolis, Seattle, Phoenix,
+Chicago, New York, Miami, Anchorage, Honolulu, and Washington, DC:
 
-1. Authenticate Wrangler and confirm Cloudflare Containers access on the account.
-2. Create a dedicated read-only runtime R2 key and set it together with the generated
-   environment-service token as Worker secrets.
-3. Deploy the staging Container and run the nine-region cold/warm benchmark.
-4. Record actual R2 operations, active container duration, and estimated provider cost.
-5. Rehearse an immutable deployment rollback and rerun health plus representative queries.
-6. Accept ADR-028 only if latency, cost, integrity, and security gates pass; otherwise use a
-   durable-volume host under ADR-027.
-7. Complete the remaining production security, observability, legal, browser, and mobile
-   gates in the MVP release checklist.
+| Metric | Result | Gate |
+| --- | ---: | ---: |
+| Overall p50 | 143 ms | report only |
+| Overall p95 | 1,200 ms | <= 8,000 ms |
+| Cold p95 | 1,396 ms | <= 8,000 ms |
+| Warm p95 | 181 ms | <= 8,000 ms |
+| Maximum | 1,396 ms | <= 8,000 ms |
+
+Every query returned the pinned release and real buildings. The final ComfortOS integration
+smoke passed 9/9 regions with 35/35 comparable candidates, 45 managed Mapbox requests, no
+public OSRM fallback, and a 3,542 ms maximum application response time. Protected application
+health was `ready`; routing, weather, buildings, and managed basemap probes all passed.
+
+## Security And Rollback Evidence
+
+- Only `ENVIRONMENT_QUERY_SERVICE_TOKEN`, `R2_ACCESS_KEY_ID`, and
+  `R2_SECRET_ACCESS_KEY` exist as Worker secret bindings; values are not in Wrangler config.
+- The runtime R2 key differs from the archive writer key, successfully reads the bucket, and
+  receives `403 AccessDenied` on a write probe. No probe object was retained.
+- Unauthenticated metadata/building requests return `401`; authenticated representative
+  queries return `200`.
+- Response scans found no Mapbox, service, health-check, or R2 credential. Cloudflare live
+  logs showed the Authorization header as `REDACTED`.
+- A real `rc1 -> rc2 -> rc1` rehearsal verified both immutable history entries. rc2 served a
+  Phoenix query with 138 buildings. After the active pointer and deployment routing key were
+  restored, Cloudflare completed the rollback rollout and rc1 served a Minneapolis query
+  with 91 buildings.
+
+The rehearsal exposed three platform integration constraints now enforced in code. Reusing
+Cloudflare's default singleton can keep serving the prior image after a rollout, so the
+Worker keys the Durable Object by deployment ID. A one-instance limit also prevents the
+previous deployment from starting while the replacement waits to sleep, so staging allows
+two instances for rollback overlap while routing requests to only one. Finally, a directory
+mount check can report ready before remote object reads work. Startup now verifies a complete
+remote random-access chain before starting HTTP service and exits if either FUSE or Node dies.
+
+## Operations And Cost
+
+Cloudflare GraphQL Analytics measured the final deployment/benchmark/integration window
+rather than estimating FUSE opens. It recorded 20 Class A list operations, 77 successful
+range reads, five successful head probes, and two failed head probes. Counting every head
+probe gives a conservative Class B upper bound of 84 operations. At current Standard R2
+rates, the conservative gross operation cost is about $0.00012 before the monthly included
+operations.
+
+The rc2 bundle-preparation window separately recorded 20,851 successful `GetObject`
+operations, approximately $0.00751 gross before the included Class B allowance. This cost is
+a deployment-control-plane expense and is not counted as per-route runtime amplification.
+
+The day-of-validation container billing snapshot recorded 77.10 CPU seconds, 13,620.00
+GiB-seconds of allocated memory, 27,240.00 GB-seconds of allocated disk, and 9.97 MB of
+transmit traffic. The provisioned-resource totals correspond to about 3,405 aggregate active
+instance-seconds. Gross CPU, memory, and disk cost is approximately $0.0375, but this run remains
+inside the Workers Paid monthly CPU, memory, disk, and North America egress allotments.
+
+R2 storage reports 83,083 objects and 99,565,242,781 payload bytes. With Standard storage
+billing rounded to 100 GB and the 10 GB monthly free tier, the steady archive estimate is
+about $1.35 per month, excluding any other account usage. Operation and container estimates
+use Cloudflare's current [R2 pricing](https://developers.cloudflare.com/r2/pricing/) and
+[Containers pricing](https://developers.cloudflare.com/containers/platform/pricing/).
+
+## Remaining Production Work
+
+1. Obtain explicit legal/privacy approval; the current release config remains
+   `review-pending`.
+2. Connect production application telemetry and alerts; the current app config remains on
+   console-only observability without configured alerts.
+3. Complete the remaining production security, browser, mobile, and release checklist gates.
+4. Decide whether to promote this accepted staging architecture or retain ADR-027's
+   durable-volume host as the production data plane.
 
 ## Judgment
 
-READY FOR R2 FUSE STAGING BENCHMARK; PRODUCTION NOT ACTIVATED
+CLOUDFLARE R2 FUSE STAGING VALIDATED; PRODUCTION NOT ACTIVATED

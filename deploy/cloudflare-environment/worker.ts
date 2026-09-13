@@ -7,6 +7,7 @@ interface Env {
   R2_SECRET_ACCESS_KEY: string;
   R2_ACCOUNT_ID: string;
   R2_BUCKET_NAME: string;
+  ENVIRONMENT_DEPLOYMENT_ID: string;
   ENVIRONMENT_RELEASE: string;
 }
 
@@ -36,7 +37,10 @@ export class EnvironmentContainer extends Container<Env> {
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
-    const container = getContainer(env.ENVIRONMENT_CONTAINER);
+    const container = getContainer(
+      env.ENVIRONMENT_CONTAINER,
+      env.ENVIRONMENT_DEPLOYMENT_ID,
+    );
     return container.fetch(request);
   },
 };

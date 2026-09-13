@@ -38,10 +38,7 @@ export function createConfiguredBuildingProvider(): ConfiguredBuildingProvider {
         new HttpBuildingProvider({
           baseUrl: serviceUrl,
           authToken: process.env.BUILDING_QUERY_SERVICE_TOKEN,
-          requestTimeoutMs: parsePositiveInteger(
-            process.env.BUILDING_QUERY_SERVICE_TIMEOUT_MS,
-            6_000,
-          ),
+          requestTimeoutMs: buildingQueryServiceTimeoutMs(),
           maxResponseBytes: parsePositiveInteger(
             process.env.BUILDING_QUERY_SERVICE_MAX_RESPONSE_BYTES,
             8 * 1024 * 1024,
@@ -90,6 +87,12 @@ export function createConfiguredBuildingProvider(): ConfiguredBuildingProvider {
     provider: new CachedBuildingProvider(overpass),
     mode: "overpass",
   };
+}
+
+export function buildingQueryServiceTimeoutMs(
+  value = process.env.BUILDING_QUERY_SERVICE_TIMEOUT_MS,
+) {
+  return parsePositiveInteger(value, 8_000);
 }
 
 export function assertNoFixtureBuildingProviderInProduction({

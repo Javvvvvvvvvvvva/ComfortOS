@@ -35,6 +35,7 @@ ENV PORT=8787
 WORKDIR /app
 
 COPY --from=build /app/dist-environment/service.mjs ./service.mjs
+COPY --from=build /app/dist-environment/probe-r2-mount.mjs ./probe-r2-mount.mjs
 COPY deploy/cloudflare-environment/generated/deployment ./deployment
 COPY deploy/cloudflare-environment/start-r2-service.sh /usr/local/bin/start-r2-service
 

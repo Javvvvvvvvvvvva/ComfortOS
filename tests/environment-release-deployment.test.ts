@@ -8,6 +8,8 @@ import { loadActiveBuildingDeployment } from "@/lib/environment/buildings/deploy
 import { MultiRegionOvertureBuildingProvider } from "@/lib/environment/buildings/providers/multiRegionOvertureBuildingProvider";
 import { activateEnvironmentRelease } from "@/scripts/activate-environment-release";
 import { rollbackEnvironmentDeployment } from "@/scripts/rollback-environment-deployment";
+import { probeR2EnvironmentMount } from "@/scripts/probe-r2-environment-mount";
+import { syncCloudflareEnvironmentConfig } from "@/scripts/sync-cloudflare-environment-config";
 import {
   archiveState,
   createFilesystemObjectStore,
@@ -114,6 +116,17 @@ test("activation is explicit, immutable, and consumable by the environment servi
   const active = loadActiveBuildingDeployment(activated.activePath);
   assert.equal(active.deployment.deploymentId, "us-test-rc1");
   assert.equal(active.catalog.summary.storeCount, 1);
+  assert.deepEqual(
+    await probeR2EnvironmentMount({
+      activeManifestPath: activated.activePath,
+      storeRoot: path.join(fixture.targetRoot, "releases", RELEASE),
+    }),
+    {
+      deploymentId: "us-test-rc1",
+      release: RELEASE,
+      partitionId: "us-dc-test",
+    },
+  );
 
   const provider = new MultiRegionOvertureBuildingProvider({
     catalogStores: active.stores,
@@ -299,6 +312,29 @@ test("rollback reuses immutable history and requires an exact confirmation", asy
     path.join(fixture.targetRoot, "deployments", "production-active.json"),
   );
   assert.equal(active.deployment.deploymentId, "us-test-a");
+
+  const wranglerConfigPath = path.join(fixture.targetRoot, "wrangler.jsonc");
+  await fs.writeFile(
+    wranglerConfigPath,
+    JSON.stringify({ vars: { R2_BUCKET_NAME: "test-bucket" } }),
+  );
+  const synchronized = await syncCloudflareEnvironmentConfig({
+    activeManifestPath: path.join(
+      fixture.targetRoot,
+      "deployments",
+      "production-active.json",
+    ),
+    wranglerConfigPath,
+  });
+  assert.equal(synchronized.deploymentId, "us-test-a");
+  assert.deepEqual(
+    JSON.parse(await fs.readFile(wranglerConfigPath, "utf8")).vars,
+    {
+      R2_BUCKET_NAME: "test-bucket",
+      ENVIRONMENT_DEPLOYMENT_ID: "us-test-a",
+      ENVIRONMENT_RELEASE: RELEASE,
+    },
+  );
 });
 
 async function createDeploymentFixture() {

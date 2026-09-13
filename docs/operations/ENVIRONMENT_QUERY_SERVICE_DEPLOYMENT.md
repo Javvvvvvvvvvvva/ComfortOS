@@ -291,19 +291,39 @@ against Git-tracked archive checkpoints. It writes ignored build artifacts under
 `deploy/cloudflare-environment/generated/` and an ignored Wrangler config containing only
 non-secret account, bucket, and release values.
 
-Before deployment, authenticate Wrangler and set these Worker secrets without writing them
-to the generated config:
+Before deployment, authenticate Wrangler and keep these local values in `.env.local` without
+writing them to the generated config:
 
 ```text
 ENVIRONMENT_QUERY_SERVICE_TOKEN
-R2_ACCESS_KEY_ID
-R2_SECRET_ACCESS_KEY
+R2_RUNTIME_ACCESS_KEY_ID
+R2_RUNTIME_SECRET_ACCESS_KEY
 ```
 
 Use a dedicated runtime R2 key limited to object read access for this bucket. Do not reuse
-the archive writer key inside the internet-facing staging runtime.
+the archive writer key inside the internet-facing staging runtime. Configure the Worker
+secret bindings without exposing values on the command line or in logs:
+
+```bash
+npm run environment:cloudflare:configure-secrets
+```
+
+The helper validates that the runtime credential has the expected R2 S3 format and differs
+from the archive writer credential. It maps the local `R2_RUNTIME_*` names to the container's
+`R2_ACCESS_KEY_ID` and `R2_SECRET_ACCESS_KEY` Worker bindings.
+
+Set `BUILDING_QUERY_SERVICE_TIMEOUT_MS=8000` on the ComfortOS application when it uses this
+service. The protected live-health probe uses the same bound, so a healthy first request is
+not rejected earlier than the Stage 11 cold-latency gate.
 
 The container uses a checksum-pinned `tigrisfs` binary and mounts R2 with `allow_other,ro`.
+The Worker keys each container Durable Object by the immutable deployment ID so an image
+rollout or rollback cannot keep serving a previous deployment through a reused singleton.
+The staging application permits two instances so the active and immediately previous
+deployment can overlap during a rollback; only the active deployment ID receives requests.
+Startup does not treat the FUSE directory alone as ready. It checksum-verifies one remote
+partition manifest, parses its tile index, opens its offset and building objects, and then
+supervises both the mount process and Node service for the container lifetime.
 It passes a release-specific `ENVIRONMENT_DEPLOYMENT_STORE_ROOT` and skips 20,758 eager
 filesystem `stat` calls. The selected partition manifest, tile index, and offset index are
 still verified on first use. `ENVIRONMENT_TRUST_VERIFIED_ARCHIVE_DATA=true` skips only the
@@ -352,6 +372,19 @@ npm run data:buildings:rollback-release -- \
   --target-root /data/comfortos \
   --deployment-id <previous-deployment-id> \
   --confirm-rollback ROLLBACK:<previous-deployment-id>
+```
+
+For the Cloudflare R2 FUSE bundle, use its generated deployment root, then synchronize the
+Worker's deployment-keyed container routing before auditing and redeploying:
+
+```bash
+npm run data:buildings:rollback-release -- \
+  --target-root deploy/cloudflare-environment/generated/deployment \
+  --deployment-id <previous-deployment-id> \
+  --confirm-rollback ROLLBACK:<previous-deployment-id>
+npm run environment:cloudflare:sync-config
+npm run environment:cloudflare:audit-bundle
+npm run environment:cloudflare:deploy -- --containers-rollout=immediate
 ```
 
 ## Application Configuration

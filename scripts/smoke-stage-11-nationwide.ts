@@ -308,6 +308,9 @@ function responseSecrets() {
     process.env.MAPBOX_ACCESS_TOKEN,
     process.env.BUILDING_QUERY_SERVICE_TOKEN,
     process.env.HEALTHCHECK_TOKEN,
+    process.env.ENVIRONMENT_QUERY_SERVICE_TOKEN,
+    process.env.R2_RUNTIME_ACCESS_KEY_ID,
+    process.env.R2_RUNTIME_SECRET_ACCESS_KEY,
     process.env.R2_SECRET_ACCESS_KEY,
   ].filter((value): value is string => Boolean(value && value.length >= 8));
 }
