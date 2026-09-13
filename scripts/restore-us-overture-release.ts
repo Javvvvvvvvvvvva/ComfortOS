@@ -23,6 +23,7 @@ const STATE_RECEIPT_FILE = "state-restore-receipt.json";
 const CATALOG_FILE = "building-store-catalog.json";
 const MAX_STATE_MANIFEST_BYTES = 64 * 1024 * 1024;
 const RESTORE_CONCURRENCY = 4;
+const REMOTE_CATALOG_CONCURRENCY = 16;
 const DEFAULT_MINIMUM_FREE_BYTES = 5 * 1024 * 1024 * 1024;
 const STORE_FILES = new Set([
   "buildings.jsonl",
@@ -42,6 +43,11 @@ export type ReleaseRestoreOptions = {
   confirmRestore?: string;
   minimumFreeBytes?: number;
 };
+
+export type RemoteReleaseCatalogOptions = Pick<
+  ReleaseRestoreOptions,
+  "release" | "states" | "checkpointRoot" | "targetRoot" | "prefix"
+>;
 
 type StateRestoreReceipt = {
   format: "comfortos-state-restore-receipt-v1";
@@ -105,16 +111,7 @@ export async function restoreRelease(
     };
   }
   if (!store) throw new Error("An object store is required outside dry-run mode.");
-  for (const checkpoint of checkpoints) {
-    if (
-      checkpoint.archive.provider !== store.provider ||
-      checkpoint.archive.location !== store.location
-    ) {
-      throw new Error(
-        `Archive checkpoint source does not match the configured object store: ${checkpoint.jurisdiction.code}`,
-      );
-    }
-  }
+  assertArchiveStoreMatches(checkpoints, store);
 
   const stateArchives: Array<{ manifest: StateArchiveManifest; bytes: Buffer }> = [];
   for (const checkpoint of checkpoints) {
@@ -365,6 +362,138 @@ export async function buildReleaseCatalog(targetRoot: string, release: string) {
   return parseBuildingStoreCatalog(catalog);
 }
 
+export async function buildRemoteReleaseCatalog(
+  options: RemoteReleaseCatalogOptions,
+  store: ObjectStore,
+) {
+  assertRestoreOptions({
+    ...options,
+    dryRun: false,
+    preflightOnly: false,
+  });
+  const checkpoints = await loadCheckpoints(options);
+  assertArchiveStoreMatches(checkpoints, store);
+
+  const stateArchives: StateArchiveManifest[] = [];
+  for (const checkpoint of checkpoints) {
+    stateArchives.push(
+      (await readAndValidateStateArchive(store, checkpoint, options.prefix)).manifest,
+    );
+  }
+
+  const inputs = stateArchives.flatMap((stateManifest) =>
+    [...groupObjectsByPartition(stateManifest.objects)].map(
+      ([partitionId, objects]) => ({
+        stateManifest,
+        partitionId,
+        objects,
+      }),
+    ),
+  );
+  const stores: BuildingStoreCatalogEntry[] = [];
+  for (
+    let offset = 0;
+    offset < inputs.length;
+    offset += REMOTE_CATALOG_CONCURRENCY
+  ) {
+    stores.push(
+      ...(await Promise.all(
+        inputs
+          .slice(offset, offset + REMOTE_CATALOG_CONCURRENCY)
+          .map(async ({ stateManifest, partitionId, objects }) => {
+            const manifestObject = objects.find(
+              (object) => object.file === "manifest.json",
+            );
+            if (!manifestObject) {
+              throw new Error(`Partition manifest is missing: ${partitionId}`);
+            }
+            const bytes = await store.readBuffer(
+              manifestObject.key,
+              manifestObject.sizeBytes,
+            );
+            if (
+              bytes.byteLength !== manifestObject.sizeBytes ||
+              sha256Buffer(bytes) !== manifestObject.sha256
+            ) {
+              throw new Error(
+                `Remote partition manifest checksum mismatch: ${partitionId}`,
+              );
+            }
+            return {
+              jurisdictionCode: stateManifest.jurisdiction.code,
+              partitionId,
+              relativePath: path.posix.join(
+                "us",
+                stateManifest.jurisdiction.code.toLowerCase(),
+                partitionId,
+              ),
+              manifestSha256: manifestObject.sha256,
+              objectCount: objects.length,
+              storedBytes: objects.reduce(
+                (total, object) => total + object.sizeBytes,
+                0,
+              ),
+              manifest: JSON.parse(
+                bytes.toString("utf8"),
+              ) as LocalOvertureStoreManifest,
+            } satisfies BuildingStoreCatalogEntry;
+          }),
+      )),
+    );
+  }
+
+  stores.sort(
+    (left, right) =>
+      left.jurisdictionCode.localeCompare(right.jurisdictionCode) ||
+      left.partitionId.localeCompare(right.partitionId),
+  );
+  const catalog = parseBuildingStoreCatalog({
+    format: "comfortos-building-store-catalog-v1",
+    generatedAt: stateArchives
+      .map((manifest) => manifest.createdAt)
+      .sort()
+      .at(-1)!,
+    release: options.release,
+    source: {
+      provider: store.provider,
+      location: store.location,
+      prefix: options.prefix,
+    },
+    summary: {
+      jurisdictionCount: checkpoints.length,
+      storeCount: stores.length,
+      objectCount: stores.reduce((total, entry) => total + entry.objectCount, 0),
+      storedBytes: stores.reduce((total, entry) => total + entry.storedBytes, 0),
+      buildingCount: stores.reduce(
+        (total, entry) => total + entry.manifest.buildingCount,
+        0,
+      ),
+      usableHeightCount: stores.reduce(
+        (total, entry) =>
+          total +
+          entry.manifest.explicitHeightCount +
+          entry.manifest.floorDerivedHeightCount,
+        0,
+      ),
+    },
+    stores,
+  });
+  const catalogPath = path.join(
+    options.targetRoot,
+    "releases",
+    options.release,
+    CATALOG_FILE,
+  );
+  await writeJsonAtomic(catalogPath, catalog);
+  return {
+    catalog,
+    catalogPath,
+    catalogSha256: await sha256File(catalogPath),
+    stateManifestCount: stateArchives.length,
+    partitionManifestCount: stores.length,
+  };
+}
+
 async function readAndValidateStateArchive(
   store: ObjectStore,
   checkpoint: StateArchiveCheckpoint,
@@ -484,7 +613,7 @@ export function validateStateArchiveManifest(
   return manifest as StateArchiveManifest;
 }
 
-async function loadCheckpoints(options: ReleaseRestoreOptions) {
+async function loadCheckpoints(options: RemoteReleaseCatalogOptions) {
   const checkpoints: StateArchiveCheckpoint[] = [];
   for (const state of options.states) {
     const checkpointPath = path.join(
@@ -510,6 +639,22 @@ async function loadCheckpoints(options: ReleaseRestoreOptions) {
     checkpoints.push(checkpoint);
   }
   return checkpoints;
+}
+
+function assertArchiveStoreMatches(
+  checkpoints: StateArchiveCheckpoint[],
+  store: ObjectStore,
+) {
+  for (const checkpoint of checkpoints) {
+    if (
+      checkpoint.archive.provider !== store.provider ||
+      checkpoint.archive.location !== store.location
+    ) {
+      throw new Error(
+        `Archive checkpoint source does not match the configured object store: ${checkpoint.jurisdiction.code}`,
+      );
+    }
+  }
 }
 
 async function assertRestoreCapacity(

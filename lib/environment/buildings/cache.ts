@@ -44,7 +44,10 @@ export class CachedBuildingProvider implements BuildingProvider {
     this.precision = options.precision ?? DEFAULT_PRECISION;
   }
 
-  async getBuildings(bounds: BoundingBox): Promise<Building[]> {
+  async getBuildings(
+    bounds: BoundingBox,
+    options?: { signal?: AbortSignal },
+  ): Promise<Building[]> {
     const key = bboxKey(bounds, this.precision);
     const now = Date.now();
     const cached = this.cache.get(key);
@@ -56,7 +59,7 @@ export class CachedBuildingProvider implements BuildingProvider {
     }
 
     this.misses += 1;
-    const value = this.provider.getBuildings(bounds);
+    const value = this.provider.getBuildings(bounds, options);
     this.cache.set(key, {
       key,
       expiresAt: now + this.ttlMs,
@@ -79,6 +82,10 @@ export class CachedBuildingProvider implements BuildingProvider {
       misses: this.misses,
       entries: this.cache.size,
     };
+  }
+
+  async getMetadata() {
+    return (await this.provider.getMetadata?.()) ?? null;
   }
 
   private prune(now: number) {

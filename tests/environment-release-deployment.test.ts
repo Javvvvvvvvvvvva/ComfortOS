@@ -7,12 +7,14 @@ import test from "node:test";
 import { loadActiveBuildingDeployment } from "@/lib/environment/buildings/deploymentCatalog";
 import { MultiRegionOvertureBuildingProvider } from "@/lib/environment/buildings/providers/multiRegionOvertureBuildingProvider";
 import { activateEnvironmentRelease } from "@/scripts/activate-environment-release";
+import { rollbackEnvironmentDeployment } from "@/scripts/rollback-environment-deployment";
 import {
   archiveState,
   createFilesystemObjectStore,
   type StateArchiveOptions,
 } from "@/scripts/archive-us-state-overture";
 import {
+  buildRemoteReleaseCatalog,
   restoreRelease,
   type ReleaseRestoreOptions,
 } from "@/scripts/restore-us-overture-release";
@@ -124,6 +126,63 @@ test("activation is explicit, immutable, and consumable by the environment servi
     confirmActivation: "us-test-rc1",
   });
   assert.equal(repeated.reusedHistory, true);
+
+  assert.throws(
+    () =>
+      loadActiveBuildingDeployment(activated.activePath, {
+        storeRoot: "relative/store",
+      }),
+    /store root must be absolute/,
+  );
+  const lazy = loadActiveBuildingDeployment(activated.activePath, {
+    storeRoot: path.join(fixture.targetRoot, "missing-r2-mount"),
+    verifyStorePresence: false,
+  });
+  assert.equal(lazy.stores.length, 1);
+  const lazyProvider = new MultiRegionOvertureBuildingProvider({
+    catalogStores: lazy.stores,
+  });
+  await assert.rejects(
+    lazyProvider.getBuildings({
+      west: -77.2,
+      south: 38.8,
+      east: -77.1,
+      north: 38.9,
+    }),
+    /ENOENT/,
+  );
+});
+
+test("remote catalog reads only verified manifests and cannot bypass non-R2 activation", async () => {
+  const fixture = await createDeploymentFixture();
+  const store = createFilesystemObjectStore(fixture.archiveRoot);
+  const remoteTarget = path.join(path.dirname(fixture.targetRoot), "remote-bundle");
+  const result = await buildRemoteReleaseCatalog(
+    {
+      release: RELEASE,
+      states: ["DC"],
+      checkpointRoot: fixture.restoreOptions.checkpointRoot,
+      targetRoot: remoteTarget,
+      prefix: fixture.restoreOptions.prefix,
+    },
+    store,
+  );
+  assert.equal(result.stateManifestCount, 1);
+  assert.equal(result.partitionManifestCount, 1);
+  assert.equal(result.catalog.summary.storeCount, 1);
+  assert.equal(result.catalog.source.provider, "filesystem");
+  await assert.rejects(
+    activateEnvironmentRelease({
+      targetRoot: remoteTarget,
+      release: RELEASE,
+      deploymentId: "remote-test",
+      requiredJurisdictionCount: 1,
+      confirmActivation: "remote-test",
+      dryRun: false,
+      verifiedRemoteCatalog: true,
+    }),
+    /requires a Cloudflare R2 source/,
+  );
 });
 
 test("active deployment rejects catalog and partition-manifest tampering", async () => {
@@ -163,6 +222,83 @@ test("active deployment rejects catalog and partition-manifest tampering", async
     () => loadActiveBuildingDeployment(activated.activePath),
     /catalog checksum mismatch/,
   );
+});
+
+test("verified archive mode skips only the whole building-file rehash", async () => {
+  const fixture = await createDeploymentFixture();
+  await restoreRelease(
+    { ...fixture.restoreOptions, confirmRestore: RELEASE },
+    createFilesystemObjectStore(fixture.archiveRoot),
+  );
+  const activated = await activateEnvironmentRelease({
+    targetRoot: fixture.targetRoot,
+    release: RELEASE,
+    deploymentId: "us-test-trusted-archive",
+    requiredJurisdictionCount: 1,
+    confirmActivation: "us-test-trusted-archive",
+    dryRun: false,
+  });
+  const active = loadActiveBuildingDeployment(activated.activePath);
+  await fs.appendFile(path.join(active.stores[0].storeDir, "buildings.jsonl"), " ");
+  const bounds = { west: -77.2, south: 38.8, east: -77.1, north: 38.9 };
+  const strictProvider = new MultiRegionOvertureBuildingProvider({
+    catalogStores: active.stores,
+  });
+  await assert.rejects(
+    strictProvider.getBuildings(bounds),
+    /checksum mismatch for buildings.jsonl/,
+  );
+  const trustedProvider = new MultiRegionOvertureBuildingProvider({
+    catalogStores: active.stores.map((store) => ({
+      ...store,
+      verifyBuildingFileChecksum: false,
+    })),
+  });
+  assert.deepEqual(await trustedProvider.getBuildings(bounds), []);
+});
+
+test("rollback reuses immutable history and requires an exact confirmation", async () => {
+  const fixture = await createDeploymentFixture();
+  await restoreRelease(
+    { ...fixture.restoreOptions, confirmRestore: RELEASE },
+    createFilesystemObjectStore(fixture.archiveRoot),
+  );
+  for (const deploymentId of ["us-test-a", "us-test-b"]) {
+    await activateEnvironmentRelease({
+      targetRoot: fixture.targetRoot,
+      release: RELEASE,
+      deploymentId,
+      requiredJurisdictionCount: 1,
+      confirmActivation: deploymentId,
+      dryRun: false,
+    });
+  }
+
+  const dryRun = await rollbackEnvironmentDeployment({
+    targetRoot: fixture.targetRoot,
+    deploymentId: "us-test-a",
+    dryRun: true,
+  });
+  assert.equal(dryRun.fromDeploymentId, "us-test-b");
+  assert.equal(dryRun.toDeploymentId, "us-test-a");
+  await assert.rejects(
+    rollbackEnvironmentDeployment({
+      targetRoot: fixture.targetRoot,
+      deploymentId: "us-test-a",
+      dryRun: false,
+    }),
+    /--confirm-rollback must be exactly/,
+  );
+  await rollbackEnvironmentDeployment({
+    targetRoot: fixture.targetRoot,
+    deploymentId: "us-test-a",
+    confirmRollback: "ROLLBACK:us-test-a",
+    dryRun: false,
+  });
+  const active = loadActiveBuildingDeployment(
+    path.join(fixture.targetRoot, "deployments", "production-active.json"),
+  );
+  assert.equal(active.deployment.deploymentId, "us-test-a");
 });
 
 async function createDeploymentFixture() {

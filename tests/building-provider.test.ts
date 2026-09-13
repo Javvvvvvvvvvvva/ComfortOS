@@ -74,6 +74,32 @@ test("local Overture provider queries bbox through the tile index", async () => 
   assert.equal(buildings[0].id, "inside");
 });
 
+test("building cache preserves provider metadata and abort options", async () => {
+  const controller = new AbortController();
+  let receivedSignal: AbortSignal | undefined;
+  const provider: BuildingProvider = {
+    async getBuildings(_bounds, options) {
+      receivedSignal = options?.signal;
+      return [];
+    },
+    async getMetadata() {
+      return { provider: "fixture", datasetVersion: "release-1" };
+    },
+  };
+  const cached = new CachedBuildingProvider(provider);
+
+  await cached.getBuildings(
+    { west: -93.27, south: 44.97, east: -93.26, north: 44.98 },
+    { signal: controller.signal },
+  );
+
+  assert.equal(receivedSignal, controller.signal);
+  assert.deepEqual(await cached.getMetadata(), {
+    provider: "fixture",
+    datasetVersion: "release-1",
+  });
+});
+
 test("local Overture provider rejects a store with a mismatched checksum", async () => {
   const storeDir = await writeStore([sampleBuilding("inside", -93.266, 44.977)]);
   const manifestPath = path.join(storeDir, "manifest.json");

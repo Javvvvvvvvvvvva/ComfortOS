@@ -1,5 +1,4 @@
-import { convex, featureCollection, point } from "@turf/turf";
-import type { Feature, LineString, MultiPolygon, Polygon } from "geojson";
+import type { LineString, MultiPolygon, Polygon } from "geojson";
 import type { Building } from "@/lib/environment/buildings/types";
 import type { SolarPosition } from "@/lib/environment/solar/solarPositionEngine";
 import { createLocalProjection, degreesToRadians } from "@/lib/environment/shade/projection";
@@ -144,28 +143,70 @@ function calculatePreparedBuildingShadow(
   ) {
     return [];
   }
-  const shadowPoints = part.projectedPoints.flatMap(([x, y]) => [
-      projection.unproject([x, y]),
-      projection.unproject([x + offset.x, y + offset.y]),
-  ]);
-  const hull = convex(
-    featureCollection(
-      shadowPoints.map((coordinate) =>
-        point([coordinate.longitude, coordinate.latitude]),
-      ),
-    ),
-  ) as Feature<Polygon> | null;
-
-  if (!hull?.geometry) return [];
+  const hull = convexHull(
+    part.projectedPoints.flatMap(([x, y]) => [
+      [x, y] as [number, number],
+      [x + offset.x, y + offset.y] as [number, number],
+    ]),
+  );
+  if (!hull) return [];
+  const ring = [...hull, hull[0]].map(([x, y]) => {
+    const coordinate = projection.unproject([x, y]);
+    return [coordinate.longitude, coordinate.latitude] as [number, number];
+  });
 
   return [
     {
       buildingId: part.buildingId,
-      geometry: hull.geometry,
+      geometry: { type: "Polygon", coordinates: [ring] },
       sourceHeightMeters: heightMeters,
       confidence: part.building.confidence,
     },
   ];
+}
+
+function convexHull(points: Array<[number, number]>): Array<[number, number]> | null {
+  const uniquePoints = Array.from(
+    new Map(points.map((point) => [`${point[0]}:${point[1]}`, point])).values(),
+  ).sort(([leftX, leftY], [rightX, rightY]) => leftX - rightX || leftY - rightY);
+  if (uniquePoints.length < 3) return null;
+
+  const lower: Array<[number, number]> = [];
+  for (const point of uniquePoints) {
+    while (
+      lower.length >= 2 &&
+      cross(lower[lower.length - 2], lower[lower.length - 1], point) <= 0
+    ) {
+      lower.pop();
+    }
+    lower.push(point);
+  }
+
+  const upper: Array<[number, number]> = [];
+  for (let index = uniquePoints.length - 1; index >= 0; index -= 1) {
+    const point = uniquePoints[index];
+    while (
+      upper.length >= 2 &&
+      cross(upper[upper.length - 2], upper[upper.length - 1], point) <= 0
+    ) {
+      upper.pop();
+    }
+    upper.push(point);
+  }
+
+  const hull = [...lower.slice(0, -1), ...upper.slice(0, -1)];
+  return hull.length >= 3 ? hull : null;
+}
+
+function cross(
+  origin: [number, number],
+  left: [number, number],
+  right: [number, number],
+) {
+  return (
+    (left[0] - origin[0]) * (right[1] - origin[1]) -
+    (left[1] - origin[1]) * (right[0] - origin[0])
+  );
 }
 
 function polygonParts(geometry: Polygon | MultiPolygon): Polygon[] {

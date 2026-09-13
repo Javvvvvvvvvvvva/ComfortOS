@@ -55,8 +55,14 @@ export type ActiveBuildingDeployment = {
   }>;
 };
 
+export type ActiveBuildingDeploymentOptions = {
+  storeRoot?: string;
+  verifyStorePresence?: boolean;
+};
+
 export function loadActiveBuildingDeployment(
   deploymentManifestPath: string,
+  options: ActiveBuildingDeploymentOptions = {},
 ): ActiveBuildingDeployment {
   const resolvedDeploymentPath = fs.realpathSync(deploymentManifestPath);
   const dataRoot = path.dirname(path.dirname(resolvedDeploymentPath));
@@ -80,22 +86,30 @@ export function loadActiveBuildingDeployment(
     throw new Error("Active environment deployment summary does not match its catalog.");
   }
 
-  const catalogRoot = resolveContainedPath(
-    dataRoot,
-    path.posix.join("releases", catalog.release),
-  );
+  if (options.storeRoot && !path.isAbsolute(options.storeRoot)) {
+    throw new Error("Active environment store root must be absolute.");
+  }
+  const catalogRoot = options.storeRoot
+    ? path.resolve(options.storeRoot)
+    : resolveContainedPath(
+        dataRoot,
+        path.posix.join("releases", catalog.release),
+      );
+  const verifyStorePresence = options.verifyStorePresence ?? true;
   const stores = catalog.stores.map((entry) => {
     const storeDir = resolveContainedPath(catalogRoot, entry.relativePath);
-    let storeStats: fs.Stats;
-    let manifestStats: fs.Stats;
-    try {
-      storeStats = fs.statSync(storeDir);
-      manifestStats = fs.statSync(path.join(storeDir, "manifest.json"));
-    } catch {
-      throw new Error(`Active environment store is missing: ${entry.partitionId}`);
-    }
-    if (!storeStats.isDirectory() || !manifestStats.isFile()) {
-      throw new Error(`Active environment store is incomplete: ${entry.partitionId}`);
+    if (verifyStorePresence) {
+      let storeStats: fs.Stats;
+      let manifestStats: fs.Stats;
+      try {
+        storeStats = fs.statSync(storeDir);
+        manifestStats = fs.statSync(path.join(storeDir, "manifest.json"));
+      } catch {
+        throw new Error(`Active environment store is missing: ${entry.partitionId}`);
+      }
+      if (!storeStats.isDirectory() || !manifestStats.isFile()) {
+        throw new Error(`Active environment store is incomplete: ${entry.partitionId}`);
+      }
     }
     return {
       storeDir,

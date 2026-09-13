@@ -267,6 +267,93 @@ Store restored candidates under the durable release path:
 Keep the previous release and deployment history intact until the new release has passed
 service health, representative bbox, route-comparison, memory, and rollback checks.
 
+## Cloudflare R2 FUSE Staging Candidate
+
+Cloudflare Container disk is ephemeral and currently limited to 20 GB per instance, so it
+cannot hold the 99.54 GB nationwide restore. ADR-028 defines a staging-only alternative that
+mounts the immutable R2 bucket read-only and bundles only verified catalog metadata. Do not
+treat this path as production-ready before its latency and cost gates pass.
+
+Prepare the small deployment bundle without downloading building payloads:
+
+```bash
+npm run environment:cloudflare:prepare -- \
+  --release 2026-08-19.0 \
+  --deployment-id us-2026-08-19.0-r2-fuse-rc1 \
+  --confirm-build us-2026-08-19.0-r2-fuse-rc1
+
+npm run environment:cloudflare:audit-bundle
+npm run environment:cloudflare:typecheck
+```
+
+The prepare command verifies the 51 remote state manifests and every partition manifest
+against Git-tracked archive checkpoints. It writes ignored build artifacts under
+`deploy/cloudflare-environment/generated/` and an ignored Wrangler config containing only
+non-secret account, bucket, and release values.
+
+Before deployment, authenticate Wrangler and set these Worker secrets without writing them
+to the generated config:
+
+```text
+ENVIRONMENT_QUERY_SERVICE_TOKEN
+R2_ACCESS_KEY_ID
+R2_SECRET_ACCESS_KEY
+```
+
+Use a dedicated runtime R2 key limited to object read access for this bucket. Do not reuse
+the archive writer key inside the internet-facing staging runtime.
+
+The container uses a checksum-pinned `tigrisfs` binary and mounts R2 with `allow_other,ro`.
+It passes a release-specific `ENVIRONMENT_DEPLOYMENT_STORE_ROOT` and skips 20,758 eager
+filesystem `stat` calls. The selected partition manifest, tile index, and offset index are
+still verified on first use. `ENVIRONMENT_TRUST_VERIFIED_ARCHIVE_DATA=true` skips only the
+full building-file rehash because archival already verified the complete remote object. This
+flag is rejected unless the active catalog source is Cloudflare R2.
+
+After staging is reachable, run:
+
+```bash
+npm run environment:cloudflare:benchmark -- \
+  --url https://<environment-worker>.workers.dev \
+  --rounds 3 \
+  --output docs/analysis/generated/environment-r2-fuse-benchmark.json
+```
+
+After configuring the ComfortOS application to use that service, validate the application
+boundary separately:
+
+```bash
+npm run smoke:stage11:nationwide -- \
+  --base-url https://<comfortos-app> \
+  --release 2026-08-19.0 \
+  --output docs/analysis/generated/stage-11-nationwide-app-smoke.json
+```
+
+This gate requires live application health, managed production routing metadata, the pinned
+building release, successful building queries, and comparable candidates in nine distributed
+regions. It also rejects any response containing a configured Mapbox, environment-service,
+health-check, or R2 credential.
+
+The benchmark covers Minneapolis, Seattle, Phoenix, Chicago, New York, Miami, Anchorage,
+Honolulu, and Washington, DC. It enforces authentication, checks for bearer-token exposure,
+separates cold and warm latency, and applies the 8-second p95 gate. Its estimated R2 object
+opens are only a lower bound; record actual FUSE metadata/range operations and active
+container duration from Cloudflare metrics before acceptance.
+
+Rollback an active bundle pointer only to an existing immutable history record:
+
+```bash
+npm run data:buildings:rollback-release -- \
+  --target-root /data/comfortos \
+  --deployment-id <previous-deployment-id> \
+  --dry-run true
+
+npm run data:buildings:rollback-release -- \
+  --target-root /data/comfortos \
+  --deployment-id <previous-deployment-id> \
+  --confirm-rollback ROLLBACK:<previous-deployment-id>
+```
+
 ## Application Configuration
 
 ```dotenv

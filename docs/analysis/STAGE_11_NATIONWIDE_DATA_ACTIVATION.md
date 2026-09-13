@@ -1,7 +1,7 @@
 # Stage 11 - Nationwide Data Activation
 
 Date: 2026-09-13
-Status: **RESTORE TOOLING AND LIVE R2 PREFLIGHT COMPLETE; PRODUCTION NOT ACTIVATED**
+Status: **LOCAL R2 CONTAINER VALIDATED; CLOUDFLARE LIVE BENCHMARK PENDING**
 
 ## Objective
 
@@ -30,6 +30,15 @@ workstation and does not begin a production rollout.
 - Allow the environment service to load the verified active catalog directly instead of
   recursively discovering and reading all partition manifests at startup.
 - Reverify a selected partition's on-disk manifest before its building data is loaded.
+- Build a compact Cloudflare staging bundle from verified remote manifests without
+  downloading the 99.54 GB building payload.
+- Support a release-specific immutable-object mount root while preserving the restored
+  durable-volume default.
+- Provide an explicit immutable-history rollback command.
+- Provide nationwide bundle-capacity and nine-region cold/warm service benchmarks.
+- Provide a nine-region application smoke gate that verifies managed routing, live health,
+  release metadata, environmental capability, comparable candidates, and credential
+  non-exposure through the real application API.
 
 ## Nationwide Evidence
 
@@ -62,22 +71,69 @@ Deterministic tests cover:
 - selected partition-manifest checksum rejection; and
 - catalog-backed provider metadata without nationwide manifest discovery.
 
-The complete suite passes 232/232 tests together with TypeScript, ESLint, the Vinext
-production build, and the dedicated environment-service bundle build.
+The complete suite passes 242/242 tests together with Node and Cloudflare Worker TypeScript,
+ESLint, and the dedicated environment-service bundle build.
+
+## Cloudflare Staging Finding
+
+Cloudflare Containers cannot host the accepted archive on instance disk: the largest
+current instance has 20 GB of ephemeral disk. A staging package now uses Cloudflare's
+documented read-only R2 FUSE path instead. The container image includes only the active
+deployment manifest and checksum-addressed nationwide catalog. `tigrisfs` is pinned to
+version 1.2.2 and its Linux AMD64 archive SHA-256.
+
+This is a proposed experiment under ADR-028, not a production architecture change. Object
+storage FUSE does not promise SSD-like performance. A local native-container probe confirmed
+that repeating the full building-file hash causes an 8-second timeout, so the R2-only runtime
+trusts the upload-time whole-object verification while retaining manifest and index checks.
+Live cold/warm latency and R2 operation amplification must decide whether the experiment is
+accepted or rejected.
+
+The verified bundle is 36,866,892 bytes, loads its catalog in 302 ms in the latest local
+audit, and uses 89,962,456 bytes of additional heap. Content-checksum deduplication preserves
+all 20,758 catalog records while reducing the runtime provider set to 19,036 unique stores; 1,722
+cross-jurisdiction border records point to identical Overture content.
+
+A native ARM64 Container probe mounted the production R2 bucket read-only and passed all
+nine representative regions. With two rounds per region, cold p95 was 3,957 ms, warm p95 was
+46 ms, overall p95 was 3,957 ms, and the maximum was 3,957 ms. The probe returned current
+release buildings in Minneapolis, Seattle, Phoenix, Chicago, New York, Miami, Anchorage,
+Honolulu, and Washington, DC. Authentication and bearer-token non-exposure checks passed.
+
+The local ComfortOS application was then connected to the authenticated R2-backed service
+and exercised through the production API boundary. Minneapolis, Seattle, Phoenix, Chicago,
+New York, Miami, Anchorage, Honolulu, and Washington, DC all returned the pinned building
+release, `ready` building capability, and at least three comparable route candidates. All
+9/9 application requests passed, 35/35 analyzed candidates were comparable, the maximum
+response time was 2,451 ms, and provider metadata recorded 45 managed Mapbox requests with
+no public OSRM fallback.
+
+That application rehearsal exposed and fixed two previously hidden integration defects.
+The building cache now forwards provider metadata and request cancellation. The shade engine
+no longer depends on a CommonJS `RBush` path that fails inside the Vinext/Cloudflare worker
+bundle; shadow hulls are generated deterministically in the existing local projection and
+covered by geometry regression tests. Node and worker execution now produce the same
+available shade capability.
+
+The AMD64 image itself builds successfully and is approximately 79.7 MB. TigrisFS crashed
+when that AMD64 image was executed through QEMU on the ARM development machine after a
+successful mount; the native ARM64 build did not. Cloudflare must therefore validate the
+production image on native AMD64 rather than treating the local emulation crash as a provider
+result.
 
 ## Remaining External Work
 
-1. Provision a production or staging environment-service host with a durable volume large
-   enough for the 99.54 GB payload plus operational headroom.
-2. Run the full restore on that host and retain its generated catalog and receipts.
-3. Measure service startup, memory, cold/warm partition access, concurrent load, and cache
-   behavior across representative states.
-4. Run nationwide bbox, state-boundary, unsupported-region, and route-comparison smoke tests.
-5. Activate a release candidate, start the private service from its active manifest, and
-   rehearse a catalog/data rollback before directing beta traffic to it.
-6. Complete the remaining production security, observability, legal, browser, and mobile
+1. Authenticate Wrangler and confirm Cloudflare Containers access on the account.
+2. Create a dedicated read-only runtime R2 key and set it together with the generated
+   environment-service token as Worker secrets.
+3. Deploy the staging Container and run the nine-region cold/warm benchmark.
+4. Record actual R2 operations, active container duration, and estimated provider cost.
+5. Rehearse an immutable deployment rollback and rerun health plus representative queries.
+6. Accept ADR-028 only if latency, cost, integrity, and security gates pass; otherwise use a
+   durable-volume host under ADR-027.
+7. Complete the remaining production security, observability, legal, browser, and mobile
    gates in the MVP release checklist.
 
 ## Judgment
 
-READY FOR DURABLE-VOLUME RESTORE; PRODUCTION NOT ACTIVATED
+READY FOR R2 FUSE STAGING BENCHMARK; PRODUCTION NOT ACTIVATED

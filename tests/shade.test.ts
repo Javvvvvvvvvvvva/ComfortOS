@@ -130,6 +130,24 @@ test("prepared shadow building context preserves exact shadow geometry", () => {
   assert.deepEqual(prepared, direct);
 });
 
+test("building shadows form a finite closed polygon ring", () => {
+  const [shadow] = calculateBuildingShadow(
+    makeFixtureBuilding(20),
+    {
+      azimuthDeg: 225,
+      elevationDeg: 35,
+      timestamp: "2026-08-08T23:00:00.000Z",
+      sunAboveHorizon: true,
+    },
+    ORIGIN,
+  );
+  const ring = (shadow.geometry as Polygon).coordinates[0];
+
+  assert.ok(ring.length >= 4);
+  assert.deepEqual(ring[0], ring.at(-1));
+  assert.ok(ring.flat().every(Number.isFinite));
+});
+
 test("targeted shadow generation preserves intersecting results and skips distant buildings", () => {
   const near = makeFixtureBuildingAt("near", 20, 0, 0);
   const far = makeFixtureBuildingAt("far", 20, 2_000, 2_000);

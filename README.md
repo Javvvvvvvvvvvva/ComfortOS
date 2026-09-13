@@ -4,7 +4,10 @@ ComfortOS is a climate-aware walking route comparison app. It keeps the fastest 
 
 ![ComfortOS route comparison](docs/assets/comfortos-mvp-route.png)
 
-The current build is the Stage 10 MVP and limited-beta hardening baseline. Managed Mapbox search and walking directions are normalized behind provider interfaces, while deterministic environmental engines calculate route costs independently from the React UI.
+The current build preserves the Stage 10 MVP and limited-beta hardening baseline while
+adding the Stage 11 nationwide environment-service staging candidate. Managed Mapbox search
+and walking directions are normalized behind provider interfaces, while deterministic
+environmental engines calculate route costs independently from the React UI.
 
 ## What It Does
 
@@ -99,6 +102,11 @@ npm run data:buildings:activate-release -- \
 The environment service then starts with
 `ENVIRONMENT_ACTIVE_DEPLOYMENT_MANIFEST=/data/comfortos/deployments/production-active.json`.
 See the deployment runbook before restoring the roughly 100 GB release.
+
+The Stage 11 Cloudflare candidate instead mounts the immutable release read-only from R2 and
+keeps only the verified catalog in the container image. Its local native-container and
+nine-region application rehearsals pass, but ADR-028 remains proposed until the native
+Cloudflare latency, operation-cost, read-only credential, and rollback gates are complete.
 
 ## Architecture
 
@@ -201,6 +209,12 @@ Run the Stage 10 smoke gate:
 npm run smoke:stage10
 ```
 
+Run the Stage 11 nationwide application gate against a configured release candidate:
+
+```bash
+npm run smoke:stage11:nationwide -- --base-url http://localhost:3000
+```
+
 The repository also includes focused routing, provider health, latency, climate, fixture, and three-city validation scripts. See the `scripts` section of `package.json` for the complete command list.
 
 ## Project Structure
@@ -257,6 +271,7 @@ Start with the canonical documents:
 - [ADR-025: Random-Access Building Stores](docs/decisions/ADR-025-random-access-building-stores.md)
 - [ADR-026: State Archive and Local Pruning](docs/decisions/ADR-026-state-archive-and-local-pruning.md)
 - [ADR-027: R2 Release Restoration and Atomic Activation](docs/decisions/ADR-027-r2-release-restoration-and-atomic-activation.md)
+- [ADR-028: Cloudflare R2 FUSE Environment Staging](docs/decisions/ADR-028-cloudflare-r2-fuse-environment-staging.md)
 - [Stage 9.6 Managed Routing Validation](docs/analysis/STAGE_9_6_MANAGED_ROUTING_VALIDATION.md)
 - [Stage 10 MVP Readiness Audit](docs/analysis/STAGE_10_MVP_READINESS_AUDIT.md)
 - [Stage 10.1 Production Hardening](docs/analysis/STAGE_10_1_PRODUCTION_HARDENING.md)

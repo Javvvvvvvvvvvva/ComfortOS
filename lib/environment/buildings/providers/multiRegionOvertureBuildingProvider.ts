@@ -16,6 +16,7 @@ export type CatalogBuildingStore = {
   storeDir: string;
   manifestSha256: string;
   manifest: LocalOvertureStoreManifest;
+  verifyBuildingFileChecksum?: boolean;
 };
 
 export class MultiRegionOvertureBuildingProvider implements BuildingProvider {
@@ -36,7 +37,10 @@ export class MultiRegionOvertureBuildingProvider implements BuildingProvider {
         },
   ) {
     const storeDirs = Array.isArray(input) ? input : (input.storeDirs ?? []);
-    const catalogStores = Array.isArray(input) ? [] : (input.catalogStores ?? []);
+    const configuredCatalogStores = Array.isArray(input)
+      ? []
+      : (input.catalogStores ?? []);
+    const catalogStores = dedupeCatalogBuildingStores(configuredCatalogStores);
     if (storeDirs.length && catalogStores.length) {
       throw new Error("Configure store directories or catalog stores, not both.");
     }
@@ -49,6 +53,7 @@ export class MultiRegionOvertureBuildingProvider implements BuildingProvider {
         const provider = new LocalOvertureBuildingProvider({
           storeDir: entry.storeDir,
           expectedManifestSha256: entry.manifestSha256,
+          verifyBuildingFileChecksum: entry.verifyBuildingFileChecksum,
         });
         return { provider, manifest: entry.manifest };
       });
@@ -225,4 +230,28 @@ function dedupeBuildings(buildings: Building[]) {
 
 function unique(values: string[]) {
   return Array.from(new Set(values));
+}
+
+export function dedupeCatalogBuildingStores(stores: CatalogBuildingStore[]) {
+  const seen = new Set<string>();
+  return stores.filter((store) => {
+    const checksums = store.manifest.checksums;
+    const bbox = store.manifest.bbox;
+    const key =
+      checksums?.buildingsSha256 &&
+      checksums.tileIndexSha256 &&
+      checksums.buildingOffsetsSha256 &&
+      bbox
+        ? JSON.stringify([
+            store.manifest.release,
+            bbox,
+            checksums.buildingsSha256,
+            checksums.tileIndexSha256,
+            checksums.buildingOffsetsSha256,
+          ])
+        : `path:${store.storeDir}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }

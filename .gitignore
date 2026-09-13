@@ -41,6 +41,8 @@ yarn-error.log*
 /dist/
 /dist-environment/
 /.wrangler/
+/wrangler.environment-service.generated.jsonc
+/deploy/cloudflare-environment/generated/
 /outputs/
 /work/
 *.tsbuildinfo

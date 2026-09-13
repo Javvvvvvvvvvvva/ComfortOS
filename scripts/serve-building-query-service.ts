@@ -17,6 +17,11 @@ const storeRoots = splitConfiguredPaths(
   process.env.BUILDING_LOCAL_OVERTURE_STORE_ROOTS,
 );
 const activeDeploymentManifest = process.env.ENVIRONMENT_ACTIVE_DEPLOYMENT_MANIFEST;
+const deploymentStoreRoot = process.env.ENVIRONMENT_DEPLOYMENT_STORE_ROOT;
+const lazyDeploymentStoreValidation =
+  process.env.ENVIRONMENT_DEPLOYMENT_LAZY_STORE_VALIDATION === "true";
+const trustVerifiedArchiveData =
+  process.env.ENVIRONMENT_TRUST_VERIFIED_ARCHIVE_DATA === "true";
 const port = Number(process.env.BUILDING_QUERY_SERVICE_PORT ?? process.env.PORT ?? 8787);
 const host = process.env.BUILDING_QUERY_SERVICE_HOST ?? "0.0.0.0";
 const serviceToken =
@@ -64,7 +69,10 @@ if (
   assertEnvironmentServiceAuthentication(process.env.NODE_ENV, serviceToken);
 
   const activeDeployment = activeDeploymentManifest
-    ? loadActiveBuildingDeployment(activeDeploymentManifest)
+    ? loadActiveBuildingDeployment(activeDeploymentManifest, {
+        storeRoot: deploymentStoreRoot,
+        verifyStorePresence: !lazyDeploymentStoreValidation,
+      })
     : null;
   const configuredStoreDirs = activeDeployment
     ? []
@@ -74,13 +82,24 @@ if (
           ...discoverBuildingStoreDirs(storeRoots),
         ]),
       );
+  if (
+    trustVerifiedArchiveData &&
+    activeDeployment?.catalog.source.provider !== "cloudflare-r2"
+  ) {
+    throw new Error(
+      "ENVIRONMENT_TRUST_VERIFIED_ARCHIVE_DATA requires an active Cloudflare R2 catalog.",
+    );
+  }
   if (!activeDeployment && !configuredStoreDirs.length) {
     throw new Error("No Overture building stores were found in the configured roots.");
   }
   const provider =
     activeDeployment
       ? new MultiRegionOvertureBuildingProvider({
-          catalogStores: activeDeployment.stores,
+          catalogStores: activeDeployment.stores.map((store) => ({
+            ...store,
+            verifyBuildingFileChecksum: !trustVerifiedArchiveData,
+          })),
           maxLoadedStores,
         })
       : configuredStoreDirs.length > 1

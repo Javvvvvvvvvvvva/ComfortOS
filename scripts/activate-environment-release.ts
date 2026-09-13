@@ -15,6 +15,7 @@ export type ActivateEnvironmentReleaseOptions = {
   requiredJurisdictionCount: number;
   confirmActivation?: string;
   dryRun: boolean;
+  verifiedRemoteCatalog?: boolean;
 };
 
 async function main() {
@@ -55,7 +56,13 @@ export async function activateEnvironmentRelease(
       `Activation requires ${options.requiredJurisdictionCount} jurisdictions; catalog contains ${catalog.summary.jurisdictionCount}.`,
     );
   }
-  await verifyCatalogManifests(path.dirname(catalogPath), catalog.stores);
+  if (options.verifiedRemoteCatalog) {
+    if (catalog.source.provider !== "cloudflare-r2") {
+      throw new Error("Remote catalog activation requires a Cloudflare R2 source.");
+    }
+  } else {
+    await verifyCatalogManifests(path.dirname(catalogPath), catalog.stores);
+  }
 
   const catalogSha256 = sha256Buffer(catalogBytes);
   const catalogRelativePath = path.posix.join(

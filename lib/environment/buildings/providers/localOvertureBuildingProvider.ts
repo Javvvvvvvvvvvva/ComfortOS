@@ -59,6 +59,7 @@ type LoadedStore = {
 export type LocalOvertureBuildingProviderOptions = {
   storeDir: string;
   expectedManifestSha256?: string;
+  verifyBuildingFileChecksum?: boolean;
 };
 
 const MANIFEST_FILE = "manifest.json";
@@ -72,6 +73,7 @@ const MAX_STORED_BUILDING_BYTES = 16 * 1024 * 1024;
 export class LocalOvertureBuildingProvider implements BuildingProvider {
   private readonly storeDir: string;
   private readonly expectedManifestSha256: string | undefined;
+  private readonly verifyBuildingFileChecksum: boolean;
   private manifestPromise: Promise<LocalOvertureStoreManifest> | null = null;
   private loaded: LoadedStore | null = null;
   private loadPromise: Promise<LoadedStore> | null = null;
@@ -79,6 +81,7 @@ export class LocalOvertureBuildingProvider implements BuildingProvider {
   constructor(options: LocalOvertureBuildingProviderOptions) {
     this.storeDir = options.storeDir;
     this.expectedManifestSha256 = options.expectedManifestSha256;
+    this.verifyBuildingFileChecksum = options.verifyBuildingFileChecksum ?? true;
   }
 
   async getBuildings(bounds: BoundingBox): Promise<Building[]> {
@@ -174,10 +177,12 @@ export class LocalOvertureBuildingProvider implements BuildingProvider {
 
     if (manifest.randomAccessIndex) {
       assertRandomAccessIndex(manifest);
-      await verifyStoreFileChecksum(
-        path.join(this.storeDir, BUILDINGS_FILE),
-        manifest.checksums?.buildingsSha256,
-      );
+      if (this.verifyBuildingFileChecksum) {
+        await verifyStoreFileChecksum(
+          path.join(this.storeDir, BUILDINGS_FILE),
+          manifest.checksums?.buildingsSha256,
+        );
+      }
       const buildingOffsets = await fs.readFile(
         path.join(this.storeDir, manifest.randomAccessIndex.file),
       );
