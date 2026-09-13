@@ -12,10 +12,17 @@ import {
 const MANIFEST_READ_CONCURRENCY = 32;
 const INLINE_REGION_METADATA_LIMIT = 12;
 
+export type CatalogBuildingStore = {
+  storeDir: string;
+  manifestSha256: string;
+  manifest: LocalOvertureStoreManifest;
+};
+
 export class MultiRegionOvertureBuildingProvider implements BuildingProvider {
   private readonly providers: LocalOvertureBuildingProvider[];
   private readonly maxLoadedStores: number;
   private manifestIndexPromise: Promise<ProviderManifest[]> | null = null;
+  private readonly catalogManifestIndex: ProviderManifest[] | null;
   private readonly lastUsed = new Map<LocalOvertureBuildingProvider, number>();
   private accessSequence = 0;
 
@@ -23,18 +30,35 @@ export class MultiRegionOvertureBuildingProvider implements BuildingProvider {
     input:
       | string[]
       | {
-          storeDirs: string[];
+          storeDirs?: string[];
+          catalogStores?: CatalogBuildingStore[];
           maxLoadedStores?: number;
         },
   ) {
-    const storeDirs = Array.isArray(input) ? input : input.storeDirs;
+    const storeDirs = Array.isArray(input) ? input : (input.storeDirs ?? []);
+    const catalogStores = Array.isArray(input) ? [] : (input.catalogStores ?? []);
+    if (storeDirs.length && catalogStores.length) {
+      throw new Error("Configure store directories or catalog stores, not both.");
+    }
     const normalized = storeDirs.map((storeDir) => storeDir.trim()).filter(Boolean);
-    if (!normalized.length) {
+    if (!normalized.length && !catalogStores.length) {
       throw new Error("At least one Overture building store directory is required.");
     }
-    this.providers = normalized.map(
-      (storeDir) => new LocalOvertureBuildingProvider({ storeDir }),
-    );
+    if (catalogStores.length) {
+      this.catalogManifestIndex = catalogStores.map((entry) => {
+        const provider = new LocalOvertureBuildingProvider({
+          storeDir: entry.storeDir,
+          expectedManifestSha256: entry.manifestSha256,
+        });
+        return { provider, manifest: entry.manifest };
+      });
+      this.providers = this.catalogManifestIndex.map(({ provider }) => provider);
+    } else {
+      this.catalogManifestIndex = null;
+      this.providers = normalized.map(
+        (storeDir) => new LocalOvertureBuildingProvider({ storeDir }),
+      );
+    }
     const configuredMaximum = Array.isArray(input) ? undefined : input.maxLoadedStores;
     this.maxLoadedStores =
       typeof configuredMaximum === "number" &&
@@ -104,6 +128,7 @@ export class MultiRegionOvertureBuildingProvider implements BuildingProvider {
   }
 
   private async loadManifestIndex() {
+    if (this.catalogManifestIndex) return this.catalogManifestIndex;
     const index: ProviderManifest[] = [];
     for (
       let offset = 0;

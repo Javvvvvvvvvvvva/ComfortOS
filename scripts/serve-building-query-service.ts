@@ -2,6 +2,7 @@ import http from "node:http";
 import { timingSafeEqual } from "node:crypto";
 import { readdirSync, realpathSync } from "node:fs";
 import path from "node:path";
+import { loadActiveBuildingDeployment } from "@/lib/environment/buildings/deploymentCatalog";
 import { LocalOvertureBuildingProvider } from "@/lib/environment/buildings/providers/localOvertureBuildingProvider";
 import { MultiRegionOvertureBuildingProvider } from "@/lib/environment/buildings/providers/multiRegionOvertureBuildingProvider";
 import type { BoundingBox } from "@/lib/environment/buildings/types";
@@ -15,6 +16,7 @@ const explicitStoreDirs = splitConfiguredPaths(
 const storeRoots = splitConfiguredPaths(
   process.env.BUILDING_LOCAL_OVERTURE_STORE_ROOTS,
 );
+const activeDeploymentManifest = process.env.ENVIRONMENT_ACTIVE_DEPLOYMENT_MANIFEST;
 const port = Number(process.env.BUILDING_QUERY_SERVICE_PORT ?? process.env.PORT ?? 8787);
 const host = process.env.BUILDING_QUERY_SERVICE_HOST ?? "0.0.0.0";
 const serviceToken =
@@ -46,24 +48,42 @@ if (
   process.argv[1]?.endsWith("serve-building-query-service.ts") ||
   process.argv[1]?.endsWith("service.mjs")
 ) {
-  if (!explicitStoreDirs.length && !storeRoots.length) {
+  if (
+    activeDeploymentManifest &&
+    (explicitStoreDirs.length || storeRoots.length)
+  ) {
     throw new Error(
-      "Pass a store directory or configure BUILDING_LOCAL_OVERTURE_STORE_DIRS or BUILDING_LOCAL_OVERTURE_STORE_ROOTS.",
+      "ENVIRONMENT_ACTIVE_DEPLOYMENT_MANIFEST cannot be combined with explicit store directories or roots.",
+    );
+  }
+  if (!activeDeploymentManifest && !explicitStoreDirs.length && !storeRoots.length) {
+    throw new Error(
+      "Configure ENVIRONMENT_ACTIVE_DEPLOYMENT_MANIFEST, pass a store directory, or configure a store root.",
     );
   }
   assertEnvironmentServiceAuthentication(process.env.NODE_ENV, serviceToken);
 
-  const configuredStoreDirs = Array.from(
-    new Set([
-      ...explicitStoreDirs.map((storeDir) => path.resolve(storeDir)),
-      ...discoverBuildingStoreDirs(storeRoots),
-    ]),
-  );
-  if (!configuredStoreDirs.length) {
+  const activeDeployment = activeDeploymentManifest
+    ? loadActiveBuildingDeployment(activeDeploymentManifest)
+    : null;
+  const configuredStoreDirs = activeDeployment
+    ? []
+    : Array.from(
+        new Set([
+          ...explicitStoreDirs.map((storeDir) => path.resolve(storeDir)),
+          ...discoverBuildingStoreDirs(storeRoots),
+        ]),
+      );
+  if (!activeDeployment && !configuredStoreDirs.length) {
     throw new Error("No Overture building stores were found in the configured roots.");
   }
   const provider =
-    configuredStoreDirs.length > 1
+    activeDeployment
+      ? new MultiRegionOvertureBuildingProvider({
+          catalogStores: activeDeployment.stores,
+          maxLoadedStores,
+        })
+      : configuredStoreDirs.length > 1
       ? new MultiRegionOvertureBuildingProvider({
           storeDirs: configuredStoreDirs,
           maxLoadedStores,
@@ -89,6 +109,15 @@ if (
             coveredFeatures: coveredFeatureProvider !== null,
           },
           datasetVersion: (await provider.getMetadata())?.datasetVersion ?? "unknown",
+          deployment: activeDeployment
+            ? {
+                id: activeDeployment.deployment.deploymentId,
+                release: activeDeployment.deployment.release,
+                jurisdictionCount:
+                  activeDeployment.catalog.summary.jurisdictionCount,
+                storeCount: activeDeployment.catalog.summary.storeCount,
+              }
+            : null,
         });
       }
 
@@ -105,6 +134,14 @@ if (
           200,
           {
             metadata: await provider.getMetadata(),
+            deployment: activeDeployment
+              ? {
+                  id: activeDeployment.deployment.deploymentId,
+                  release: activeDeployment.deployment.release,
+                  catalogSha256: activeDeployment.deployment.catalogSha256,
+                  summary: activeDeployment.deployment.summary,
+                }
+              : null,
             coveredFeatures: coveredMetadata
               ? {
                   ...coveredMetadata,

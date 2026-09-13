@@ -1,7 +1,7 @@
 # Environment Query Service Deployment
 
 Date: 2026-09-02
-Updated: 2026-09-03
+Updated: 2026-09-13
 
 ## Purpose
 
@@ -20,23 +20,27 @@ docker build -f Dockerfile.environment-service -t comfortos-environment-service 
 Mount immutable, read-only data volumes. Do not copy production datasets into the application
 repository or image.
 
-Required runtime configuration:
+Required runtime configuration for an activated release:
 
 ```dotenv
-BUILDING_LOCAL_OVERTURE_STORE_DIRS=/data/minneapolis,/data/seattle,/data/phoenix
+ENVIRONMENT_ACTIVE_DEPLOYMENT_MANIFEST=/data/comfortos/deployments/production-active.json
 ENVIRONMENT_QUERY_SERVICE_TOKEN=<private-random-token>
 PORT=8787
 ```
 
-For partitioned multi-state deployments, point the service at one or more roots instead of
-listing every store:
+The active deployment manifest points to a checksum-addressed catalog and is the production
+path for partitioned nationwide data. Explicit directories and recursive roots remain
+available for development and small staging datasets:
 
 ```dotenv
+BUILDING_LOCAL_OVERTURE_STORE_DIRS=/data/minneapolis,/data/seattle,/data/phoenix
+# or
 BUILDING_LOCAL_OVERTURE_STORE_ROOTS=/data/us
 ```
 
 The service recursively discovers directories containing `manifest.json`. Multiple roots
-are comma-separated; explicit store directories and roots may be used together.
+are comma-separated; explicit store directories and roots may be used together. They cannot
+be combined with `ENVIRONMENT_ACTIVE_DEPLOYMENT_MANIFEST`.
 
 The production process refuses to start without `ENVIRONMENT_QUERY_SERVICE_TOKEN`. The
 runtime image contains one bundled service module and no npm development toolchain.
@@ -78,11 +82,12 @@ COVERED_FEATURE_QUERY_SERVICE_MAX_FEATURES=10000
 6. Switch the active mount or manifest atomically.
 7. Keep the previous release mounted or immediately recoverable for rollback.
 
-The provider rejects a store when a recorded content checksum does not match.
-Only partition manifests are read during coverage discovery. Building and tile-index files
-are loaded on demand, and the service retains at most the configured number of recently used
-stores in memory. This boundary is required before adding statewide or nationwide partition
-sets.
+The provider rejects a store when a recorded content checksum does not match. An active
+nationwide catalog supplies verified partition bounds without recursively discovering or
+reading all partition manifests at service startup. The selected partition manifest,
+building file, and indexes remain checksum-verified before use. Data files are loaded on
+demand, and the service retains at most the configured number of recently used stores in
+memory.
 
 New stores include `building-offsets.bin`, a fixed-width random-access index. On first use,
 the service streams the full building file through SHA-256 verification, loads only the tile
@@ -180,15 +185,87 @@ Use `--dry-run true` without R2 credentials to validate the local state, route r
 object list, byte counts, and deterministic state-manifest hash. The resulting archive
 checkpoint is source-control metadata, not a production activation record.
 
-Store validated candidates under a durable release path such as:
+## Nationwide Restore And Activation
 
-```text
-/data/us/<state>/<release>/<partition-id>/
+Inspect the complete restore plan without making an R2 request:
+
+```bash
+npm run data:buildings:restore-release -- \
+  --release 2026-08-19.0 \
+  --states all \
+  --checkpoint-root config/data-regions/archive-checkpoints \
+  --target-root /data/comfortos \
+  --dry-run true
 ```
 
-Point `BUILDING_LOCAL_OVERTURE_STORE_ROOTS` at the common root. Keep the previous release
-directory intact until the new release has passed service health, representative bbox,
-route-comparison, memory, and rollback checks.
+Preflight only the 51 remote completion manifests before reserving a large deployment
+volume. This reads no partition payloads:
+
+```bash
+npm run data:buildings:restore-release -- \
+  --release 2026-08-19.0 \
+  --states all \
+  --checkpoint-root config/data-regions/archive-checkpoints \
+  --target-root /data/comfortos \
+  --provider r2 \
+  --preflight true
+```
+
+Restore the release to a durable volume only after capacity has been provisioned. The
+command requires an exact release confirmation, preserves a 5 GiB free-space floor by
+default, downloads at bounded concurrency, verifies every byte and SHA-256, and reuses only
+matching local objects after an interruption:
+
+```bash
+npm run data:buildings:restore-release -- \
+  --release 2026-08-19.0 \
+  --states all \
+  --checkpoint-root config/data-regions/archive-checkpoints \
+  --target-root /data/comfortos \
+  --provider r2 \
+  --confirm-restore 2026-08-19.0
+```
+
+The restore produces:
+
+```text
+/data/comfortos/
+  releases/2026-08-19.0/
+    building-store-catalog.json
+    us/<state>/<partition-id>/
+  deployments/
+```
+
+Validate activation first, then activate with an immutable deployment identifier:
+
+```bash
+npm run data:buildings:activate-release -- \
+  --target-root /data/comfortos \
+  --release 2026-08-19.0 \
+  --deployment-id us-2026-08-19.0-rc1 \
+  --dry-run true
+
+npm run data:buildings:activate-release -- \
+  --target-root /data/comfortos \
+  --release 2026-08-19.0 \
+  --deployment-id us-2026-08-19.0-rc1 \
+  --confirm-activation us-2026-08-19.0-rc1
+```
+
+Activation requires 51 jurisdictions by default, verifies every cataloged partition
+manifest, snapshots the catalog under its SHA-256, preserves immutable deployment history,
+and atomically writes `deployments/production-active.json`. Restart the environment service
+after an activation or rollback. Never point production at the mutable restore candidate
+catalog directly.
+
+Store restored candidates under the durable release path:
+
+```text
+/data/comfortos/releases/<release>/us/<state>/<partition-id>/
+```
+
+Keep the previous release and deployment history intact until the new release has passed
+service health, representative bbox, route-comparison, memory, and rollback checks.
 
 ## Application Configuration
 

@@ -1,7 +1,8 @@
 # ComfortOS MVP Deployment And Data Operations
 
 Date: 2026-08-16
-Status: Stage 10 production proposal; deployment not yet complete
+Updated: 2026-09-13
+Status: Stage 11 deployment contract implemented; external deployment not yet complete
 
 ## Intended Topology
 
@@ -45,17 +46,18 @@ separate supervised container or VM process with the following properties:
 
 - Read-only store volume populated from versioned object-storage artifacts.
 - One active manifest mapping a capability region to a store release.
-- All three validated stores loaded by the same `MultiRegionOvertureBuildingProvider`.
+- Active stores selected by the same `MultiRegionOvertureBuildingProvider` from a verified
+  release catalog.
 - `/health` for process/store readiness and `/metadata` for non-secret provenance.
 - Private network access from the app API; TLS and service authentication at the platform
   boundary.
 - At least two instances or a documented rapid-restart policy for beta.
-- Memory sized from a measured all-store resident-set benchmark. The current provider loads
-  `buildings.jsonl` and its tile index into process memory on first use, so the deployment
-  must not be sized from file size alone.
+- Memory and storage sized from measured nationwide startup and representative partition
+  benchmarks. Indexed stores verify `buildings.jsonl`, load bounded tile/offset indexes, and
+  read candidate records by byte position rather than retaining the full building file.
 - Request timeout, concurrency, payload-size, and bbox-size limits at the service edge.
 
-The current stores are:
+The original climate-validation stores were:
 
 | Capability region | Overture release | Buildings | Validation storage |
 | --- | --- | ---: | --- |
@@ -63,9 +65,9 @@ The current stores are:
 | Seattle | `2026-07-22.0` | 117,331 | local `/tmp` store |
 | Phoenix | `2026-06-17.0` | 51,737 | local `/tmp` store |
 
-The mixed release set is acceptable for validation but must be deliberate and visible in
-the production active manifest. A synchronized release is preferred when it passes the
-same validation gates.
+Those mixed releases remain historical validation evidence. The synchronized
+`2026-08-19.0` nationwide archive is now the production candidate, but it is not deployed or
+active until the Stage 11 restore, load, smoke, and rollback gates pass.
 
 ## Versioned Store Layout
 
@@ -75,11 +77,14 @@ Recommended object-storage layout:
 comfortos-environment-data/
   overture-buildings/
     <release>/
-      <region-id>/
-        manifest.json
-        buildings.jsonl
-        tile-index.json
-        checksums.json
+      us/
+        <state>/
+          state-archive-manifest.json
+          <partition-id>/
+            manifest.json
+            buildings.jsonl
+            tile-index.json
+            building-offsets.bin
   covered-features/
     <source-release>/
       <region-id>/
@@ -88,10 +93,13 @@ comfortos-environment-data/
         checksums.json
   deployments/
     production-active.json
+    history/<deployment-id>.json
 ```
 
-`production-active.json` is changed atomically. Store artifacts are immutable after
-publication. The previous active manifest remains available for rollback.
+R2 archive completion does not create `production-active.json`. The restored durable volume
+contains a checksum-addressed catalog snapshot, immutable deployment history, and the
+atomically changed active manifest. Store artifacts remain immutable after publication, and
+the previous release remains available for rollback.
 
 ## Dataset Update Runbook
 

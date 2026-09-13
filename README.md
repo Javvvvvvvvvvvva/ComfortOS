@@ -26,9 +26,11 @@ Place search, managed walking routes, and National Weather Service conditions ar
 across all 50 states and the District of Columbia. The public `/coverage` page and
 `/api/regions` endpoint expose that catalog separately from environmental-data readiness.
 
-Detailed Comfort data is metro-validated in Phoenix, Minneapolis, Seattle, and Chicago. The
-repository does not claim statewide building, shade, or rain-cover coverage until reviewed
-spatial partitions are deployed. Generate bounded state ingestion plans with:
+The pinned `2026-08-19.0` building release is built, validated, checksum-verified, and
+archived in R2 for all 50 states and the District of Columbia. Archival is not production
+deployment: statewide building and shade coverage is not claimed until the release is
+restored to a durable environment-service volume and explicitly activated. Rain-cover data
+remains a separate capability. Generate bounded state ingestion plans with:
 
 ```bash
 npm run data:buildings:plan:states -- --states IL
@@ -72,6 +74,31 @@ npm run data:buildings:archive-state -- \
 The command loads R2 credentials from `.env.local` by default, publishes the state archive
 manifest last, writes only a compact checkpoint to Git, and never changes production
 deployment coverage.
+
+After provisioning a durable deployment volume, preflight the remote manifests, restore the
+release, and create an atomic active deployment:
+
+```bash
+npm run data:buildings:restore-release -- \
+  --release 2026-08-19.0 --states all \
+  --checkpoint-root config/data-regions/archive-checkpoints \
+  --target-root /data/comfortos --provider r2 --preflight true
+
+npm run data:buildings:restore-release -- \
+  --release 2026-08-19.0 --states all \
+  --checkpoint-root config/data-regions/archive-checkpoints \
+  --target-root /data/comfortos --provider r2 \
+  --confirm-restore 2026-08-19.0
+
+npm run data:buildings:activate-release -- \
+  --target-root /data/comfortos --release 2026-08-19.0 \
+  --deployment-id us-2026-08-19.0-rc1 \
+  --confirm-activation us-2026-08-19.0-rc1
+```
+
+The environment service then starts with
+`ENVIRONMENT_ACTIVE_DEPLOYMENT_MANIFEST=/data/comfortos/deployments/production-active.json`.
+See the deployment runbook before restoring the roughly 100 GB release.
 
 ## Architecture
 
@@ -228,6 +255,8 @@ Start with the canonical documents:
 - [ADR-023: Production Provider Boundaries](docs/decisions/ADR-023-production-provider-boundaries.md)
 - [ADR-024: Nationwide Coverage and Partitioned Environmental Data](docs/decisions/ADR-024-nationwide-coverage-and-partitioned-environmental-data.md)
 - [ADR-025: Random-Access Building Stores](docs/decisions/ADR-025-random-access-building-stores.md)
+- [ADR-026: State Archive and Local Pruning](docs/decisions/ADR-026-state-archive-and-local-pruning.md)
+- [ADR-027: R2 Release Restoration and Atomic Activation](docs/decisions/ADR-027-r2-release-restoration-and-atomic-activation.md)
 - [Stage 9.6 Managed Routing Validation](docs/analysis/STAGE_9_6_MANAGED_ROUTING_VALIDATION.md)
 - [Stage 10 MVP Readiness Audit](docs/analysis/STAGE_10_MVP_READINESS_AUDIT.md)
 - [Stage 10.1 Production Hardening](docs/analysis/STAGE_10_1_PRODUCTION_HARDENING.md)
@@ -235,6 +264,7 @@ Start with the canonical documents:
 - [Illinois Overture Rollout Pilot](docs/analysis/STAGE_10_3_ILLINOIS_OVERTURE_ROLLOUT.md)
 - [Nationwide Data Build Checkpoint](docs/analysis/STAGE_10_4_NATIONWIDE_DATA_BUILD_CHECKPOINT.md)
 - [State Archive Pipeline](docs/analysis/STAGE_10_5_STATE_ARCHIVE_PIPELINE.md)
+- [Stage 11 Nationwide Data Activation](docs/analysis/STAGE_11_NATIONWIDE_DATA_ACTIVATION.md)
 - [MVP Release Checklist](docs/release/MVP_RELEASE_CHECKLIST.md)
 - [Environment Query Service Deployment](docs/operations/ENVIRONMENT_QUERY_SERVICE_DEPLOYMENT.md)
 - [Observability Runbook](docs/operations/OBSERVABILITY_RUNBOOK.md)

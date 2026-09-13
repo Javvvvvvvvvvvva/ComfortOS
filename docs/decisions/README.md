@@ -55,3 +55,4 @@ Accepted ADRs:
 - `ADR-024-nationwide-coverage-and-partitioned-environmental-data.md`
 - `ADR-025-random-access-building-stores.md`
 - `ADR-026-state-archive-and-local-pruning.md`
+- `ADR-027-r2-release-restoration-and-atomic-activation.md`

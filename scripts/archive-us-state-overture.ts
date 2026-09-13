@@ -1,9 +1,11 @@
 import { createHash } from "node:crypto";
-import { createReadStream } from "node:fs";
+import { createReadStream, createWriteStream } from "node:fs";
 import fs, { constants as fsConstants } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { loadEnvFile } from "node:process";
+import { Readable, Transform } from "node:stream";
+import { pipeline } from "node:stream/promises";
 import {
   GetObjectCommand,
   HeadObjectCommand,
@@ -159,6 +161,12 @@ export interface ObjectStore {
   location: string;
   inspect(key: string): Promise<RemoteInspection>;
   putFile(key: string, filePath: string, object: { sizeBytes: number; sha256: string }): Promise<void>;
+  readBuffer(key: string, maxBytes: number): Promise<Buffer>;
+  downloadFile(
+    key: string,
+    filePath: string,
+    object: { sizeBytes: number; sha256: string },
+  ): Promise<void>;
 }
 
 async function main() {
@@ -558,6 +566,21 @@ export function createFilesystemObjectStore(root: string): ObjectStore {
       await fs.mkdir(path.dirname(target), { recursive: true });
       await fs.copyFile(filePath, target, fsConstants.COPYFILE_EXCL);
     },
+    async readBuffer(key, maxBytes) {
+      const target = safeObjectPath(resolvedRoot, key);
+      const stats = await fs.stat(target);
+      if (!stats.isFile() || stats.size > maxBytes) {
+        throw new Error(`Object exceeds the configured read limit: ${key}`);
+      }
+      return fs.readFile(target);
+    },
+    async downloadFile(key, filePath, object) {
+      await writeVerifiedDownload(
+        createReadStream(safeObjectPath(resolvedRoot, key)),
+        filePath,
+        object,
+      );
+    },
   };
 }
 
@@ -668,7 +691,103 @@ export function createR2ObjectStore(options: {
         throw new Error(`R2 upload failed for ${key}.`, { cause: error });
       }
     },
+    async readBuffer(key, maxBytes) {
+      try {
+        return await retryTransientOperation(
+          async () => {
+            const response = await client.send(
+              new GetObjectCommand({ Bucket: options.bucket, Key: key }),
+            );
+            if (!response.Body) throw new Error(`R2 object returned no body: ${key}`);
+            const chunks: Buffer[] = [];
+            let sizeBytes = 0;
+            for await (const chunk of response.Body as AsyncIterable<Uint8Array>) {
+              sizeBytes += chunk.byteLength;
+              if (sizeBytes > maxBytes) {
+                throw new Error(`Object exceeds the configured read limit: ${key}`);
+              }
+              chunks.push(Buffer.from(chunk));
+            }
+            return Buffer.concat(chunks, sizeBytes);
+          },
+          {
+            attempts: R2_VERIFICATION_ATTEMPTS,
+            baseDelayMs: R2_RETRY_BASE_DELAY_MS,
+            shouldRetry: (error) =>
+              !isRemoteMissing(error) &&
+              !(error instanceof Error && /configured read limit/.test(error.message)),
+            onRetry: (attempt, delayMs) => {
+              console.warn(
+                `R2 read request failed; retrying in ${delayMs / 1_000}s (${attempt}/${R2_VERIFICATION_ATTEMPTS}).`,
+              );
+            },
+          },
+        );
+      } catch (error) {
+        throw new Error(`R2 read failed for ${key}.`, { cause: error });
+      }
+    },
+    async downloadFile(key, filePath, object) {
+      try {
+        await retryTransientOperation(
+          async () => {
+            const response = await client.send(
+              new GetObjectCommand({ Bucket: options.bucket, Key: key }),
+            );
+            if (!response.Body) throw new Error(`R2 object returned no body: ${key}`);
+            await writeVerifiedDownload(
+              Readable.from(response.Body as AsyncIterable<Uint8Array>),
+              filePath,
+              object,
+            );
+          },
+          {
+            attempts: R2_VERIFICATION_ATTEMPTS,
+            baseDelayMs: R2_RETRY_BASE_DELAY_MS,
+            shouldRetry: (error) =>
+              !(error instanceof Error && /checksum or byte count mismatch/.test(error.message)),
+            onRetry: (attempt, delayMs) => {
+              console.warn(
+                `R2 download failed; retrying in ${delayMs / 1_000}s (${attempt}/${R2_VERIFICATION_ATTEMPTS}).`,
+              );
+            },
+          },
+        );
+      } catch (error) {
+        throw new Error(`R2 download failed for ${key}.`, { cause: error });
+      }
+    },
   };
+}
+
+async function writeVerifiedDownload(
+  source: NodeJS.ReadableStream,
+  filePath: string,
+  expected: { sizeBytes: number; sha256: string },
+) {
+  await fs.mkdir(path.dirname(filePath), { recursive: true });
+  const temporaryPath = `${filePath}.${process.pid}.part`;
+  await fs.rm(temporaryPath, { force: true });
+  const hash = createHash("sha256");
+  let sizeBytes = 0;
+  const verifier = new Transform({
+    transform(chunk: Buffer, _encoding, callback) {
+      hash.update(chunk);
+      sizeBytes += chunk.byteLength;
+      callback(null, chunk);
+    },
+  });
+
+  try {
+    await pipeline(source, verifier, createWriteStream(temporaryPath, { flags: "wx" }));
+    if (sizeBytes !== expected.sizeBytes || hash.digest("hex") !== expected.sha256) {
+      throw new Error("Downloaded object checksum or byte count mismatch.");
+    }
+    await fs.rename(temporaryPath, filePath);
+  } catch (error) {
+    await fs.rm(temporaryPath, { force: true });
+    throw error;
+  }
 }
 
 export async function retryTransientOperation<T>(

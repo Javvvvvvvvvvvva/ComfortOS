@@ -23,6 +23,8 @@
     "data:buildings:rollout": "node --import tsx scripts/build-us-overture-rollout.ts",
     "data:buildings:audit": "node --import tsx scripts/audit-us-overture-build-progress.ts",
     "data:buildings:archive-state": "node --import tsx scripts/archive-us-state-overture.ts",
+    "data:buildings:restore-release": "node --import tsx scripts/restore-us-overture-release.ts",
+    "data:buildings:activate-release": "node --import tsx scripts/activate-environment-release.ts",
     "data:buildings:index": "node --import tsx scripts/index-overture-building-store.ts",
     "data:covered-features:overpass": "node --import tsx scripts/extract-covered-features-overpass.ts",
     "buildings:serve": "node --import tsx scripts/serve-building-query-service.ts",

@@ -56,8 +56,9 @@ type LoadedStore = {
   tileIndex: TileIndex;
 };
 
-type LocalOvertureBuildingProviderOptions = {
+export type LocalOvertureBuildingProviderOptions = {
   storeDir: string;
+  expectedManifestSha256?: string;
 };
 
 const MANIFEST_FILE = "manifest.json";
@@ -70,12 +71,14 @@ const MAX_STORED_BUILDING_BYTES = 16 * 1024 * 1024;
 
 export class LocalOvertureBuildingProvider implements BuildingProvider {
   private readonly storeDir: string;
+  private readonly expectedManifestSha256: string | undefined;
   private manifestPromise: Promise<LocalOvertureStoreManifest> | null = null;
   private loaded: LoadedStore | null = null;
   private loadPromise: Promise<LoadedStore> | null = null;
 
   constructor(options: LocalOvertureBuildingProviderOptions) {
     this.storeDir = options.storeDir;
+    this.expectedManifestSha256 = options.expectedManifestSha256;
   }
 
   async getBuildings(bounds: BoundingBox): Promise<Building[]> {
@@ -106,6 +109,11 @@ export class LocalOvertureBuildingProvider implements BuildingProvider {
       this.manifestPromise = fs
         .readFile(path.join(this.storeDir, MANIFEST_FILE), "utf8")
         .then((text) => {
+          verifyStoreChecksum(
+            MANIFEST_FILE,
+            text,
+            this.expectedManifestSha256,
+          );
           const manifest = JSON.parse(text) as LocalOvertureStoreManifest;
           if (manifest.format !== "comfortos-local-building-store-v1") {
             throw new Error("Unsupported local Overture building store.");
