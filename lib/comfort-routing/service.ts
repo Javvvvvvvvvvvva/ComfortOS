@@ -17,6 +17,8 @@ import { RainAnalysisService } from "@/lib/environment/rain/rainExposureEngine";
 import type { RainAnalysisResult } from "@/lib/environment/rain/types";
 import { HeatAnalysisService } from "@/lib/environment/heat/heatExposureEngine";
 import type { HeatAnalysisResult } from "@/lib/environment/heat/types";
+import { SnowAnalysisService } from "@/lib/environment/snow/snowExposureEngine";
+import type { SnowAnalysisResult } from "@/lib/environment/snow/types";
 import type { ShadeAnalysisService } from "@/lib/environment/shade/service";
 import { prepareShadowBuildingContext } from "@/lib/environment/shade/shadowEngine";
 import type { ShadeAnalysisResult } from "@/lib/environment/shade/types";
@@ -24,6 +26,7 @@ import type { WindAnalysisResult } from "@/lib/environment/wind/types";
 import type { WindAnalysisService } from "@/lib/environment/wind/windService";
 import { prepareWindBuildingContext } from "@/lib/environment/wind/urbanWindModel";
 import type { Coordinate } from "@/lib/geo/types";
+import { assertValidCoordinate } from "@/lib/geo/validation";
 import {
   calculateCandidateDiversity,
   deduplicateRouteCandidates,
@@ -40,7 +43,10 @@ import {
   type RouteRequest,
   type RouteResult,
 } from "@/lib/routing/types";
-import type { WeatherService } from "@/lib/weather/service";
+import {
+  resolveCoordinateScopedWeather,
+  type WeatherService,
+} from "@/lib/weather/service";
 import type { WeatherBundle } from "@/lib/weather/types";
 import { deriveRegionCapabilities } from "@/lib/regions/capabilities";
 import type { ComfortRouteRerankingPolicy } from "@/lib/comfort-routing/policy";
@@ -74,6 +80,7 @@ type CandidateTiming = {
   windAnalysis: number;
   rainAnalysis: number;
   heatAnalysis: number;
+  snowAnalysis: number;
   comfortAnalysis: number;
 };
 
@@ -83,6 +90,7 @@ type CandidatePreComfortAnalysis = {
   windAnalysis: WindAnalysisResult | null;
   rainAnalysis: RainAnalysisResult | null;
   heatAnalysis: HeatAnalysisResult | null;
+  snowAnalysis: SnowAnalysisResult | null;
   includeEnvironmentalDebug: boolean;
   error?: string;
 };
@@ -101,6 +109,7 @@ export class ComfortRouteComparisonService {
     private readonly coveredFeatureProviderMode = "disabled",
     private readonly rainService = new RainAnalysisService(),
     private readonly heatService = new HeatAnalysisService(),
+    private readonly snowService = new SnowAnalysisService(),
   ) {}
 
   async compareWalkingRoutes(
@@ -173,9 +182,14 @@ export class ComfortRouteComparisonService {
 
     throwIfAborted(options.signal);
     const weatherStartedAt = performance.now();
-    const weatherBundle =
-      request.weatherBundle ??
-      (await this.weatherService.getWeatherBundle(request.weatherCoordinate ?? request.origin));
+    const weatherCoordinate = request.weatherCoordinate ?? request.origin;
+    assertValidCoordinate(weatherCoordinate, "Weather coordinate");
+    const resolvedWeather = await resolveCoordinateScopedWeather(
+      this.weatherService,
+      weatherCoordinate,
+      request.weatherBundle,
+    );
+    const weatherBundle = resolvedWeather.bundle;
     performanceMs.weather = Math.round(performance.now() - weatherStartedAt);
 
     throwIfAborted(options.signal);
@@ -206,6 +220,7 @@ export class ComfortRouteComparisonService {
       windAnalysis: 0,
       rainAnalysis: 0,
       heatAnalysis: 0,
+      snowAnalysis: 0,
       comfortAnalysis: 0,
     };
     throwIfAborted(options.signal);
@@ -216,7 +231,7 @@ export class ComfortRouteComparisonService {
           candidate,
           departureTime: request.departureTime,
           weatherBundle,
-          weatherCoordinate: request.weatherCoordinate ?? request.origin,
+          weatherCoordinate,
           includeEnvironmentalDebug: request.includeEnvironmentalDebug ?? false,
           buildings: sharedBuildings,
           projectionOrigin: sharedProjectionOrigin,
@@ -230,6 +245,7 @@ export class ComfortRouteComparisonService {
     );
     const rainCapability = calculateRainCoverCapability(environmentalAnalyses);
     const heatCapability = calculateHeatCapability(environmentalAnalyses);
+    const snowCapability = calculateSnowCapability(environmentalAnalyses);
     const capabilities = deriveRegionCapabilities({
       routingReady: routingProviderMetadata?.productionEligible === true,
       weatherAvailable:
@@ -249,6 +265,10 @@ export class ComfortRouteComparisonService {
         coveredFeatureResult.metadata !== null &&
         coveredFeatureResult.metadata.mode !== "disabled",
       rainCoverConsumerEligible: rainCapability.consumerEligible,
+      snowAvailableCount: environmentalAnalyses.filter(
+        (analysis) => analysis.snowAnalysis !== null,
+      ).length,
+      snowConsumerEligible: snowCapability.consumerEligible,
       heatAvailableCount: environmentalAnalyses.filter(
         (analysis) => analysis.heatAnalysis !== null,
       ).length,
@@ -256,7 +276,9 @@ export class ComfortRouteComparisonService {
     });
     const contextDecision = decideRoutingContext(weatherBundle, {
       rainCapable: capabilities.rainCover === "ready",
+      snowCapable: capabilities.snow === "ready",
       heatCapable: capabilities.heat === "ready",
+      atTime: request.departureTime,
     });
     const profile = profileForContext(contextDecision.context);
     const analyzed = await Promise.all(
@@ -277,6 +299,7 @@ export class ComfortRouteComparisonService {
     performanceMs.windAnalysis = Math.round(timing.windAnalysis);
     performanceMs.rainAnalysis = Math.round(timing.rainAnalysis);
     performanceMs.heatAnalysis = Math.round(timing.heatAnalysis);
+    performanceMs.snowAnalysis = Math.round(timing.snowAnalysis);
     performanceMs.comfortAnalysis = Math.round(timing.comfortAnalysis);
 
     throwIfAborted(options.signal);
@@ -322,6 +345,7 @@ export class ComfortRouteComparisonService {
         ...contextDecision,
         profile,
         rainCapable: capabilities.rainCover === "ready",
+        snowCapable: capabilities.snow === "ready",
         heatCapable: capabilities.heat === "ready",
       },
       performanceMs,
@@ -330,6 +354,17 @@ export class ComfortRouteComparisonService {
 
     const serializationStartedAt = performance.now();
     comparison.debug.performanceMs = performanceMs;
+    comparison.debug.weather = {
+      bundleSource: resolvedWeather.source,
+      suppliedBundleAccepted: resolvedWeather.suppliedBundleAccepted,
+      currentObservationFresh: weatherBundle.quality?.currentObservationFresh ?? null,
+      currentObservationAgeMinutes:
+        weatherBundle.quality?.currentObservationAgeMinutes ?? null,
+      stationDistanceMeters:
+        weatherBundle.quality?.currentObservationStationDistanceMeters ?? null,
+      humidityCoverage: weatherBundle.quality?.humidityCoverage ?? null,
+      cloudCoverCoverage: weatherBundle.quality?.cloudCoverCoverage ?? null,
+    };
     performanceMs.serialization = Math.round(performance.now() - serializationStartedAt);
     performanceMs.total = Math.round(performance.now() - startedAt);
 
@@ -409,16 +444,28 @@ export class ComfortRouteComparisonService {
     const shadeAnalysis = resultValue<ShadeAnalysisResult | null>(shadeResult);
     const windAnalysis = resultValue<WindAnalysisResult | null>(windResult);
     const rainAnalysis = resultValue<RainAnalysisResult | null>(rainResult);
-    const heatAnalysis = await timeAsync(timing, "heatAnalysis", () =>
-      this.heatService.analyzeRouteHeat({
-        route: candidate,
-        departureTime,
-        weatherBundle,
-        weatherCoordinate,
-        shadeAnalysis,
-        windAnalysis,
-      }),
-    ).catch(() => null);
+    const [heatAnalysis, snowAnalysis] = await Promise.all([
+      timeAsync(timing, "heatAnalysis", () =>
+        this.heatService.analyzeRouteHeat({
+          route: candidate,
+          departureTime,
+          weatherBundle,
+          weatherCoordinate,
+          shadeAnalysis,
+          windAnalysis,
+        }),
+      ).catch(() => null),
+      timeAsync(timing, "snowAnalysis", () =>
+        this.snowService.analyzeRouteSnow({
+          route: candidate,
+          departureTime,
+          weatherBundle,
+          weatherCoordinate,
+          windAnalysis,
+          coveredFeatures,
+        }),
+      ).catch(() => null),
+    ]);
     throwIfAborted(signal);
 
     return {
@@ -427,9 +474,10 @@ export class ComfortRouteComparisonService {
       windAnalysis: includeEnvironmentalDebug ? windAnalysis : stripWindDebug(windAnalysis),
       rainAnalysis: includeEnvironmentalDebug ? rainAnalysis : stripRainDebug(rainAnalysis),
       heatAnalysis: includeEnvironmentalDebug ? heatAnalysis : stripHeatDebug(heatAnalysis),
+      snowAnalysis: includeEnvironmentalDebug ? snowAnalysis : stripSnowDebug(snowAnalysis),
       includeEnvironmentalDebug,
       error:
-        !shadeAnalysis || !windAnalysis || !rainAnalysis || !heatAnalysis
+        !shadeAnalysis || !windAnalysis || !rainAnalysis || !heatAnalysis || !snowAnalysis
           ? "One or more environmental analyses were unavailable for this candidate."
           : undefined,
     };
@@ -448,7 +496,7 @@ export class ComfortRouteComparisonService {
     departureTime: string;
     weatherBundle: WeatherBundle;
     timing: CandidateTiming;
-    profile: "cold" | "balanced" | "rain" | "heat";
+    profile: "cold" | "balanced" | "rain" | "snow" | "heat";
     includeEnvironmentalDebug: boolean;
     signal?: AbortSignal;
   }): Promise<Omit<AnalyzedRouteCandidate, "role" | "metrics">> {
@@ -462,6 +510,7 @@ export class ComfortRouteComparisonService {
         windAnalysis: analysis.windAnalysis,
         rainAnalysis: analysis.rainAnalysis,
         heatAnalysis: analysis.heatAnalysis,
+        snowAnalysis: analysis.snowAnalysis,
         profile,
       }),
     );
@@ -475,6 +524,7 @@ export class ComfortRouteComparisonService {
       windAnalysis: analysis.windAnalysis,
       rainAnalysis: analysis.rainAnalysis,
       heatAnalysis: analysis.heatAnalysis,
+      snowAnalysis: analysis.snowAnalysis,
       comfortAnalysis: includeEnvironmentalDebug
         ? comfortAnalysis
         : stripComfortDebug(comfortAnalysis),
@@ -490,6 +540,7 @@ export class ComfortRouteComparisonService {
     windAnalysis,
     rainAnalysis,
     heatAnalysis,
+    snowAnalysis,
     profile,
   }: {
     candidate: RouteCandidate;
@@ -499,7 +550,8 @@ export class ComfortRouteComparisonService {
     windAnalysis: WindAnalysisResult | null;
     rainAnalysis: RainAnalysisResult | null;
     heatAnalysis: HeatAnalysisResult | null;
-    profile: "cold" | "balanced" | "rain" | "heat";
+    snowAnalysis: SnowAnalysisResult | null;
+    profile: "cold" | "balanced" | "rain" | "snow" | "heat";
   }): Promise<ComfortAnalysisResult | null> {
     try {
       return await this.comfortService.analyzeRouteComfort({
@@ -510,6 +562,7 @@ export class ComfortRouteComparisonService {
         windAnalysis,
         rainAnalysis,
         heatAnalysis,
+        snowAnalysis,
         profile,
       });
     } catch {
@@ -586,14 +639,22 @@ function stripHeatDebug(analysis: HeatAnalysisResult | null) {
   return { ...analysis, debug: undefined };
 }
 
+function stripSnowDebug(analysis: SnowAnalysisResult | null) {
+  if (!analysis?.debug) return analysis;
+  return { ...analysis, debug: undefined };
+}
+
 function stripComfortDebug(analysis: ComfortAnalysisResult | null) {
   if (!analysis?.debug) return analysis;
   return { ...analysis, debug: undefined };
 }
 
-function profileForContext(context: RoutingContext): "cold" | "balanced" | "rain" | "heat" {
+function profileForContext(
+  context: RoutingContext,
+): "cold" | "balanced" | "rain" | "snow" | "heat" {
   if (context === "rain") return "rain";
   if (context === "heat") return "heat";
+  if (context === "snow") return "snow";
   if (context === "cold") return "cold";
   return "balanced";
 }
@@ -717,6 +778,14 @@ function buildDiversitySummary(
   const rains = candidates.flatMap((candidate) =>
     candidate.rainAnalysis ? [candidate.rainAnalysis.summary.averageRainExposure] : [],
   );
+  const snows = candidates.flatMap((candidate) =>
+    candidate.snowAnalysis
+      ? [
+          candidate.snowAnalysis.summary.averageSnowfallExposure +
+            candidate.snowAnalysis.summary.averageIceExposure,
+        ]
+      : [],
+  );
   const heats = candidates.flatMap((candidate) =>
     candidate.heatAnalysis ? [candidate.heatAnalysis.summary.averageHeatExposure] : [],
   );
@@ -729,6 +798,7 @@ function buildDiversitySummary(
     rawEnvironmentalCostRange: numericRange(costs),
     windExposureRange: numericRange(winds),
     rainExposureRange: numericRange(rains),
+    snowExposureRange: numericRange(snows),
     heatExposureRange: numericRange(heats),
     directSunRatioRange: numericRange(directSun),
     shadeRatioRange: numericRange(shades),
@@ -839,6 +909,29 @@ function calculateHeatCapability(
     coverageQuality,
     consumerEligible: consumerEligible && hasShadeDiversity,
   };
+}
+
+function calculateSnowCapability(
+  analyses: Array<{
+    snowAnalysis: SnowAnalysisResult | null;
+    windAnalysis: WindAnalysisResult | null;
+  }>,
+) {
+  const summaries = analyses.flatMap((analysis) =>
+    analysis.snowAnalysis ? [analysis.snowAnalysis.summary] : [],
+  );
+  const consumerEligible =
+    summaries.length === analyses.length &&
+    summaries.some(
+      (summary) =>
+        summary.completeness >= 0.75 &&
+        summary.confidence >= 0.45 &&
+        ((summary.maximumSnowfallMmPerHour ?? 0) >= 0.25 ||
+          (summary.maximumIceAccumulationMmPerHour ?? 0) >= 0.01),
+    ) &&
+    analyses.every((analysis) => analysis.windAnalysis !== null);
+
+  return { consumerEligible };
 }
 
 function numericRange(values: number[]) {

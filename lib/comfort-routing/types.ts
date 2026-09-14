@@ -3,6 +3,7 @@ import type { ShadeAnalysisResult } from "@/lib/environment/shade/types";
 import type { WindAnalysisResult } from "@/lib/environment/wind/types";
 import type { RainAnalysisResult } from "@/lib/environment/rain/types";
 import type { HeatAnalysisResult } from "@/lib/environment/heat/types";
+import type { SnowAnalysisResult } from "@/lib/environment/snow/types";
 import type {
   RouteCandidate,
   RoutingProviderMetadata,
@@ -38,6 +39,7 @@ export type AnalyzedRouteCandidate = {
   windAnalysis?: WindAnalysisResult | null;
   rainAnalysis?: RainAnalysisResult | null;
   heatAnalysis?: HeatAnalysisResult | null;
+  snowAnalysis?: SnowAnalysisResult | null;
   comfortAnalysis?: ComfortAnalysisResult | null;
   metrics: RouteCandidateComparisonMetrics;
   error?: string;
@@ -64,6 +66,7 @@ export type ComfortRouteComparisonDebug = {
       rawEnvironmentalCostRange: number | null;
       windExposureRange: number | null;
       rainExposureRange: number | null;
+      snowExposureRange: number | null;
       heatExposureRange: number | null;
       directSunRatioRange: number | null;
       shadeRatioRange: number | null;
@@ -87,6 +90,7 @@ export type ComfortRouteComparisonDebug = {
     coveredFeatureFetch?: number;
     rainAnalysis?: number;
     heatAnalysis?: number;
+    snowAnalysis?: number;
     weather: number;
     shadeAnalysis?: number;
     windAnalysis?: number;
@@ -125,10 +129,20 @@ export type ComfortRouteComparisonDebug = {
     productionEligible: boolean;
   };
   routingUsage?: RoutingUsageMetrics;
+  weather?: {
+    bundleSource: "request-bundle" | "provider-fetch";
+    suppliedBundleAccepted: boolean;
+    currentObservationFresh: boolean | null;
+    currentObservationAgeMinutes: number | null;
+    stationDistanceMeters: number | null;
+    humidityCoverage: number | null;
+    cloudCoverCoverage: number | null;
+  };
   capabilities?: RegionCapabilities;
   context?: RoutingContextDecision & {
-    profile: "cold" | "balanced" | "rain" | "heat";
+    profile: "cold" | "balanced" | "rain" | "snow" | "heat";
     rainCapable: boolean;
+    snowCapable: boolean;
     heatCapable: boolean;
   };
   candidates: Array<{
@@ -152,6 +166,11 @@ export type ComfortRouteComparisonDebug = {
     longestContinuousCoveredMeters: number | null;
     coveredSegmentCount: number | null;
     rainConfidence: number | null;
+    snowExposure: number | null;
+    iceExposure: number | null;
+    snowfallMmPerHour: number | null;
+    iceAccumulationMmPerHour: number | null;
+    snowConfidence: number | null;
     heatExposure: number | null;
     directSunRatio: number | null;
     longestContinuousSunMeters: number | null;

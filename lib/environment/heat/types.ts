@@ -13,12 +13,19 @@ export type SegmentHeatExposure = {
   temperatureC: number | null;
   apparentTemperatureC: number | null;
   heatIndexC: number | null;
+  heatTemperatureSource:
+    | "provider-heat-index"
+    | "calculated-heat-index"
+    | "ambient"
+    | "missing";
   effectiveHeatTemperatureC: number | null;
   relativeHumidity: number | null;
+  cloudCover: number | null;
   shadeRatio: number | null;
   directSunRatio: number | null;
   solarElevationDeg: number | null;
   solarElevationModifier: number;
+  solarCloudModifier: number;
   windExposureMps: number | null;
   ventilationModifier: number;
   ambientHeatCost: number;
@@ -35,6 +42,7 @@ export type RouteHeatSummary = {
   averageHeatExposure: number;
   totalHeatExposureCost: number;
   ambientHeatExposure: number;
+  humidityExposure: number;
   solarExposure: number;
   ventilationModifier: number;
   shadeRatio: number;
@@ -50,6 +58,8 @@ export type HeatQuality = {
   temperatureAvailable: boolean;
   apparentTemperatureAvailable: boolean;
   humidityAvailable: boolean;
+  heatIndexAvailable: boolean;
+  cloudCoverAvailable: boolean;
   shadeAvailable: boolean;
   windAvailable: boolean;
   routeAnalysisCoverage: number;
@@ -67,6 +77,7 @@ export type HeatAnalysisRequest = {
 
 export type HeatAnalysisResult = {
   status: "available";
+  modelVersion: string;
   routeGeometry: LineStringGeometry;
   departureTime: string;
   segmentHeat: SegmentHeatExposure[];

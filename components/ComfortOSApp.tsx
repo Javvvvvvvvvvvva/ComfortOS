@@ -2,6 +2,19 @@
 
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import {
+  ArrowRight,
+  Check,
+  ChevronDown,
+  ChevronRight,
+  ChevronUp,
+  Clock3,
+  Gauge,
+  Info,
+  LocateFixed,
+  RotateCcw,
+  Search,
+} from "lucide-react";
 import type { Coordinate } from "@/lib/geo/types";
 import type { RouteResult } from "@/lib/routing/types";
 import { formatCoordinate, formatDistance, formatDuration } from "@/lib/geo/format";
@@ -32,6 +45,7 @@ import type { ShadeAnalysisResult } from "@/lib/environment/shade/types";
 import type { WindAnalysisResult } from "@/lib/environment/wind/types";
 import type { RainAnalysisResult } from "@/lib/environment/rain/types";
 import type { HeatAnalysisResult } from "@/lib/environment/heat/types";
+import type { SnowAnalysisResult } from "@/lib/environment/snow/types";
 import type { ComfortAnalysisResult } from "@/lib/comfort/types";
 import type {
   AnalyzedRouteCandidate,
@@ -41,6 +55,7 @@ import { EnvironmentSummary } from "./EnvironmentSummary";
 import { decideRoutingContext } from "@/lib/comfort-routing/contextualMode";
 import { explainComfortRoute } from "@/lib/comfort-routing/explanations";
 import { createRouteEvent, type ComfortRouteEvent } from "@/lib/comfort-routing/events";
+import { PUBLIC_PRODUCT_NAME } from "@/lib/brand";
 
 const ComfortMap = lazy(async () => {
   const loaded = await import("./ComfortMap");
@@ -55,8 +70,14 @@ type ShadeState = "idle" | "loading" | "success" | "error";
 type WindState = "idle" | "loading" | "success" | "error";
 type RainState = "idle" | "loading" | "success" | "error";
 type HeatState = "idle" | "loading" | "success" | "error";
+type SnowState = "idle" | "loading" | "success" | "error";
 type ComfortState = "idle" | "loading" | "success" | "error";
-type ContextualRouteLabel = "Stay Warm" | "Stay Dry" | "Stay Cool" | "Comfort";
+type ContextualRouteLabel =
+  | "Stay Warm"
+  | "Stay Dry"
+  | "Snow Comfort"
+  | "Stay Cool"
+  | "Comfort";
 type ComfortAnalysisState =
   | { status: "idle" }
   | { status: "loading"; startedAt: string }
@@ -96,6 +117,8 @@ export function ComfortOSApp() {
   const [rainState, setRainState] = useState<RainState>("idle");
   const [heatAnalysis, setHeatAnalysis] = useState<HeatAnalysisResult | null>(null);
   const [heatState, setHeatState] = useState<HeatState>("idle");
+  const [snowAnalysis, setSnowAnalysis] = useState<SnowAnalysisResult | null>(null);
+  const [snowState, setSnowState] = useState<SnowState>("idle");
   const [comfortAnalysis, setComfortAnalysis] = useState<ComfortAnalysisResult | null>(null);
   const [comfortState, setComfortState] = useState<ComfortState>("idle");
   const [comfortAnalysisState, setComfortAnalysisState] =
@@ -103,6 +126,9 @@ export function ComfortOSApp() {
   const [events, setEvents] = useState<ComfortRouteEvent[]>([]);
   const [geolocationStatus, setGeolocationStatus] =
     useState<GeolocationStatus>("idle");
+  const [tripEditorOpen, setTripEditorOpen] = useState(true);
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [sheetExpanded, setSheetExpanded] = useState(false);
   const searchRequestId = useRef(0);
   const routeRequestId = useRef(0);
   const routeAbortController = useRef<AbortController | null>(null);
@@ -116,7 +142,11 @@ export function ComfortOSApp() {
   });
   const routingContext =
     routeComparison?.debug.context ??
-    decideRoutingContext(weather, { rainCapable: false, heatCapable: false });
+    decideRoutingContext(weather, {
+      rainCapable: false,
+      snowCapable: false,
+      heatCapable: false,
+    });
   const debugMode =
     typeof window !== "undefined"
       ? new URLSearchParams(window.location.search).get("debug")
@@ -127,6 +157,7 @@ export function ComfortOSApp() {
   const showRoutingDebug = debugMode === "routing" || debugMode === "environment";
   const showRainDebug = debugMode === "rain" || debugMode === "environment";
   const showHeatDebug = debugMode === "heat" || debugMode === "environment";
+  const showSnowDebug = debugMode === "snow" || debugMode === "environment";
 
   const recordEvent = useCallback((event: ComfortRouteEvent) => {
     setEvents((current) => [...current.slice(-24), event]);
@@ -147,6 +178,8 @@ export function ComfortOSApp() {
     setRainState("idle");
     setHeatAnalysis(null);
     setHeatState("idle");
+    setSnowAnalysis(null);
+    setSnowState("idle");
     setComfortAnalysis(null);
     setComfortState("idle");
     setComfortAnalysisState({ status: "idle" });
@@ -299,6 +332,9 @@ export function ComfortOSApp() {
 
     setRouteState("loading");
     setError(null);
+    setTripEditorOpen(false);
+    setDetailsOpen(false);
+    setSheetExpanded(false);
     const requestId = routeRequestId.current + 1;
     routeRequestId.current = requestId;
     routeAbortController.current?.abort();
@@ -319,6 +355,8 @@ export function ComfortOSApp() {
       setRainState("idle");
       setHeatAnalysis(null);
       setHeatState("idle");
+      setSnowAnalysis(null);
+      setSnowState("idle");
       setComfortAnalysis(null);
       setComfortState("idle");
       setComfortAnalysisState({ status: "idle" });
@@ -343,6 +381,7 @@ export function ComfortOSApp() {
       setWindState("loading");
       setRainState("loading");
       setHeatState("loading");
+      setSnowState("loading");
       setComfortState("loading");
       recordEvent(createRouteEvent("comfort_analysis_started"));
       const comfortTimeout = window.setTimeout(() => {
@@ -352,10 +391,11 @@ export function ComfortOSApp() {
         setWindState("error");
         setRainState("error");
         setHeatState("error");
+        setSnowState("error");
         setComfortState("error");
         setComfortAnalysisState({
           status: "failed",
-          reason: "Comfort analysis is taking longer than expected.",
+          reason: "The comfort check is taking longer than expected.",
         });
       }, COMFORT_ANALYSIS_TIMEOUT_MS);
 
@@ -363,8 +403,6 @@ export function ComfortOSApp() {
         origin: originCoordinate,
         destination: destinationCoordinate,
         departureTime,
-        weatherCoordinate: weatherCoordinate ?? undefined,
-        weatherBundle: weather ?? undefined,
         generationMode: "enhanced",
         generationPolicy: {
           maxCandidateAttempts: 4,
@@ -376,7 +414,8 @@ export function ComfortOSApp() {
           showWindDebug ||
           showComfortDebug ||
           showRainDebug ||
-          showHeatDebug,
+          showHeatDebug ||
+          showSnowDebug,
       }, comfortController.signal)
         .then((comparison) => {
           window.clearTimeout(comfortTimeout);
@@ -429,13 +468,14 @@ export function ComfortOSApp() {
           setWindState("error");
           setRainState("error");
           setHeatState("error");
+          setSnowState("error");
           setComfortState("error");
           setComfortAnalysisState({
             status: "failed",
             reason:
               comfortError instanceof Error
                 ? comfortError.message
-                : "Comfort analysis unavailable.",
+                : "We could not finish the comfort check.",
           });
         });
     } catch (routeError) {
@@ -457,6 +497,7 @@ export function ComfortOSApp() {
           : "Unable to calculate a walking route.",
       );
       setRouteState("error");
+      setTripEditorOpen(true);
     }
   }
 
@@ -472,6 +513,9 @@ export function ComfortOSApp() {
     resetAnalysisState();
     setSelectionMode("origin");
     setError(null);
+    setTripEditorOpen(true);
+    setDetailsOpen(false);
+    setSheetExpanded(false);
   }
 
   async function selectSearchResult(suggestion: PlaceSuggestion) {
@@ -592,6 +636,8 @@ export function ComfortOSApp() {
     setRainState(candidate.rainAnalysis ? "success" : "error");
     setHeatAnalysis(candidate.heatAnalysis ?? null);
     setHeatState(candidate.heatAnalysis ? "success" : "error");
+    setSnowAnalysis(candidate.snowAnalysis ?? null);
+    setSnowState(candidate.snowAnalysis ? "success" : "error");
     setComfortAnalysis(candidate.comfortAnalysis ?? null);
     setComfortState(candidate.comfortAnalysis ? "success" : "error");
   }
@@ -624,117 +670,177 @@ export function ComfortOSApp() {
       </Suspense>
 
       <section className="top-chrome" aria-label="Current map context">
-        <div className="top-title">
-          <p className="eyebrow">Outdoor comfort navigation</p>
-          <h1>ComfortOS</h1>
+        <div className="brand-lockup">
+          <span className="brand-mark" aria-hidden="true" />
+          <span className="brand-copy">
+            <h1>{PUBLIC_PRODUCT_NAME}</h1>
+            <span>the nicer walk</span>
+          </span>
         </div>
         <EnvironmentSummary weather={weather} state={weatherState} />
       </section>
 
-      <section className="bottom-sheet" aria-label="Walking route controls">
-        <div className="sheet-handle" aria-hidden="true" />
+      <section
+        className={`bottom-sheet ${route ? "has-route" : "planning"} ${
+          sheetExpanded ? "expanded" : ""
+        }`}
+        aria-label="Walking route controls"
+      >
+        <header className="sheet-header">
+          <div>
+            <p className="eyebrow">A route for right now</p>
+            <h2>
+              {route ? "Pick your walk" : origin ? "Where to?" : "Where are we starting?"}
+            </h2>
+          </div>
+          <div className="sheet-tools">
+            <details className="product-menu">
+              <summary aria-label="Product information" title="Product information">
+                <Info size={18} />
+              </summary>
+              <nav aria-label="Coverage, privacy, terms, data sources, and support">
+                <Link href="/coverage">Coverage</Link>
+                <Link href="/data-sources">Data sources</Link>
+                <Link href="/privacy">Privacy</Link>
+                <Link href="/terms">Terms</Link>
+                <Link href="/support">Support</Link>
+              </nav>
+            </details>
+            <button
+              type="button"
+              className="sheet-size-action"
+              aria-label={sheetExpanded ? "Collapse route panel" : "Expand route panel"}
+              title={sheetExpanded ? "Collapse panel" : "Expand panel"}
+              onClick={() => setSheetExpanded((current) => !current)}
+            >
+              {sheetExpanded ? <ChevronDown size={20} /> : <ChevronUp size={20} />}
+            </button>
+          </div>
+        </header>
 
-        <label className="search-label" htmlFor="place-search">
-          Where are you going?
-        </label>
-        <div className="search-row">
-          <input
-            id="place-search"
-            type="search"
-            value={query}
-            placeholder={`Search ${activePointLabel}`}
-            autoComplete="off"
-            onChange={(event) => handleQueryChange(event.target.value)}
-            aria-controls="place-results"
-          />
+        {route && !tripEditorOpen ? (
           <button
             type="button"
-            className="location-action"
-            onClick={useCurrentLocation}
-            disabled={geolocationStatus === "requesting"}
+            className="trip-summary"
+            onClick={() => {
+              setTripEditorOpen(true);
+              setSheetExpanded(true);
+            }}
           >
-            {geolocationStatus === "requesting" ? "Locating" : "Use my location"}
+            <span className="trip-summary-points" aria-hidden="true">
+              <span className="point-dot origin-dot" />
+              <span className="trip-line" />
+              <span className="point-dot destination-dot" />
+            </span>
+            <span className="trip-summary-copy">
+              <span>{origin?.name ?? "Origin"}</span>
+              <strong>{destination?.name ?? "Destination"}</strong>
+            </span>
+            <span className="trip-edit-label">Change</span>
           </button>
-        </div>
-
-        <div className="search-feedback" aria-live="polite">
-          {searchState === "loading" ? "Searching..." : null}
-          {searchState === "empty" ? "No places found." : null}
-          {searchState === "error" ? searchError : null}
-          {geolocationMessage ? geolocationMessage : null}
-        </div>
-
-        {weather?.alerts[0] ? (
-          <div className="weather-alert" role="alert" aria-live="assertive">
-            <span className="eyebrow">Official weather alert</span>
-            <strong>{weather.alerts[0].event}</strong>
-            <span>{weather.alerts[0].headline ?? "Active NWS alert."}</span>
-          </div>
         ) : null}
 
-        {places.length > 0 ? (
-          <div id="place-results" className="place-results" role="listbox">
-            {places.map((place) => (
+        {!route || tripEditorOpen ? (
+          <div className="trip-editor">
+            <div className="point-grid" role="group" aria-label="Trip points">
               <button
-                key={place.id}
                 type="button"
-                className="place-result"
-                role="option"
-                aria-selected="false"
-                onClick={() => void selectSearchResult(place)}
+                className={`point-row ${selectionMode === "origin" ? "active" : ""}`}
+                aria-pressed={selectionMode === "origin"}
+                onClick={() => setSelectionMode("origin")}
               >
-                <span>{place.name}</span>
-                <small>
-                  {place.address ??
-                    place.category ??
-                    (place.coordinate ? formatCoordinate(place.coordinate) : "Place")}
-                </small>
+                <span className="point-dot origin-dot" aria-hidden="true" />
+                <span>
+                  <span className="point-label">Origin</span>
+                  <strong>{origin?.name ?? "Pick a starting point"}</strong>
+                  {origin ? <small>{origin.address ?? formatCoordinate(origin.coordinate)}</small> : null}
+                </span>
               </button>
-            ))}
+              <button
+                type="button"
+                className={`point-row ${selectionMode === "destination" ? "active" : ""}`}
+                aria-pressed={selectionMode === "destination"}
+                onClick={() => setSelectionMode("destination")}
+              >
+                <span className="point-dot destination-dot" aria-hidden="true" />
+                <span>
+                  <span className="point-label">Destination</span>
+                  <strong>{destination?.name ?? "Pick a destination"}</strong>
+                  {destination ? (
+                    <small>{destination.address ?? formatCoordinate(destination.coordinate)}</small>
+                  ) : null}
+                </span>
+              </button>
+            </div>
+
+            <label className="sr-only" htmlFor="place-search">
+              Search {activePointLabel}
+            </label>
+            <div className="search-row">
+              <div className="search-field">
+                <Search size={18} aria-hidden="true" />
+                <input
+                  id="place-search"
+                  type="search"
+                  value={query}
+                  placeholder={`Search ${activePointLabel}`}
+                  autoComplete="off"
+                  onChange={(event) => handleQueryChange(event.target.value)}
+                  aria-controls="place-results"
+                />
+              </div>
+              <button
+                type="button"
+                className="location-action"
+                onClick={useCurrentLocation}
+                disabled={geolocationStatus === "requesting"}
+                aria-label="Use current location as origin"
+                title="Use current location"
+              >
+                <LocateFixed size={19} aria-hidden="true" />
+              </button>
+            </div>
+
+            <div className="search-feedback" aria-live="polite">
+              {searchState === "loading" ? "Searching..." : null}
+              {searchState === "empty" ? "No places found." : null}
+              {searchState === "error" ? searchError : null}
+              {geolocationMessage ? geolocationMessage : null}
+            </div>
+
+            {weather?.alerts[0] ? (
+              <div className="weather-alert" role="alert" aria-live="assertive">
+                <span className="eyebrow">Official weather alert</span>
+                <strong>{weather.alerts[0].event}</strong>
+                <span>{weather.alerts[0].headline ?? "Active NWS alert."}</span>
+              </div>
+            ) : null}
+
+            {places.length > 0 ? (
+              <div id="place-results" className="place-results" role="listbox">
+                {places.map((place) => (
+                  <button
+                    key={place.id}
+                    type="button"
+                    className="place-result"
+                    role="option"
+                    aria-selected="false"
+                    onClick={() => void selectSearchResult(place)}
+                  >
+                    <span>{place.name}</span>
+                    <small>
+                      {place.address ??
+                        place.category ??
+                        (place.coordinate ? formatCoordinate(place.coordinate) : "Place")}
+                    </small>
+                  </button>
+                ))}
+              </div>
+            ) : null}
           </div>
         ) : null}
 
-        <div className="selection-tabs" role="radiogroup" aria-label="Map tap target">
-          <button
-            type="button"
-            className={selectionMode === "origin" ? "active" : ""}
-            aria-pressed={selectionMode === "origin"}
-            onClick={() => setSelectionMode("origin")}
-          >
-            Origin
-          </button>
-          <button
-            type="button"
-            className={selectionMode === "destination" ? "active" : ""}
-            aria-pressed={selectionMode === "destination"}
-            onClick={() => setSelectionMode("destination")}
-          >
-            Destination
-          </button>
-        </div>
-
-        <div className="point-grid">
-          <div className="point-row">
-            <span className="point-dot origin-dot" aria-hidden="true" />
-            <div>
-              <p>Origin</p>
-              <strong>{origin?.name ?? "Not selected"}</strong>
-              {origin ? <small>{origin.address ?? formatCoordinate(origin.coordinate)}</small> : null}
-            </div>
-          </div>
-          <div className="point-row">
-            <span className="point-dot destination-dot" aria-hidden="true" />
-            <div>
-              <p>Destination</p>
-              <strong>{destination?.name ?? "Not selected"}</strong>
-              {destination ? (
-                <small>{destination.address ?? formatCoordinate(destination.coordinate)}</small>
-              ) : null}
-            </div>
-          </div>
-        </div>
-
-        {route ? (
+        {route && !tripEditorOpen ? (
           <div className="route-options" aria-label="Route comparison">
             {routeComparison ? (
               <ComfortRouteCards
@@ -749,59 +855,55 @@ export function ComfortOSApp() {
                 className="route-option selected"
                 aria-pressed="true"
               >
-                <span className="route-option-main">
-                  <span>
-                    <span className="eyebrow route-eyebrow">Fastest</span>
-                    <strong>{formatDuration(route.durationSeconds)}</strong>
+                <span className="route-option-icon" aria-hidden="true">
+                  <Clock3 size={17} />
+                </span>
+                <span className="route-option-copy">
+                  <span className="route-option-top">
+                    <span className="route-option-label">Fastest</span>
                   </span>
+                  <span className="route-note-inline">
+                    Standard walking route is ready.
+                  </span>
+                </span>
+                <span className="route-option-main">
+                  <strong>{formatDuration(route.durationSeconds)}</strong>
                   <span>{formatDistance(route.distanceMeters)}</span>
                 </span>
-                <span className="route-note-inline">
-                  Standard walking route is ready.
+                <span className="route-option-status" aria-hidden="true">
+                  <Check size={17} />
                 </span>
               </button>
             )}
 
             <ComfortProgressPanel
               state={comfortAnalysisState}
-              contextReason={routingContext.reason}
               contextualRouteLabel={routingContext.routeLabel}
-              fastest={routeComparison?.fastest ?? null}
-              comfort={routeComparison?.comfort ?? null}
               weatherState={weatherState}
             />
           </div>
-        ) : (
-          <div className="route-card" aria-live="polite">
-            <div className="route-card-head">
-              <div>
-                <p className="eyebrow route-eyebrow">Fastest</p>
-                <h2>Set two points</h2>
-              </div>
-            </div>
-
-            <p className="route-note">
-              Search, use current location, or tap the map to set both points.
-            </p>
-          </div>
-        )}
-
-        {route ? (
-          <p className="environment-disclaimer" role="note">
-            Outdoor conditions are estimates and can change. Official weather alerts take priority.
-          </p>
         ) : null}
 
-        <nav className="product-links" aria-label="Coverage, privacy, terms, data sources, and support">
-          <Link href="/coverage">Coverage</Link>
-          <Link href="/privacy">Privacy</Link>
-          <Link href="/terms">Terms</Link>
-          <Link href="/data-sources">Data</Link>
-          <Link href="/support">Support</Link>
-        </nav>
+        {route && !tripEditorOpen ? (
+          <button
+            type="button"
+            className="details-toggle"
+            aria-expanded={detailsOpen}
+            onClick={() => {
+              const nextOpen = !detailsOpen;
+              setDetailsOpen(nextOpen);
+              if (nextOpen) setSheetExpanded(true);
+            }}
+          >
+            <span>Why this one?</span>
+            {detailsOpen ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+          </button>
+        ) : null}
+
+        {route && !tripEditorOpen && detailsOpen ? <div className="route-details-body">
 
         {showRoutingDebug && routeComparison ? (
-          <div className="shade-estimate">
+          <div className="shade-estimate debug-panel">
             <p className="eyebrow">Routing debug</p>
             <strong>
               {routeComparison.debug.generation?.environmentAnalyzedCandidates ??
@@ -858,7 +960,9 @@ export function ComfortOSApp() {
                 context {routeComparison.debug.context.context} · profile{" "}
                 {routeComparison.debug.context.profile} · rain capable{" "}
                 {formatBoolean(routeComparison.debug.context.rainCapable)} · rain severity{" "}
-                {routeComparison.debug.context.rainSeverity.toFixed(2)} · cold severity{" "}
+                {routeComparison.debug.context.rainSeverity.toFixed(2)} · snow capable{" "}
+                {formatBoolean(routeComparison.debug.context.snowCapable)} · snow severity{" "}
+                {routeComparison.debug.context.snowSeverity.toFixed(2)} · cold severity{" "}
                 {routeComparison.debug.context.coldSeverity.toFixed(2)} · heat capable{" "}
                 {formatBoolean(routeComparison.debug.context.heatCapable)} · heat severity{" "}
                 {routeComparison.debug.context.heatSeverity.toFixed(2)}
@@ -906,6 +1010,10 @@ export function ComfortOSApp() {
                   {formatBoolean(candidate.detourEligible)}
                   {" · "}rain{" "}
                   {candidate.rainExposure === null ? "n/a" : candidate.rainExposure.toFixed(2)}
+                  {" · "}snow{" "}
+                  {candidate.snowExposure === null ? "n/a" : candidate.snowExposure.toFixed(2)}
+                  {" · "}ice{" "}
+                  {candidate.iceExposure === null ? "n/a" : candidate.iceExposure.toFixed(2)}
                   {" · "}heat{" "}
                   {candidate.heatExposure === null ? "n/a" : candidate.heatExposure.toFixed(2)}
                   {" · "}direct sun{" "}
@@ -936,7 +1044,7 @@ export function ComfortOSApp() {
         ) : null}
 
         {route ? (
-          <div className="shade-estimate" aria-live="polite">
+          <div className="shade-estimate route-metric heat-metric" aria-live="polite">
             <p className="eyebrow">Heat exposure</p>
             {heatState === "loading" ? <strong>Estimating heat exposure...</strong> : null}
             {heatState === "error" ? <strong>Heat exposure unavailable</strong> : null}
@@ -976,7 +1084,7 @@ export function ComfortOSApp() {
         ) : null}
 
         {route ? (
-          <div className="shade-estimate" aria-live="polite">
+          <div className="shade-estimate route-metric rain-metric" aria-live="polite">
             <p className="eyebrow">Rain exposure</p>
             {rainState === "loading" ? <strong>Estimating rain exposure...</strong> : null}
             {rainState === "error" ? <strong>Rain exposure unavailable</strong> : null}
@@ -1028,8 +1136,49 @@ export function ComfortOSApp() {
           </div>
         ) : null}
 
+        {route && (routingContext.context === "snow" || showSnowDebug) ? (
+          <div className="shade-estimate route-metric snow-metric" aria-live="polite">
+            <p className="eyebrow">Snow &amp; ice exposure</p>
+            {snowState === "loading" ? <strong>Estimating winter exposure...</strong> : null}
+            {snowState === "error" ? <strong>Winter exposure unavailable</strong> : null}
+            {snowAnalysis && snowState === "success" ? (
+              <>
+                <strong>{formatSnowExposureLabel(snowAnalysis)}</strong>
+                <span>
+                  snowfall {formatNullableNumber(snowAnalysis.summary.maximumSnowfallMmPerHour, " mm/h")} · ice{" "}
+                  {formatNullableNumber(snowAnalysis.summary.maximumIceAccumulationMmPerHour, " mm/h")} · confidence{" "}
+                  {Math.round(snowAnalysis.summary.confidence * 100)}%
+                </span>
+                {showSnowDebug ? (
+                  <div className="shade-debug-grid">
+                    <small>
+                      analyzed {Math.round(snowAnalysis.summary.analyzedMeters)} m · unknown weather{" "}
+                      {Math.round(snowAnalysis.summary.unknownMeters)} m · completeness{" "}
+                      {Math.round(snowAnalysis.summary.completeness * 100)}%
+                    </small>
+                    <small>
+                      covered {Math.round(snowAnalysis.summary.coveredMeters)} m · exposed{" "}
+                      {Math.round(snowAnalysis.summary.exposedMeters)} m · unknown cover{" "}
+                      {Math.round(snowAnalysis.summary.unknownCoverMeters)} m
+                    </small>
+                    <small>
+                      snowfall exposure {snowAnalysis.summary.averageSnowfallExposure.toFixed(2)} · ice exposure{" "}
+                      {snowAnalysis.summary.averageIceExposure.toFixed(2)}
+                    </small>
+                    <small>segment sample: {formatSnowSegmentDebug(snowAnalysis)}</small>
+                    <small>
+                      Terrain grade, plowing, and observed sidewalk ice are not active inputs.
+                    </small>
+                  </div>
+                ) : null}
+              </>
+            ) : null}
+            {showSnowDebug ? <small>Debug layer: snow and ice exposure route segments</small> : null}
+          </div>
+        ) : null}
+
         {route ? (
-          <div className="shade-estimate" aria-live="polite">
+          <div className="shade-estimate route-metric shade-metric" aria-live="polite">
             <p className="eyebrow">Estimated building shade</p>
             {shadeState === "loading" ? <strong>Estimating building shade...</strong> : null}
             {shadeState === "error" ? <strong>Shade estimate unavailable</strong> : null}
@@ -1076,10 +1225,10 @@ export function ComfortOSApp() {
         ) : null}
 
         {route ? (
-          <div className="shade-estimate" aria-live="polite">
+          <div className="shade-estimate route-metric comfort-metric" aria-live="polite">
             <p className="eyebrow">Outdoor Comfort</p>
             {comfortState === "loading" ? <strong>Estimating outdoor comfort...</strong> : null}
-            {comfortState === "error" ? <strong>Comfort estimate unavailable</strong> : null}
+            {comfortState === "error" ? <strong>Comfort check unavailable</strong> : null}
             {comfortAnalysis && comfortState === "success" ? (
               <>
                 <strong>
@@ -1103,7 +1252,9 @@ export function ComfortOSApp() {
                       thermal {comfortAnalysis.summary.thermalExposure.toFixed(2)} · wind{" "}
                       {comfortAnalysis.summary.windExposure.toFixed(2)} · solar{" "}
                       {comfortAnalysis.summary.solarExposure.toFixed(2)} · rain{" "}
-                      {comfortAnalysis.summary.rainExposure.toFixed(2)} · heat{" "}
+                      {comfortAnalysis.summary.rainExposure.toFixed(2)} · snow{" "}
+                      {comfortAnalysis.summary.snowExposure.toFixed(2)} · ice{" "}
+                      {comfortAnalysis.summary.iceExposure.toFixed(2)} · heat{" "}
                       {comfortAnalysis.summary.heatExposure.toFixed(2)}
                     </small>
                     <small>
@@ -1121,7 +1272,7 @@ export function ComfortOSApp() {
         ) : null}
 
         {route ? (
-          <div className="shade-estimate" aria-live="polite">
+          <div className="shade-estimate route-metric wind-metric" aria-live="polite">
             <p className="eyebrow">Estimated wind exposure</p>
             {windState === "loading" ? <strong>Estimating wind exposure...</strong> : null}
             {windState === "error" ? <strong>Wind estimate unavailable</strong> : null}
@@ -1160,21 +1311,41 @@ export function ComfortOSApp() {
           </div>
         ) : null}
 
+          <p className="environment-disclaimer" role="note">
+            Conditions are estimates and can change. Official weather alerts take priority.
+          </p>
+        </div> : null}
+
         {error ? <p className="error-message">{error}</p> : null}
 
-        <div className="action-row">
-          <button type="button" className="secondary-action" onClick={clearRoute}>
-            Clear
-          </button>
-          <button
-            type="button"
-            className="primary-action"
-            disabled={!canRoute || routeState === "loading"}
-            onClick={calculateRoute}
-          >
-            {routeState === "loading" ? "Routing..." : "Get walking route"}
-          </button>
-        </div>
+        {!route || tripEditorOpen ? (
+          <div className="action-row">
+            <button
+              type="button"
+              className="secondary-action"
+              onClick={clearRoute}
+              aria-label="Reset trip"
+              title="Reset trip"
+            >
+              <RotateCcw size={18} aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              className="primary-action"
+              disabled={!canRoute || routeState === "loading"}
+              onClick={calculateRoute}
+            >
+              <span>
+                {routeState === "loading"
+                  ? "Looking for nicer ways..."
+                  : canRoute
+                    ? "Find the nicer way"
+                    : "Add two places"}
+              </span>
+              {routeState !== "loading" ? <ArrowRight size={18} aria-hidden="true" /> : null}
+            </button>
+          </div>
+        ) : null}
       </section>
     </main>
   );
@@ -1208,12 +1379,18 @@ function ComfortRouteCards({
                       fastest: comparison.fastest,
                       comfort: comparison.comfort,
                     })
+                : contextualRouteLabel === "Snow Comfort"
+                  ? explainSnowRoute({
+                      fastest: comparison.fastest,
+                      comfort: comparison.comfort,
+                    })
                 : explainComfortRoute({
                     fastest: comparison.fastest,
                     comfort: comparison.comfort,
                   })
               : [];
           const selected = candidate.id === selectedCandidateId;
+          const recommended = candidate.id === comparison.comfort.id;
 
           return (
             <button
@@ -1225,45 +1402,56 @@ function ComfortRouteCards({
               aria-pressed={selected}
               onClick={() => onSelect(candidate.id)}
             >
-              <span className="route-option-main">
-                <span>
-                  <span className="eyebrow route-eyebrow">
+              <span className="route-option-icon" aria-hidden="true">
+                {candidate.role === "comfort" ? <Gauge size={17} /> : <Clock3 size={17} />}
+              </span>
+              <span className="route-option-copy">
+                <span className="route-option-top">
+                  <span className="route-option-label">
                     {formatCandidateLabel(candidate, contextualRouteLabel)}
                   </span>
-                  <strong>{formatDuration(candidate.route.durationSeconds)}</strong>
+                  {recommended ? <span className="route-recommendation">Recommended</span> : null}
                 </span>
+                {candidate.role === "comfort" ? (
+                  <span className="route-tradeoff">
+                    +{formatDuration(candidate.metrics.extraDurationSeconds)} ·{" "}
+                    {explanations[0]?.label ?? "Lower environmental exposure"}
+                  </span>
+                ) : candidate.role === "fastest-and-comfort" && candidate.status === "complete" ? (
+                  <span className="route-note-inline">
+                    {contextualRouteLabel === "Stay Dry"
+                      ? "Fastest is also the driest option we found."
+                      : contextualRouteLabel === "Stay Cool"
+                        ? "Fastest has the lowest estimated heat exposure we found."
+                        : contextualRouteLabel === "Snow Comfort"
+                          ? "Fastest has the lowest estimated winter exposure we found."
+                        : "Fastest is also the most comfortable option right now."}
+                  </span>
+                ) : candidate.role === "fastest-and-comfort" ? (
+                  <span className="route-note-inline">
+                    The comfort check has limited environmental data.
+                  </span>
+                ) : (
+                  <span className="route-note-inline">
+                    Standard walking route for the time comparison.
+                  </span>
+                )}
+                {candidate.role === "comfort" && explanations.length > 1 ? (
+                  <span className="route-note-inline">
+                    {explanations.slice(1).map((item) => item.label).join(" · ")}
+                  </span>
+                ) : null}
+                {candidate.status !== "complete" ? (
+                  <span className="route-note-inline">Limited environmental data.</span>
+                ) : null}
+              </span>
+              <span className="route-option-main">
+                <strong>{formatDuration(candidate.route.durationSeconds)}</strong>
                 <span>{formatDistance(candidate.route.distanceMeters)}</span>
               </span>
-              {candidate.role === "comfort" ? (
-                <span className="route-tradeoff">
-                  +{formatDuration(candidate.metrics.extraDurationSeconds)} ·{" "}
-                  {explanations[0]?.label ?? "Lower environmental exposure"}
-                </span>
-              ) : candidate.role === "fastest-and-comfort" && candidate.status === "complete" ? (
-                <span className="route-note-inline">
-                  {contextualRouteLabel === "Stay Dry"
-                    ? "Best choice right now. Fastest is also the driest option we found."
-                    : contextualRouteLabel === "Stay Cool"
-                      ? "Best choice right now. Fastest has the lowest estimated heat exposure we found."
-                    : "Best choice right now. Fastest is also the most comfortable based on current conditions."}
-                </span>
-              ) : candidate.role === "fastest-and-comfort" ? (
-                <span className="route-note-inline">
-                  Fastest route is ready. Comfort analysis has limited environmental data.
-                </span>
-              ) : (
-                <span className="route-note-inline">
-                  Standard walking route for the time comparison.
-                </span>
-              )}
-              {candidate.role === "comfort" && explanations.length > 1 ? (
-                <span className="route-note-inline">
-                  {explanations.slice(1).map((item) => item.label).join(" · ")}
-                </span>
-              ) : null}
-              {candidate.status !== "complete" ? (
-                <span className="route-note-inline">Limited environmental data.</span>
-              ) : null}
+              <span className="route-option-status" aria-hidden="true">
+                {selected ? <Check size={17} /> : <ChevronRight size={17} />}
+              </span>
             </button>
           );
         })}
@@ -1273,17 +1461,11 @@ function ComfortRouteCards({
 
 function ComfortProgressPanel({
   state,
-  contextReason,
   contextualRouteLabel,
-  fastest,
-  comfort,
   weatherState,
 }: {
   state: ComfortAnalysisState;
-  contextReason: string;
   contextualRouteLabel: ContextualRouteLabel;
-  fastest: AnalyzedRouteCandidate | null;
-  comfort: AnalyzedRouteCandidate | null;
   weatherState: WeatherState;
 }) {
   if (weatherState === "error") {
@@ -1298,7 +1480,7 @@ function ComfortProgressPanel({
   if (state.status === "loading") {
     return (
       <div className="comfort-progress" aria-live="polite">
-        <strong>Analyzing outdoor comfort...</strong>
+        <strong>Checking which walk feels better...</strong>
         <span>
           {contextualRouteLabel === "Stay Warm"
             ? "Checking cold and wind exposure."
@@ -1306,6 +1488,8 @@ function ComfortProgressPanel({
               ? "Checking rain exposure and covered walking."
               : contextualRouteLabel === "Stay Cool"
                 ? "Checking heat exposure and estimated building shade."
+                : contextualRouteLabel === "Snow Comfort"
+                  ? "Checking snowfall, ice accumulation, cover, and wind exposure."
               : "Checking environmental alternatives."}
         </span>
       </div>
@@ -1315,7 +1499,7 @@ function ComfortProgressPanel({
   if (state.status === "failed") {
     return (
       <div className="comfort-progress limited">
-        <strong>Comfort analysis unavailable.</strong>
+        <strong>Comfort check unavailable.</strong>
         <span>{state.reason}</span>
       </div>
     );
@@ -1330,30 +1514,6 @@ function ComfortProgressPanel({
     );
   }
 
-  if (state.status === "complete" && fastest && comfort) {
-    if (fastest.id === comfort.id) {
-      return (
-        <div className="comfort-progress complete">
-          <strong>Best choice right now.</strong>
-          <span>
-            {contextualRouteLabel === "Stay Dry"
-              ? "The fastest route is also the driest option we found."
-              : contextualRouteLabel === "Stay Cool"
-                ? "The fastest route has the lowest estimated heat exposure we found."
-              : "The fastest route is also the most comfortable based on current conditions."}
-          </span>
-        </div>
-      );
-    }
-
-    return (
-      <div className="comfort-progress complete">
-        <strong>{contextualRouteLabel} route found.</strong>
-        <span>{contextReason}</span>
-      </div>
-    );
-  }
-
   return null;
 }
 
@@ -1361,7 +1521,9 @@ function formatCandidateLabel(
   candidate: AnalyzedRouteCandidate,
   contextualRouteLabel: ContextualRouteLabel,
 ) {
-  if (candidate.role === "comfort") return `${contextualRouteLabel} · Recommended`;
+  if (candidate.role === "comfort") {
+    return contextualRouteLabel === "Comfort" ? "Comfiest" : contextualRouteLabel;
+  }
   if (candidate.role === "fastest-and-comfort") return "Fastest";
   return "Fastest";
 }
@@ -1441,6 +1603,56 @@ function explainHeatRoute({
   return explanations.length > 0 ? explanations : [{ label: "Lower estimated heat exposure" }];
 }
 
+function explainSnowRoute({
+  fastest,
+  comfort,
+}: {
+  fastest: AnalyzedRouteCandidate;
+  comfort: AnalyzedRouteCandidate;
+}) {
+  const fastestSnow = fastest.snowAnalysis?.summary;
+  const comfortSnow = comfort.snowAnalysis?.summary;
+  const explanations: Array<{ label: string }> = [];
+  if (fastestSnow && comfortSnow) {
+    const fastestExposure =
+      fastestSnow.averageSnowfallExposure + fastestSnow.averageIceExposure;
+    const comfortExposure =
+      comfortSnow.averageSnowfallExposure + comfortSnow.averageIceExposure;
+    if (fastestExposure > 0) {
+      const reduction = Math.max(
+        0,
+        (fastestExposure - comfortExposure) / fastestExposure,
+      );
+      if (reduction >= 0.03) {
+        explanations.push({
+          label: `${Math.round(reduction * 100)}% lower estimated winter exposure`,
+        });
+      }
+    }
+    if (
+      comfortSnow.coveredMeters - fastestSnow.coveredMeters >= 15 &&
+      comfortSnow.maximumSnowfallMmPerHour !== null &&
+      comfortSnow.maximumSnowfallMmPerHour > 0
+    ) {
+      explanations.push({ label: "More covered walking during snowfall" });
+    }
+  }
+
+  const fastestWind = fastest.windAnalysis?.summary.averageEstimatedExposureMps;
+  const comfortWind = comfort.windAnalysis?.summary.averageEstimatedExposureMps;
+  if (
+    typeof fastestWind === "number" &&
+    typeof comfortWind === "number" &&
+    fastestWind - comfortWind >= 0.35
+  ) {
+    explanations.push({ label: "Lower estimated wind exposure" });
+  }
+
+  return explanations.length > 0
+    ? explanations.slice(0, 3)
+    : [{ label: "Lower estimated snow, ice, and cold exposure" }];
+}
+
 function formatRainExposureLabel(value: number) {
   if (value <= 0.02) return "Minimal estimated rain exposure";
   if (value <= 0.25) return "Light estimated rain exposure";
@@ -1453,6 +1665,16 @@ function formatHeatExposureLabel(value: number) {
   if (value <= 0.7) return "Low estimated heat exposure";
   if (value <= 1.7) return "Moderate estimated heat exposure";
   return "High estimated heat exposure";
+}
+
+function formatSnowExposureLabel(snowAnalysis: SnowAnalysisResult) {
+  const exposure =
+    snowAnalysis.summary.averageSnowfallExposure + snowAnalysis.summary.averageIceExposure;
+
+  if (exposure <= 0.02) return "Minimal estimated winter exposure";
+  if (exposure <= 0.25) return "Light estimated winter exposure";
+  if (exposure <= 0.6) return "Moderate estimated winter exposure";
+  return "High estimated winter exposure";
 }
 
 function formatNullableNumber(value: number | null | undefined, unit: string) {
@@ -1565,7 +1787,20 @@ function formatComfortCompleteness(comfortAnalysis: ComfortAnalysisResult) {
     completeness.windAvailable,
   )} · shade ${formatBoolean(completeness.shadeAvailable)} · rain ${formatBoolean(
     completeness.rainAvailable,
-  )} · heat ${formatBoolean(completeness.heatAvailable)}`;
+  )} · snow ${formatBoolean(completeness.snowAvailable)} · heat ${formatBoolean(
+    completeness.heatAvailable,
+  )}`;
+}
+
+function formatSnowSegmentDebug(snowAnalysis: SnowAnalysisResult) {
+  const segment = snowAnalysis.segmentSnow[0];
+  if (!segment) return "none";
+
+  return `${formatDebugTime(segment.timestamp)} · ${segment.precipitationType ?? "unknown"} · wind factor ${segment.windDrivenSnowFactor.toFixed(
+    2,
+  )} · snow ${segment.estimatedSnowfallExposure.toFixed(2)} · ice ${segment.estimatedIceExposure.toFixed(
+    2,
+  )}`;
 }
 
 function formatBoolean(value: boolean) {

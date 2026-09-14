@@ -41,6 +41,84 @@ test("estimated building shade reduces direct-sun heat exposure", async () => {
   assert.ok(exposed.summary.averageHeatExposure > shaded.summary.averageHeatExposure);
 });
 
+test("generic apparent temperature is not counted again as heat index", async () => {
+  const route = makeRoute(600);
+  const baseline = await analyzeHeat({
+    route,
+    weather: makeWeather({
+      temperatureC: 35,
+      apparentTemperatureC: 35,
+      relativeHumidity: 55,
+    }),
+    shadeRatio: 0.2,
+    solarElevationDeg: 60,
+  });
+  const inflatedApparent = await analyzeHeat({
+    route,
+    weather: makeWeather({
+      temperatureC: 35,
+      apparentTemperatureC: 55,
+      relativeHumidity: 55,
+    }),
+    shadeRatio: 0.2,
+    solarElevationDeg: 60,
+  });
+
+  assert.equal(
+    inflatedApparent.summary.averageHeatExposure,
+    baseline.summary.averageHeatExposure,
+  );
+});
+
+test("humidity is represented once through the NWS heat-index pathway", async () => {
+  const route = makeRoute(600);
+  const dry = await analyzeHeat({
+    route,
+    weather: makeWeather({ temperatureC: 35, relativeHumidity: 20 }),
+    shadeRatio: 0.5,
+    solarElevationDeg: 60,
+  });
+  const humid = await analyzeHeat({
+    route,
+    weather: makeWeather({ temperatureC: 35, relativeHumidity: 70 }),
+    shadeRatio: 0.5,
+    solarElevationDeg: 60,
+  });
+  const segment = humid.segmentHeat[0];
+  const expectedCombinedThermalCost =
+    Math.max(0, Math.min(1, ((segment.effectiveHeatTemperatureC ?? 26) - 26) / 17)) *
+    3.1;
+
+  assert.ok(humid.summary.averageHeatExposure > dry.summary.averageHeatExposure);
+  assert.ok(humid.summary.humidityExposure > dry.summary.humidityExposure);
+  assert.ok(segment.humidityCost > 0);
+  assert.ok(
+    Math.abs(segment.ambientHeatCost + segment.humidityCost - expectedCombinedThermalCost) <
+      1e-9,
+  );
+});
+
+test("cloud cover attenuates but does not erase daytime solar exposure", async () => {
+  const route = makeRoute(600);
+  const clear = await analyzeHeat({
+    route,
+    weather: makeWeather({ temperatureC: 40, relativeHumidity: 25, cloudCover: 0 }),
+    shadeRatio: 0.05,
+    solarElevationDeg: 68,
+  });
+  const overcast = await analyzeHeat({
+    route,
+    weather: makeWeather({ temperatureC: 40, relativeHumidity: 25, cloudCover: 100 }),
+    shadeRatio: 0.05,
+    solarElevationDeg: 68,
+  });
+
+  assert.ok(clear.summary.solarExposure > overcast.summary.solarExposure);
+  assert.ok(overcast.summary.solarExposure > 0);
+  assert.equal(clear.segmentHeat[0].solarCloudModifier, 1);
+  assert.equal(overcast.segmentHeat[0].solarCloudModifier, 0.25);
+});
+
 test("night keeps ambient heat while direct solar exposure is zero", async () => {
   const result = await analyzeHeat({
     route: makeRoute(600),
@@ -156,12 +234,16 @@ function makeRoute(durationSeconds: number): RouteResult {
 
 function makeWeather({
   temperatureC,
-  apparentTemperatureC,
+  apparentTemperatureC = temperatureC,
   relativeHumidity,
+  heatIndexC = null,
+  cloudCover = 0,
 }: {
   temperatureC: number;
-  apparentTemperatureC: number;
+  apparentTemperatureC?: number;
   relativeHumidity: number;
+  heatIndexC?: number | null;
+  cloudCover?: number | null;
 }): WeatherBundle {
   return {
     coordinate: { latitude: 33.451, longitude: -112.074 },
@@ -171,7 +253,9 @@ function makeWeather({
       timestamp: departureTime,
       temperatureC,
       apparentTemperatureC,
+      heatIndexC,
       relativeHumidity,
+      cloudCover,
       windSpeedMps: 1,
       windDirectionDeg: 270,
       shortCondition: "Sunny",

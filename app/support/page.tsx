@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PolicyPage, PolicySection } from "@/components/PolicyPage";
+import { PUBLIC_PRODUCT_NAME } from "@/lib/brand";
 
 export const metadata: Metadata = {
-  title: "Support | ComfortOS",
-  description: "Get help or report route and place-data issues in ComfortOS.",
+  title: `Support | ${PUBLIC_PRODUCT_NAME}`,
+  description: `Get help or report route and place-data issues in ${PUBLIC_PRODUCT_NAME}.`,
 };
 
 export default function SupportPage() {
@@ -20,7 +21,7 @@ export default function SupportPage() {
         {supportUrl ? (
           <p>
             <Link className="policy-contact" href={supportUrl}>
-              Open the ComfortOS support channel
+              Open the {PUBLIC_PRODUCT_NAME} support channel
             </Link>
           </p>
         ) : (
@@ -32,14 +33,14 @@ export default function SupportPage() {
       </PolicySection>
       <PolicySection title="Place listing corrections">
         <p>
-          ComfortOS displays temporary Mapbox place-search results. Report an incorrect result
+          {PUBLIC_PRODUCT_NAME} displays temporary Mapbox place-search results. Report an incorrect result
           here and, when appropriate, submit the business correction to the upstream mapping
           provider as well.
         </p>
       </PolicySection>
       <PolicySection title="Weather and urgent conditions">
         <p>
-          ComfortOS support cannot provide emergency or weather-safety assistance. Follow
+          {PUBLIC_PRODUCT_NAME} support cannot provide emergency or weather-safety assistance. Follow
           official alerts and local emergency services for urgent conditions.
         </p>
       </PolicySection>

@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { PolicyPage, PolicySection } from "@/components/PolicyPage";
+import { PUBLIC_PRODUCT_NAME } from "@/lib/brand";
 
 export const metadata: Metadata = {
-  title: "Terms | ComfortOS",
-  description: "Terms for the ComfortOS limited beta walking-route experience.",
+  title: `Terms | ${PUBLIC_PRODUCT_NAME}`,
+  description: `Terms for the ${PUBLIC_PRODUCT_NAME} limited beta walking-route experience.`,
 };
 
 export default function TermsPage() {
@@ -11,11 +12,11 @@ export default function TermsPage() {
     <PolicyPage
       eyebrow="Limited beta terms"
       title="Comfort guidance, not a safety guarantee"
-      summary="ComfortOS compares estimated outdoor exposure along walking routes. It is not emergency guidance, medical advice, or turn-by-turn navigation."
+      summary={`${PUBLIC_PRODUCT_NAME} compares estimated outdoor exposure along walking routes. It is not emergency guidance, medical advice, or turn-by-turn navigation.`}
     >
       <PolicySection title="Use of the service">
         <p>
-          You may use ComfortOS to compare available walking routes. You remain responsible
+          You may use {PUBLIC_PRODUCT_NAME} to compare available walking routes. You remain responsible
           for observing actual street conditions, access restrictions, closures, traffic,
           weather, and official instructions.
         </p>
@@ -37,7 +38,7 @@ export default function TermsPage() {
       <PolicySection title="Acceptable use">
         <p>
           Do not automate abusive request volumes, bypass access controls, interfere with the
-          service, or use ComfortOS in a way that violates provider terms or applicable law.
+          service, or use {PUBLIC_PRODUCT_NAME} in a way that violates provider terms or applicable law.
         </p>
       </PolicySection>
       <PolicySection title="Third-party services">

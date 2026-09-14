@@ -22,6 +22,12 @@ Revision date available from zip metadata: August 7, 2026, 9:56 PM.
 
 Why this is current: the bundled design-baseline README identifies `ComfortOS-Prototype.dc.html` as the current Round 2 baseline and explicitly marks `ComfortOS-Prototype-v1-round1.dc.html` as superseded. Inspection confirms Round 2 contains the current interaction model, compact Home treatment, tradeoff-strip Route Cards, city-specific time labels, Comfort Map layers, and Active Navigation microclimate guidance.
 
+The production map shell has since been refined for live nationwide data. See
+[`../FINAL_UI_REFINEMENT.md`](../FINAL_UI_REFINEMENT.md) for the implemented
+information hierarchy, responsive behavior, and validation record. This refinement
+does not replace the product rules in the Round 2 baseline; it applies them to the
+real search, routing, weather, and environmental-analysis workflow.
+
 Also preserved in latest:
 
 ```text

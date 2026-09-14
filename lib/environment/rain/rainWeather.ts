@@ -1,4 +1,5 @@
 import type { WeatherBundle, WeatherForecastPoint } from "@/lib/weather/types";
+import type { PrecipitationType } from "@/lib/weather/precipitation";
 
 export type SegmentRainWeather = {
   precipitationIntensityMmPerHour?: number | null;
@@ -6,6 +7,7 @@ export type SegmentRainWeather = {
   regionalWindSpeedMps?: number | null;
   regionalWindDirectionDeg?: number | null;
   condition?: string | null;
+  precipitationType?: PrecipitationType | null;
   confidence: number;
   selectionMethod: "interpolated-hourly" | "nearest-hour" | "current" | "missing";
 };
@@ -52,6 +54,7 @@ export function selectRainWeatherForTime(
             ratio,
           ),
           condition: before.shortCondition ?? after.shortCondition ?? null,
+          precipitationType: before.precipitationType ?? after.precipitationType ?? null,
           confidence: 0.72,
           selectionMethod: "interpolated-hourly",
         };
@@ -73,6 +76,7 @@ export function selectRainWeatherForTime(
       regionalWindSpeedMps: nearestForecast.windSpeedMps,
       regionalWindDirectionDeg: nearestForecast.windDirectionDeg,
       condition: nearestForecast.shortCondition ?? null,
+      precipitationType: nearestForecast.precipitationType ?? null,
       confidence: 0.64,
       selectionMethod: "nearest-hour",
     };
@@ -85,6 +89,7 @@ export function selectRainWeatherForTime(
       regionalWindSpeedMps: weatherBundle.current.windSpeedMps,
       regionalWindDirectionDeg: weatherBundle.current.windDirectionDeg,
       condition: weatherBundle.current.shortCondition ?? null,
+      precipitationType: weatherBundle.current.precipitationType ?? null,
       confidence: weatherBundle.current.confidence ?? 0.62,
       selectionMethod: "current",
     };

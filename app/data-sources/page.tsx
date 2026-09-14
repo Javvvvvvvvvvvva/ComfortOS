@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { PolicyPage, PolicySection } from "@/components/PolicyPage";
+import { ENGINE_NAME, PUBLIC_PRODUCT_NAME } from "@/lib/brand";
 
 export const metadata: Metadata = {
-  title: "Data Sources | ComfortOS",
-  description: "Data sources and model boundaries used by ComfortOS.",
+  title: `Data Sources | ${PUBLIC_PRODUCT_NAME}`,
+  description: `Data sources and model boundaries used by ${PUBLIC_PRODUCT_NAME}.`,
 };
 
 export default function DataSourcesPage() {
@@ -11,7 +12,7 @@ export default function DataSourcesPage() {
     <PolicyPage
       eyebrow="Data attribution"
       title="What powers each route comparison"
-      summary="ComfortOS keeps provider data behind normalized interfaces and distinguishes observations from deterministic exposure estimates."
+      summary={`${PUBLIC_PRODUCT_NAME} keeps provider data behind normalized interfaces and distinguishes observations from deterministic exposure estimates.`}
     >
       <PolicySection title="Maps, places, and routes">
         <p>
@@ -44,7 +45,7 @@ export default function DataSourcesPage() {
       </PolicySection>
       <PolicySection title="Comfort estimates">
         <p>
-          ComfortOS calculates solar position, building shade, urban wind exposure, rain
+          {ENGINE_NAME} calculates solar position, building shade, urban wind exposure, rain
           exposure, and heat exposure with deterministic models. These outputs estimate
           relative route conditions and do not certify that a route is safe.
         </p>

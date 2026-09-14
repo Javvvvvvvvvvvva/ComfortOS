@@ -69,6 +69,58 @@ test("no-rain Seattle-like weather remains balanced", () => {
   assert.equal(decision.context, "balanced");
 });
 
+test("snow context activates only when winter exposure inputs are comparable", () => {
+  const decision = decideRoutingContext(
+    weather({
+      temperatureC: -4,
+      windSpeedMps: 4,
+      precipitationMmPerHour: 0.8,
+      snowfallMmPerHour: 5,
+      iceAccumulationMmPerHour: 0,
+      precipitationType: "snow",
+      shortCondition: "Snow",
+    }),
+    { rainCapable: true, snowCapable: true },
+  );
+
+  assert.equal(decision.context, "snow");
+  assert.equal(decision.routeLabel, "Snow Comfort");
+});
+
+test("snow weather falls back to cold routing when snow capability is unavailable", () => {
+  const decision = decideRoutingContext(
+    weather({
+      temperatureC: -4,
+      windSpeedMps: 4,
+      precipitationMmPerHour: 0.8,
+      snowfallMmPerHour: 5,
+      iceAccumulationMmPerHour: 0,
+      precipitationType: "snow",
+      shortCondition: "Snow",
+    }),
+    { rainCapable: true, snowCapable: false },
+  );
+
+  assert.equal(decision.context, "cold");
+});
+
+test("frozen precipitation is not double-counted as liquid rain", () => {
+  const decision = decideRoutingContext(
+    weather({
+      temperatureC: 12,
+      windSpeedMps: 2,
+      precipitationMmPerHour: 2,
+      snowfallMmPerHour: 3,
+      iceAccumulationMmPerHour: 0,
+      precipitationType: "snow",
+      shortCondition: "Snow",
+    }),
+    { rainCapable: true, snowCapable: false },
+  );
+
+  assert.equal(decision.context, "balanced");
+});
+
 test("severe cold outranks light rain", () => {
   const decision = decideRoutingContext(
     weather({
@@ -172,12 +224,18 @@ function weather({
   apparentTemperatureC,
   windSpeedMps,
   precipitationMmPerHour,
+  snowfallMmPerHour,
+  iceAccumulationMmPerHour,
+  precipitationType,
   shortCondition,
 }: {
   temperatureC: number;
   apparentTemperatureC?: number;
   windSpeedMps: number;
   precipitationMmPerHour?: number;
+  snowfallMmPerHour?: number;
+  iceAccumulationMmPerHour?: number;
+  precipitationType?: "none" | "rain" | "snow" | "sleet" | "freezing-rain" | "mixed" | "unknown";
   shortCondition?: string;
 }): WeatherBundle {
   return {
@@ -191,6 +249,9 @@ function weather({
       windSpeedMps,
       windDirectionDeg: 315,
       precipitationMmPerHour: precipitationMmPerHour ?? null,
+      snowfallMmPerHour: snowfallMmPerHour ?? null,
+      iceAccumulationMmPerHour: iceAccumulationMmPerHour ?? null,
+      precipitationType,
       shortCondition,
       source: "test",
       confidence: 1,

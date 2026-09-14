@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { PUBLIC_PRODUCT_NAME } from "@/lib/brand";
 
 export function PolicyPage({
   eyebrow,
@@ -16,7 +17,8 @@ export function PolicyPage({
     <main className="policy-page">
       <header className="policy-header">
         <Link className="policy-brand" href="/">
-          ComfortOS
+          <span className="policy-brand-mark" aria-hidden="true" />
+          <span>{PUBLIC_PRODUCT_NAME}</span>
         </Link>
         <p className="eyebrow">{eyebrow}</p>
         <h1>{title}</h1>

@@ -8,9 +8,16 @@ import {
   normalizeNwsPointResponse,
   NwsWeatherProvider,
 } from "@/lib/weather/providers/nwsWeatherProvider";
-import { selectWeatherCoordinate } from "@/lib/weather/location";
-import { WeatherService } from "@/lib/weather/service";
-import type { WeatherProvider } from "@/lib/weather/types";
+import { selectComfortWeatherForTime } from "@/lib/comfort/context";
+import {
+  selectWeatherCoordinate,
+  weatherBundleMatchesCoordinate,
+} from "@/lib/weather/location";
+import {
+  resolveCoordinateScopedWeather,
+  WeatherService,
+} from "@/lib/weather/service";
+import type { WeatherBundle, WeatherProvider } from "@/lib/weather/types";
 import {
   directionToDegrees,
   fahrenheitToCelsius,
@@ -31,11 +38,13 @@ test("normalizes NWS point metadata", () => {
   const point = normalizeNwsPointResponse({
     properties: {
       forecastHourly: "https://api.weather.gov/gridpoints/MPX/107,71/forecast/hourly",
+      forecastGridData: "https://api.weather.gov/gridpoints/MPX/107,71",
       observationStations: "https://api.weather.gov/gridpoints/MPX/107,71/stations",
     },
   });
 
   assert.match(point.forecastHourly, /forecast\/hourly/);
+  assert.match(point.forecastGridData ?? "", /gridpoints\/MPX/);
   assert.match(point.observationStations, /stations/);
 });
 
@@ -46,6 +55,8 @@ test("normalizes latest station observations with nullable fields", () => {
       temperature: { value: 23.2, unitCode: "wmoUnit:degC" },
       heatIndex: { value: null, unitCode: "wmoUnit:degC" },
       windChill: { value: 20.1, unitCode: "wmoUnit:degC" },
+      dewpoint: { value: 12.3, unitCode: "wmoUnit:degC" },
+      cloudLayers: [{ amount: "BKN", base: { value: 1200 } }],
       relativeHumidity: { value: 54 },
       windSpeed: { value: 4.5, unitCode: "wmoUnit:m_s-1" },
       windDirection: { value: 370, unitCode: "wmoUnit:degree_(angle)" },
@@ -59,6 +70,11 @@ test("normalizes latest station observations with nullable fields", () => {
   assert.equal(snapshot.timestamp, "2026-08-08T17:10:00.000Z");
   assert.equal(snapshot.temperatureC, 23.2);
   assert.equal(snapshot.apparentTemperatureC, 20.1);
+  assert.equal(snapshot.windChillC, 20.1);
+  assert.equal(snapshot.heatIndexC, null);
+  assert.equal(snapshot.apparentTemperatureSource, "wind-chill");
+  assert.equal(snapshot.dewPointC, 12.3);
+  assert.equal(snapshot.cloudCover, 75);
   assert.equal(snapshot.windDirectionDeg, 10);
   assert.equal(snapshot.precipitationMmPerHour, 1);
   assert.equal(snapshot.windGustMps, null);
@@ -87,23 +103,57 @@ test("normalizes NWS observation wind quantities to meters per second", () => {
 });
 
 test("normalizes NWS hourly forecast periods", () => {
-  const forecast = normalizeNwsHourlyForecastResponse({
-    properties: {
-      periods: [
-        {
-          startTime: "2026-08-08T13:00:00-05:00",
-          temperature: 80,
-          temperatureUnit: "F",
-          relativeHumidity: { value: 61 },
-          windSpeed: "6 mph",
-          windDirection: "NW",
-          probabilityOfPrecipitation: { value: 20 },
-          quantitativePrecipitation: { value: 0.002, unitCode: "wmoUnit:m" },
-          shortForecast: "Mostly Sunny",
-        },
-      ],
+  const forecast = normalizeNwsHourlyForecastResponse(
+    {
+      properties: {
+        periods: [
+          {
+            startTime: "2026-08-08T13:00:00-05:00",
+            temperature: 80,
+            temperatureUnit: "F",
+            relativeHumidity: { value: 61 },
+            windSpeed: "6 mph",
+            windDirection: "NW",
+            probabilityOfPrecipitation: { value: 20 },
+            quantitativePrecipitation: { value: 0.002, unitCode: "wmoUnit:m" },
+            shortForecast: "Mostly Sunny",
+          },
+        ],
+      },
     },
-  });
+    {
+      properties: {
+        dewpoint: {
+          uom: "wmoUnit:degC",
+          values: [{ validTime: "2026-08-08T18:00:00Z/PT1H", value: 18 }],
+        },
+        skyCover: {
+          uom: "wmoUnit:percent",
+          values: [{ validTime: "2026-08-08T18:00:00Z/PT1H", value: 72 }],
+        },
+        quantitativePrecipitation: {
+          uom: "wmoUnit:mm",
+          values: [{ validTime: "2026-08-08T18:00:00Z/PT4H", value: 8 }],
+        },
+        snowfallAmount: {
+          uom: "wmoUnit:mm",
+          values: [{ validTime: "2026-08-08T18:00:00Z/PT4H", value: 20 }],
+        },
+        iceAccumulation: {
+          uom: "wmoUnit:mm",
+          values: [{ validTime: "2026-08-08T18:00:00Z/PT4H", value: 0 }],
+        },
+        weather: {
+          values: [
+            {
+              validTime: "2026-08-08T18:00:00Z/PT4H",
+              value: [{ weather: "snow", intensity: "moderate" }],
+            },
+          ],
+        },
+      },
+    },
+  );
 
   assert.equal(forecast.length, 1);
   assert.equal(Math.round(forecast[0].temperatureC ?? 0), 27);
@@ -111,6 +161,11 @@ test("normalizes NWS hourly forecast periods", () => {
   assert.equal(Math.round((forecast[0].windSpeedMps ?? 0) * 100) / 100, 2.68);
   assert.equal(forecast[0].precipitationProbability, 20);
   assert.equal(forecast[0].precipitationMmPerHour, 2);
+  assert.equal(forecast[0].dewPointC, 18);
+  assert.equal(forecast[0].cloudCover, 72);
+  assert.equal(forecast[0].snowfallMmPerHour, 5);
+  assert.equal(forecast[0].iceAccumulationMmPerHour, 0);
+  assert.equal(forecast[0].precipitationType, "snow");
 });
 
 test("normalizes active alerts", () => {
@@ -149,6 +204,75 @@ test("selects weather location by origin, current location, then no location", (
   );
   assert.deepEqual(selectWeatherCoordinate({ currentLocation }), currentLocation);
   assert.equal(selectWeatherCoordinate({}), null);
+});
+
+test("weather bundles are scoped to the requested user location", async () => {
+  const seattle = { latitude: 47.6062, longitude: -122.3321 };
+  const phoenix = { latitude: 33.4484, longitude: -112.074 };
+  const supplied = weatherBundleAt(seattle, 12);
+  let fetchedCoordinate: Coordinate | null = null;
+  const weatherService = {
+    async getWeatherBundle(coordinate: Coordinate) {
+      fetchedCoordinate = coordinate;
+      return weatherBundleAt(coordinate, 38);
+    },
+  };
+
+  assert.equal(weatherBundleMatchesCoordinate(seattle, { ...seattle, latitude: 47.607 }), true);
+  assert.equal(weatherBundleMatchesCoordinate(seattle, phoenix), false);
+
+  const resolved = await resolveCoordinateScopedWeather(
+    weatherService,
+    phoenix,
+    supplied,
+  );
+  assert.equal(resolved.source, "provider-fetch");
+  assert.equal(resolved.suppliedBundleAccepted, false);
+  assert.deepEqual(fetchedCoordinate, phoenix);
+  assert.equal(resolved.bundle.current?.temperatureC, 38);
+});
+
+test("current observations win near departure and forecasts interpolate circular wind", () => {
+  const bundle = weatherBundleAt(MINNEAPOLIS, 5);
+  bundle.current = {
+    timestamp: "2026-08-08T18:00:00.000Z",
+    temperatureC: 5,
+    relativeHumidity: 80,
+    source: "test",
+    confidence: 0.9,
+  };
+  bundle.hourlyForecast = [
+    {
+      timestamp: "2026-08-08T18:00:00.000Z",
+      temperatureC: 8,
+      cloudCover: 80,
+      windSpeedMps: 2,
+      windDirectionDeg: 350,
+    },
+    {
+      timestamp: "2026-08-08T19:00:00.000Z",
+      temperatureC: 10,
+      cloudCover: 60,
+      windSpeedMps: 4,
+      windDirectionDeg: 10,
+    },
+  ];
+
+  const nearCurrent = selectComfortWeatherForTime(
+    bundle,
+    "2026-08-08T18:20:00.000Z",
+  );
+  assert.equal(nearCurrent.selectionMethod, "current");
+  assert.equal(nearCurrent.temperatureC, 5);
+  assert.ok((nearCurrent.cloudCover ?? 0) > 70);
+
+  const forecast = selectComfortWeatherForTime(
+    { ...bundle, current: null },
+    "2026-08-08T18:30:00.000Z",
+  );
+  assert.equal(forecast.selectionMethod, "interpolated-hourly");
+  assert.ok(Math.abs(forecast.regionalWindDirectionDeg ?? 360) < 0.001);
+  assert.equal(forecast.cloudCover, 70);
 });
 
 test("rejects malformed provider responses", () => {
@@ -240,4 +364,19 @@ function jsonResponse(payload: unknown) {
     status: 200,
     headers: { "content-type": "application/geo+json" },
   });
+}
+
+function weatherBundleAt(coordinate: Coordinate, temperatureC: number): WeatherBundle {
+  return {
+    coordinate,
+    current: {
+      timestamp: "2026-08-08T18:00:00.000Z",
+      temperatureC,
+      source: "test",
+    },
+    hourlyForecast: [],
+    alerts: [],
+    source: "test",
+    updatedAt: "2026-08-08T18:00:00.000Z",
+  };
 }

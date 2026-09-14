@@ -14,14 +14,21 @@ import type {
   SegmentHeatExposure,
 } from "@/lib/environment/heat/types";
 import type { TimedRouteSegment } from "@/lib/environment/shade/types";
+import { HEAT_MODEL_VERSION } from "@/lib/comfort/modelVersion";
+import {
+  calculateCloudSolarTransmission,
+  CLOUD_ATTENUATION_EXPONENT,
+  OVERCAST_SOLAR_TRANSMISSION_FLOOR,
+} from "@/lib/environment/solar/cloudAttenuation";
 
 export const HEAT_ENGINE_CONSTANTS = {
   warmThresholdC: 26,
   severeHeatC: 43,
   extremeHeatC: 47,
   ambientHeatWeight: 3.1,
-  humidityWeight: 0.45,
   solarExposureWeight: 2.2,
+  overcastSolarTransmissionFloor: OVERCAST_SOLAR_TRANSMISSION_FLOOR,
+  cloudAttenuationExponent: CLOUD_ATTENUATION_EXPONENT,
   maxVentilationBenefit: 0.32,
   ventilationFullEffectMps: 4,
   directSunRunThreshold: 0.65,
@@ -54,6 +61,7 @@ export class HeatAnalysisService {
 
     return {
       status: "available",
+      modelVersion: HEAT_MODEL_VERSION,
       routeGeometry,
       departureTime: departureDate.toISOString(),
       segmentHeat,
@@ -64,6 +72,8 @@ export class HeatAnalysisService {
           (segment) => segment.apparentTemperatureC !== null || segment.heatIndexC !== null,
         ),
         humidityAvailable: segmentHeat.some((segment) => segment.relativeHumidity !== null),
+        heatIndexAvailable: segmentHeat.some((segment) => segment.heatIndexC !== null),
+        cloudCoverAvailable: segmentHeat.some((segment) => segment.cloudCover !== null),
         shadeAvailable: request.shadeAnalysis !== null && request.shadeAnalysis !== undefined,
         windAvailable: request.windAnalysis !== null && request.windAnalysis !== undefined,
         routeAnalysisCoverage: routeMeters > 0 ? summary.analyzedMeters / routeMeters : 0,
@@ -72,7 +82,7 @@ export class HeatAnalysisService {
       debug: {
         segments: heatSegmentsToFeatureCollection(timedSegments, segmentHeat),
         note:
-          "Heat exposure is deterministic from normalized temperature, humidity/apparent-temperature where available, estimated building shade, solar elevation, route timing, and bounded ventilation. It is not a medical heat-risk or WBGT certification.",
+          "Heat exposure is deterministic from normalized ambient temperature, one NWS Heat Index humidity pathway, estimated building shade, solar elevation, cloud attenuation, route timing, and bounded ventilation. It is not measured radiation, medical heat risk, or WBGT certification.",
       },
     };
   }
@@ -109,10 +119,12 @@ function analyzeSegmentHeat({
         );
   const temperatureC = normalizeNumber(weather.temperatureC);
   const apparentTemperatureC = normalizeNumber(weather.apparentTemperatureC);
+  const providerHeatIndexC = normalizeNumber(weather.heatIndexC);
   const relativeHumidity = normalizeNumber(weather.relativeHumidity);
+  const cloudCover = normalizePercent(weather.cloudCover);
   const heatTemperature = selectEffectiveHeatTemperatureC({
     temperatureC,
-    apparentTemperatureC,
+    heatIndexC: providerHeatIndexC,
     relativeHumidity,
   });
   const effectiveHeatTemperatureC = heatTemperature.effectiveHeatTemperatureC;
@@ -134,18 +146,26 @@ function analyzeSegmentHeat({
       )
     : 0;
   const windExposureMps = normalizeNumber(wind?.estimatedExposureMps);
-  const ambientHeatCost = heatRatio * HEAT_ENGINE_CONSTANTS.ambientHeatWeight;
-  const humidityCost =
-    relativeHumidity === null
+  const ambientHeatRatio =
+    temperatureC === null
       ? 0
-      : clamp01((relativeHumidity - 35) / 45) *
-        heatRatio *
-        HEAT_ENGINE_CONSTANTS.humidityWeight;
+      : clamp01(
+          (temperatureC - HEAT_ENGINE_CONSTANTS.warmThresholdC) /
+            (HEAT_ENGINE_CONSTANTS.severeHeatC - HEAT_ENGINE_CONSTANTS.warmThresholdC),
+        );
+  const combinedThermalHeatCost = heatRatio * HEAT_ENGINE_CONSTANTS.ambientHeatWeight;
+  const ambientHeatCost = Math.min(
+    combinedThermalHeatCost,
+    ambientHeatRatio * HEAT_ENGINE_CONSTANTS.ambientHeatWeight,
+  );
+  const humidityCost = Math.max(0, combinedThermalHeatCost - ambientHeatCost);
+  const solarCloudModifier = calculateSolarCloudModifier(cloudCover, daylight);
   const solarExposureCost =
     directSunRatio === null
       ? 0
       : directSunRatio *
         solarElevationModifier *
+        solarCloudModifier *
         heatRatio *
         HEAT_ENGINE_CONSTANTS.solarExposureWeight;
   const ventilationModifier = calculateVentilationModifier({
@@ -161,7 +181,8 @@ function analyzeSegmentHeat({
     weatherConfidence: weather.confidence,
     temperatureC,
     relativeHumidity,
-    apparentTemperatureC,
+    heatIndexC: heatTemperature.heatIndexC,
+    cloudCover,
     shadeConfidence: shade?.confidence ?? null,
     windConfidence: wind?.confidence ?? null,
   });
@@ -174,12 +195,15 @@ function analyzeSegmentHeat({
     temperatureC,
     apparentTemperatureC,
     heatIndexC: heatTemperature.heatIndexC,
+    heatTemperatureSource: heatTemperature.source,
     effectiveHeatTemperatureC,
     relativeHumidity,
+    cloudCover,
     shadeRatio,
     directSunRatio,
     solarElevationDeg,
     solarElevationModifier,
+    solarCloudModifier,
     windExposureMps,
     ventilationModifier,
     ambientHeatCost,
@@ -189,6 +213,13 @@ function analyzeSegmentHeat({
     totalHeatExposureMinutesCost: totalHeatExposureCost * Math.max(0, durationSeconds / 60),
     confidence,
   };
+}
+
+export function calculateSolarCloudModifier(
+  cloudCover: number | null | undefined,
+  daylight: boolean,
+) {
+  return calculateCloudSolarTransmission(cloudCover, daylight);
 }
 
 export function calculateVentilationModifier({
@@ -254,6 +285,7 @@ function summarizeRouteHeat(segmentHeat: SegmentHeatExposure[], routeMeters: num
     averageHeatExposure,
     totalHeatExposureCost,
     ambientHeatExposure: timeWeightedAverage(segmentHeat, (segment) => segment.ambientHeatCost),
+    humidityExposure: timeWeightedAverage(segmentHeat, (segment) => segment.humidityCost),
     solarExposure: timeWeightedAverage(segmentHeat, (segment) => segment.solarExposureCost),
     ventilationModifier: timeWeightedAverage(segmentHeat, (segment) => segment.ventilationModifier),
     shadeRatio: distanceWeightedAverage(segmentHeat, (segment) => segment.shadeRatio ?? 0),
@@ -300,13 +332,17 @@ function heatSegmentsToFeatureCollection(
         id: segment.id,
         totalHeatExposureCost: heat?.totalHeatExposureCost ?? 0,
         ambientHeatCost: heat?.ambientHeatCost ?? 0,
+        humidityCost: heat?.humidityCost ?? 0,
         solarExposureCost: heat?.solarExposureCost ?? 0,
         ventilationModifier: heat?.ventilationModifier ?? 0,
         directSunRatio: heat?.directSunRatio ?? null,
         shadeRatio: heat?.shadeRatio ?? null,
         solarElevationDeg: heat?.solarElevationDeg ?? null,
+        cloudCover: heat?.cloudCover ?? null,
+        solarCloudModifier: heat?.solarCloudModifier ?? null,
         temperatureC: heat?.temperatureC ?? null,
         effectiveHeatTemperatureC: heat?.effectiveHeatTemperatureC ?? null,
+        heatTemperatureSource: heat?.heatTemperatureSource ?? "missing",
         confidence: heat?.confidence ?? 0,
       });
     }),
@@ -317,24 +353,31 @@ function calculateHeatConfidence({
   weatherConfidence,
   temperatureC,
   relativeHumidity,
-  apparentTemperatureC,
+  heatIndexC,
+  cloudCover,
   shadeConfidence,
   windConfidence,
 }: {
   weatherConfidence: number;
   temperatureC: number | null;
   relativeHumidity: number | null;
-  apparentTemperatureC: number | null;
+  heatIndexC: number | null;
+  cloudCover: number | null;
   shadeConfidence: number | null;
   windConfidence: number | null;
 }) {
   const temperatureConfidence = temperatureC === null ? 0 : weatherConfidence;
-  const apparentConfidence =
-    apparentTemperatureC !== null || relativeHumidity !== null ? weatherConfidence : 0.45;
+  const humidityConfidence =
+    heatIndexC !== null || relativeHumidity !== null ? weatherConfidence : 0;
+  const cloudConfidence = cloudCover !== null ? weatherConfidence : 0;
   const shade = shadeConfidence ?? 0;
   const wind = windConfidence ?? 0.42;
   return clamp01(
-    temperatureConfidence * 0.42 + apparentConfidence * 0.18 + shade * 0.28 + wind * 0.12,
+    temperatureConfidence * 0.38 +
+      humidityConfidence * 0.17 +
+      shade * 0.25 +
+      cloudConfidence * 0.1 +
+      wind * 0.1,
   );
 }
 
@@ -366,4 +409,9 @@ function distanceWeightedAverage(
 
 function normalizeNumber(value: number | null | undefined) {
   return typeof value === "number" && Number.isFinite(value) ? value : null;
+}
+
+function normalizePercent(value: number | null | undefined) {
+  const number = normalizeNumber(value);
+  return number === null ? null : Math.max(0, Math.min(100, number));
 }

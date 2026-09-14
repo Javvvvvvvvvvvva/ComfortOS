@@ -3,6 +3,9 @@
 Date: 2026-08-16
 Status: Accepted
 
+Weather normalization and heat/humidity accounting are amended by
+`ADR-029-weather-and-comfort-model-v2.md`.
+
 ## Context
 
 Stage 9 adds Phoenix as a third real validation region and introduces the first hot-weather ComfortOS objective:

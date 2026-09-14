@@ -69,6 +69,7 @@ Do not claim:
 - medical risk, WBGT, measured solar radiation, or certified shelter;
 - that `Stay Cool` makes extreme heat safe;
 - that `Stay Dry` makes flooding or severe weather safe.
+- that `Snow Comfort` identifies plowed, ice-free, accessible, or safe pavement.
 
 Official warnings must visually and semantically outrank ordinary Comfort recommendations.
 The implemented alert block uses `role="alert"` and assertive announcement before normal

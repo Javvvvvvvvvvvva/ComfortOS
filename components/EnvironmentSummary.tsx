@@ -1,5 +1,6 @@
 "use client";
 
+import { CloudSun, Droplets, Snowflake, Wind } from "lucide-react";
 import { formatTemperatureF, formatWindMph } from "@/lib/weather/format";
 import type { WeatherBundle } from "@/lib/weather/types";
 
@@ -20,19 +21,40 @@ export function EnvironmentSummary({ weather, state }: EnvironmentSummaryProps) 
     ) ?? "Wind unavailable";
   const condition =
     current?.shortCondition ?? nextForecast?.shortCondition ?? "Official conditions";
+  const humidity = current?.relativeHumidity ?? nextForecast?.relativeHumidity;
+  const snowfall = current?.snowfallMmPerHour ?? nextForecast?.snowfallMmPerHour;
+  const ice = current?.iceAccumulationMmPerHour ?? nextForecast?.iceAccumulationMmPerHour;
+  const winterPrecipitation =
+    (typeof snowfall === "number" && snowfall > 0) ||
+    (typeof ice === "number" && ice > 0);
 
   return (
     <div className="weather-summary" aria-live="polite">
-      <p className="eyebrow">Live weather</p>
+      <CloudSun className="weather-icon" size={19} aria-hidden="true" />
       {state === "idle" && !weather ? (
-        <strong>Select an origin</strong>
+        <span className="weather-empty">Weather where you start</span>
       ) : state === "error" ? (
-        <strong>Live conditions unavailable</strong>
+        <span className="weather-empty">Weather unavailable</span>
       ) : (
         <>
-          <strong>{state === "loading" && !weather ? "Loading..." : temperature}</strong>
-          <span>{condition}</span>
-          <small>{wind}</small>
+          <span className="weather-reading">
+            <strong>{state === "loading" && !weather ? "--" : temperature}</strong>
+            <span>{condition}</span>
+          </span>
+          <span className="weather-facts">
+            <small><Wind size={12} aria-hidden="true" />{wind}</small>
+            {typeof humidity === "number" ? (
+              <small><Droplets size={12} aria-hidden="true" />{Math.round(humidity)}%</small>
+            ) : null}
+            {winterPrecipitation ? (
+              <small>
+                <Snowflake size={12} aria-hidden="true" />
+                {typeof snowfall === "number" && snowfall > 0
+                  ? `${snowfall.toFixed(1)} mm/h snow`
+                  : `${(ice ?? 0).toFixed(2)} mm/h ice`}
+              </small>
+            ) : null}
+          </span>
         </>
       )}
     </div>

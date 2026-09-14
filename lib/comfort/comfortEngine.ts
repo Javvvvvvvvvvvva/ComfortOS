@@ -9,6 +9,7 @@ import {
   clamp01,
   coldStressRatio,
 } from "@/lib/comfort/thermal";
+import { calculateCloudSolarTransmission } from "@/lib/environment/solar/cloudAttenuation";
 
 export class ComfortEngine {
   constructor(private readonly weights: ComfortWeights = weightsForProfile("cold")) {}
@@ -20,11 +21,11 @@ export class ComfortEngine {
     if (this.weights.profile === "heat") {
       return this.evaluateHeatSegment(input);
     }
+    if (this.weights.profile === "snow") {
+      return this.evaluateSnowSegment(input);
+    }
 
-    const temperatureC = firstNumber(
-      input.weather.apparentTemperatureC,
-      input.weather.temperatureC,
-    );
+    const temperatureC = firstNumber(input.weather.temperatureC);
     const windExposureMps = input.wind?.estimatedExposureMps ?? null;
     const windChill = calculateEstimatedPedestrianWindChill({
       temperatureC,
@@ -68,11 +69,13 @@ export class ComfortEngine {
       shadeRatio: input.shade?.shadeRatio ?? null,
       estimatedWindExposureMps: windExposureMps,
       estimatedRainExposure: null,
+      estimatedSnowExposure: null,
       estimatedHeatExposure: null,
       thermalCost,
       windCost,
       solarCost,
       rainCost,
+      snowCost: 0,
       heatCost: 0,
       comfortCostRate,
       totalComfortCost: comfortCostRate * durationMinutes,
@@ -102,7 +105,17 @@ export class ComfortEngine {
     if ((input.shade.solarElevationDeg ?? 0) <= 0) return 0;
     if (coldRatio <= 0) return 0;
     const sunExposureRatio = 1 - clamp01(input.shade.shadeRatio);
-    return sunExposureRatio * coldRatio * input.shade.confidence * this.weights.winterSunBenefit;
+    const cloudTransmission = calculateCloudSolarTransmission(
+      input.weather.cloudCover,
+      true,
+    );
+    return (
+      sunExposureRatio *
+      cloudTransmission *
+      coldRatio *
+      input.shade.confidence *
+      this.weights.winterSunBenefit
+    );
   }
 
   private evaluateRainSegment(input: SegmentComfortInput): SegmentComfortResult {
@@ -133,11 +146,13 @@ export class ComfortEngine {
       shadeRatio: input.shade?.shadeRatio ?? null,
       estimatedWindExposureMps: input.wind?.estimatedExposureMps ?? null,
       estimatedRainExposure: rain?.estimatedRainExposure ?? null,
+      estimatedSnowExposure: null,
       estimatedHeatExposure: null,
       thermalCost: 0,
       windCost: 0,
       solarCost: 0,
       rainCost,
+      snowCost: 0,
       heatCost: 0,
       comfortCostRate: rainCost,
       totalComfortCost: rainCost * durationMinutes,
@@ -174,11 +189,13 @@ export class ComfortEngine {
       shadeRatio: heat?.shadeRatio ?? input.shade?.shadeRatio ?? null,
       estimatedWindExposureMps: input.wind?.estimatedExposureMps ?? null,
       estimatedRainExposure: null,
+      estimatedSnowExposure: null,
       estimatedHeatExposure: heat?.totalHeatExposureCost ?? null,
       thermalCost: ambientHeat + humidity,
       windCost: ventilationBenefit,
       solarCost: sunExposure,
       rainCost: 0,
+      snowCost: 0,
       heatCost,
       comfortCostRate: heat?.totalHeatExposureCost ?? heatCost,
       totalComfortCost:
@@ -190,6 +207,95 @@ export class ComfortEngine {
         ventilationBenefit,
       },
       confidence: heat ? clamp01(heat.confidence * 0.9 + input.weather.confidence * 0.1) : 0,
+    };
+  }
+
+  private evaluateSnowSegment(input: SegmentComfortInput): SegmentComfortResult {
+    const snow = input.snow;
+    const temperatureC = firstNumber(input.weather.temperatureC);
+    const windExposureMps = input.wind?.estimatedExposureMps ?? null;
+    const windChill = calculateEstimatedPedestrianWindChill({
+      temperatureC,
+      pedestrianWindExposureMps: windExposureMps,
+    });
+    const coldRatio = coldStressRatio({
+      temperatureC,
+      neutralTemperatureC: this.weights.neutralTemperatureC,
+      severeColdTemperatureC: this.weights.severeColdTemperatureC,
+    });
+    const cold = coldRatio === null ? 0 : coldRatio * this.weights.temperature;
+    const windChillPenalty =
+      windChill.windChillC !== null && temperatureC !== null
+        ? clamp01((temperatureC - windChill.windChillC) / 15) *
+          this.weights.estimatedWindChill
+        : 0;
+    const exposure =
+      windExposureMps === null
+        ? 0
+        : clamp01(windExposureMps / 10) * this.weights.windExposure;
+    const headwind = input.wind
+      ? clamp01(input.wind.headwindComponentMps / 8) * this.weights.headwind
+      : 0;
+    const crosswind = input.wind
+      ? clamp01(input.wind.crosswindComponentMps / 8) * this.weights.crosswind
+      : 0;
+    const snowfallExposure = snow
+      ? snow.estimatedSnowfallExposure * this.weights.snowfallExposure
+      : 0;
+    const iceAccumulation = snow
+      ? snow.estimatedIceExposure * this.weights.iceAccumulation
+      : 0;
+    const thermalCost = cold + windChillPenalty;
+    const windCost = exposure + headwind + crosswind;
+    const solarBenefit = this.calculateWinterSunBenefit(input, coldRatio ?? 0);
+    const solarCost = solarBenefit > 0 ? -solarBenefit : 0;
+    const snowCost = snowfallExposure + iceAccumulation;
+    const comfortCostRate = Math.max(
+      0,
+      thermalCost + windCost + solarCost + snowCost,
+    );
+    const durationMinutes = Math.max(0, input.durationSeconds / 60);
+
+    return {
+      segmentId: input.segmentId,
+      estimatedMidpointTime: input.estimatedMidpointTime,
+      distanceMeters: input.distanceMeters,
+      durationSeconds: input.durationSeconds,
+      temperatureC,
+      estimatedPedestrianWindChillC: windChill.windChillC,
+      shadeRatio: input.shade?.shadeRatio ?? null,
+      estimatedWindExposureMps: windExposureMps,
+      estimatedRainExposure: null,
+      estimatedSnowExposure: snow
+        ? snow.estimatedSnowfallExposure + snow.estimatedIceExposure
+        : null,
+      estimatedHeatExposure: null,
+      thermalCost,
+      windCost,
+      solarCost,
+      rainCost: 0,
+      snowCost,
+      heatCost: 0,
+      comfortCostRate,
+      totalComfortCost: comfortCostRate * durationMinutes,
+      contributions: {
+        cold,
+        estimatedWindChill: windChillPenalty,
+        windExposure: exposure,
+        headwind,
+        crosswind,
+        winterSunBenefit: solarBenefit > 0 ? -solarBenefit : 0,
+        snowfallExposure,
+        iceAccumulation,
+      },
+      confidence: snow
+        ? clamp01(
+            snow.confidence * 0.62 +
+              input.weather.confidence * 0.13 +
+              (input.wind?.confidence ?? 0) * 0.2 +
+              (input.shade?.confidence ?? 0) * 0.05,
+          )
+        : 0,
     };
   }
 

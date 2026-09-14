@@ -65,7 +65,9 @@ from production evidence.
   redaction and retention.
 - [x] Keep the environmental-estimate disclaimer in the route result.
 - [x] Keep official NWS alerts separate, assertive, and above ordinary route recommendations.
-- [x] Avoid safety certification, WBGT, flood-safety, and medical-risk claims.
+- [x] Avoid safety certification, WBGT, flood-safety, medical-risk, plowing, and ice-free pavement claims.
+- [x] Validate the first 24 forecast hours at one existing route point in all 50 states and D.C.
+- [x] Validate one managed Mapbox + R2 + NWS Comfort comparison in all 50 states and D.C.
 
 ## P1 Before External Beta Expansion
 
@@ -170,3 +172,14 @@ replace the unchecked production deployment, legal, security, and monitoring gat
 
 Release approval remains unavailable until every P0 item is checked and the release-candidate
 build/browser gate is rerun in the production-equivalent environment.
+
+## Post-Stage-11 Model Hardening Evidence
+
+- [x] Separate ambient temperature, Heat Index, Wind Chill, dew point, humidity, and cloud cover
+  in the normalized weather contract.
+- [x] Prevent duplicate cold/wind-chill and heat/humidity accounting.
+- [x] Apply numeric NWS sky cover to the daytime solar-exposure proxy.
+- [x] Reject client weather bundles that do not match the requested user-location scope.
+- [x] Pass deterministic weather/comfort regressions and the three-city live NWS validation.
+- [ ] Complete field calibration before describing Comfort Score as an absolute or scientifically
+  validated measure.

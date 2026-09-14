@@ -21,6 +21,7 @@ import type { RainAnalysisResult } from "@/lib/environment/rain/types";
 import type { HeatAnalysisResult } from "@/lib/environment/heat/types";
 import type { ComfortAnalysisResult } from "@/lib/comfort/types";
 import { createBasemapStyle } from "@/lib/map/basemap";
+import { PUBLIC_PRODUCT_NAME } from "@/lib/brand";
 
 type SelectionMode = "origin" | "destination";
 
@@ -121,7 +122,7 @@ export function ComfortMap({
       attributionControl: false,
     });
 
-    map.addControl(new NavigationControl({ visualizePitch: true }), "top-right");
+    map.addControl(new NavigationControl({ visualizePitch: true }), "top-left");
     map.addControl(new AttributionControl({ compact: true }), "bottom-left");
     map.on("click", (event: MapMouseEvent) => {
       onMapSelectRef.current({
@@ -261,6 +262,7 @@ export function ComfortMap({
         null;
 
       if (boundsGeometry) {
+        const isDesktop = window.matchMedia("(min-width: 780px)").matches;
         const bounds = boundsGeometry.coordinates.reduce(
           (currentBounds, coordinate) => currentBounds.extend(coordinate),
           new LngLatBounds(
@@ -269,7 +271,9 @@ export function ComfortMap({
           ),
         );
         map.fitBounds(bounds as LngLatBoundsLike, {
-          padding: { top: 96, right: 56, bottom: 330, left: 56 },
+          padding: isDesktop
+            ? { top: 104, right: 500, bottom: 96, left: 72 }
+            : { top: 108, right: 40, bottom: 360, left: 40 },
           duration: 700,
           maxZoom: 16,
         });
@@ -648,10 +652,10 @@ export function ComfortMap({
       <div
         ref={containerRef}
         className="map-canvas"
-        aria-label="Interactive ComfortOS walking map"
+        aria-label={`Interactive ${PUBLIC_PRODUCT_NAME} walking map`}
       />
-      <div className="map-instruction" aria-live="polite">
-        Tap the map to set {selectionMode === "origin" ? "an origin" : "a destination"}.
+      <div className="sr-only" aria-live="polite">
+        Map selection target: {selectionMode === "origin" ? "origin" : "destination"}.
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Manrope, Newsreader } from "next/font/google";
+import { PUBLIC_PRODUCT_NAME, PUBLIC_PRODUCT_TAGLINE } from "@/lib/brand";
 import "maplibre-gl/dist/maplibre-gl.css";
 import "./globals.css";
 
@@ -16,12 +17,12 @@ const newsreader = Newsreader({
 });
 
 export const metadata: Metadata = {
-  title: "ComfortOS",
-  description:
-    "Walking routes informed by current outdoor conditions, estimated exposure, and location capabilities.",
+  title: PUBLIC_PRODUCT_NAME,
+  description: `${PUBLIC_PRODUCT_TAGLINE} Walking routes shaped by current outdoor conditions.`,
   icons: {
-    icon: "/favicon.svg",
-    shortcut: "/favicon.svg",
+    icon: "/brand/ahhway-mark.png",
+    shortcut: "/brand/ahhway-mark.png",
+    apple: "/brand/ahhway-mark.png",
   },
 };
 

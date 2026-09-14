@@ -1,0 +1,154 @@
+{
+  "format": "comfortos-environment-source-catalog-v1",
+  "updatedAt": "2026-09-13T00:00:00.000Z",
+  "sources": [
+    {
+      "id": "usgs-3dep-elevation-2026-08-24",
+      "layer": "terrain-elevation",
+      "authority": "U.S. Geological Survey",
+      "dataset": "3D Elevation Program Bare Earth DEM",
+      "version": "service-2026-08-24",
+      "dataAsOf": "2026-08-24",
+      "coverage": ["conus", "alaska", "hawaii", "district-of-columbia"],
+      "spatialResolutionMeters": {
+        "nominal": 10,
+        "available": [1, 5, 10, 30, 60]
+      },
+      "updateCadence": "continuous",
+      "freshnessPolicyDays": 120,
+      "license": {
+        "name": "Public Domain",
+        "url": "https://www.usgs.gov/information-policies-and-instructions/copyrights-and-credits"
+      },
+      "access": {
+        "method": "arcgis-image-service",
+        "url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer",
+        "dataUri": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer"
+      },
+      "activation": "pilot",
+      "qualitySignals": ["source resolution", "acquisition date", "vertical datum"],
+      "intendedUses": ["route grade", "slope", "aspect", "terrain exposure"],
+      "prohibitedClaims": ["step-free accessibility", "landslide safety", "trail condition"]
+    },
+    {
+      "id": "usgs-annual-nlcd-land-cover-c1.2-2025",
+      "layer": "land-cover",
+      "authority": "U.S. Geological Survey",
+      "dataset": "Annual National Land Cover Database Collection 1.2 Land Cover",
+      "version": "collection-1.2-2025",
+      "dataAsOf": "2025-12-31",
+      "coverage": ["conus", "district-of-columbia"],
+      "spatialResolutionMeters": { "nominal": 30 },
+      "updateCadence": "annual",
+      "freshnessPolicyDays": 550,
+      "license": {
+        "name": "CC0 1.0 Universal",
+        "url": "https://creativecommons.org/publicdomain/zero/1.0/"
+      },
+      "access": {
+        "method": "ogc-wms",
+        "url": "https://dmsdata.cr.usgs.gov/geoserver/mrlc_Land-Cover-Native_conus_year_data/wms?service=WMS&request=GetCapabilities&version=1.3.0"
+      },
+      "activation": "candidate",
+      "qualitySignals": ["land-cover confidence", "reference validation", "mapping year"],
+      "intendedUses": ["surface context", "forest context", "open-land exposure"],
+      "prohibitedClaims": ["parcel land use", "sidewalk condition", "exact tree shade"]
+    },
+    {
+      "id": "usgs-annual-nlcd-impervious-c1.2-2025",
+      "layer": "impervious-surface",
+      "authority": "U.S. Geological Survey",
+      "dataset": "Annual National Land Cover Database Collection 1.2 Fractional Impervious Surface",
+      "version": "collection-1.2-2025",
+      "dataAsOf": "2025-12-31",
+      "coverage": ["conus", "district-of-columbia"],
+      "spatialResolutionMeters": { "nominal": 30 },
+      "updateCadence": "annual",
+      "freshnessPolicyDays": 550,
+      "license": {
+        "name": "CC0 1.0 Universal",
+        "url": "https://creativecommons.org/publicdomain/zero/1.0/"
+      },
+      "access": {
+        "method": "ogc-wms",
+        "url": "https://dmsdata.cr.usgs.gov/geoserver/mrlc_Fractional-Impervious-Surface-Native_conus_year_data/wms?service=WMS&request=GetCapabilities&version=1.3.0"
+      },
+      "activation": "candidate",
+      "qualitySignals": ["fractional coverage", "reference validation", "mapping year"],
+      "intendedUses": ["impervious exposure", "surface heat context"],
+      "prohibitedClaims": ["measured surface temperature", "medical heat risk", "pavement condition"]
+    },
+    {
+      "id": "usfs-tree-canopy-cover-2025.6",
+      "layer": "tree-canopy",
+      "authority": "USDA Forest Service",
+      "dataset": "National Land Cover Database Tree Canopy Cover",
+      "version": "2025.6",
+      "dataAsOf": "2025-12-31",
+      "coverage": ["conus", "southeast-alaska"],
+      "spatialResolutionMeters": { "nominal": 30 },
+      "updateCadence": "annual",
+      "freshnessPolicyDays": 550,
+      "license": {
+        "name": "U.S. Government public data",
+        "url": "https://www.fs.usda.gov/about-agency/website-policies-important-links"
+      },
+      "access": {
+        "method": "official-download",
+        "url": "https://data.fs.usda.gov/geodata/rastergateway/treecanopycover/"
+      },
+      "activation": "candidate",
+      "qualitySignals": ["tree canopy percent", "standard error", "mapping year"],
+      "intendedUses": ["tree-canopy context", "green corridor comparison"],
+      "prohibitedClaims": ["individual tree location", "exact tree shadow", "tree health"]
+    },
+    {
+      "id": "overture-base-land-2026-08-19.0",
+      "layer": "landform",
+      "authority": "Overture Maps Foundation",
+      "dataset": "Overture Base land and land cover",
+      "version": "2026-08-19.0",
+      "dataAsOf": "2026-08-19",
+      "coverage": ["global"],
+      "updateCadence": "monthly",
+      "freshnessPolicyDays": 90,
+      "license": {
+        "name": "ODbL 1.0",
+        "url": "https://opendatacommons.org/licenses/odbl/1-0/"
+      },
+      "access": {
+        "method": "cloud-geoparquet",
+        "url": "https://docs.overturemaps.org/guides/base/",
+        "dataUri": "s3://overturemaps-us-west-2/release/2026-08-19.0/theme=base/type=land/*"
+      },
+      "activation": "fallback-only",
+      "qualitySignals": ["source lineage", "source update time", "geometry"],
+      "intendedUses": ["named landforms", "broad forest fallback", "water and wetland context"],
+      "prohibitedClaims": ["measured elevation", "exact canopy percentage", "terrain grade"]
+    },
+    {
+      "id": "overture-transportation-surface-2026-08-19.0",
+      "layer": "pedestrian-surface",
+      "authority": "Overture Maps Foundation",
+      "dataset": "Overture Transportation segments",
+      "version": "2026-08-19.0",
+      "dataAsOf": "2026-08-19",
+      "coverage": ["global"],
+      "updateCadence": "monthly",
+      "freshnessPolicyDays": 90,
+      "license": {
+        "name": "ODbL 1.0",
+        "url": "https://opendatacommons.org/licenses/odbl/1-0/"
+      },
+      "access": {
+        "method": "cloud-geoparquet",
+        "url": "https://docs.overturemaps.org/schema/reference/transportation/segment/",
+        "dataUri": "s3://overturemaps-us-west-2/release/2026-08-19.0/theme=transportation/type=segment/*"
+      },
+      "activation": "candidate",
+      "qualitySignals": ["source lineage", "road surface presence", "pedestrian class"],
+      "intendedUses": ["sidewalk context", "surface context", "crosswalk context"],
+      "prohibitedClaims": ["ADA compliance", "current obstruction", "sidewalk quality where attributes are missing"]
+    }
+  ]
+}

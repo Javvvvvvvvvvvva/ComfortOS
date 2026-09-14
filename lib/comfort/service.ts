@@ -13,6 +13,7 @@ import type {
   SegmentComfortResult,
 } from "@/lib/comfort/types";
 import { clamp01 } from "@/lib/comfort/thermal";
+import { COMFORT_MODEL_VERSION } from "@/lib/comfort/modelVersion";
 import {
   assignSegmentTraversalTimes,
   segmentRouteGeometry,
@@ -41,16 +42,19 @@ export class ComfortAnalysisService {
     const engine = createComfortEngine(profile);
     const inputs = buildSegmentComfortInputs(request, timedSegments);
     const segmentComfort = inputs.map((input) => engine.evaluateSegment(input));
+    const analyzedMeters = analyzedRouteMetersForProfile(request, routeMeters, profile);
     const completeness = calculateCompleteness({
       inputs,
       routeMeters,
       hasShadeAnalysis: Boolean(request.shadeAnalysis),
       hasWindAnalysis: Boolean(request.windAnalysis),
       hasRainAnalysis: Boolean(request.rainAnalysis),
+      hasSnowAnalysis: Boolean(request.snowAnalysis),
       hasHeatAnalysis: Boolean(request.heatAnalysis),
       shadeAnalyzedMeters: request.shadeAnalysis?.summary.analyzedMeters ?? 0,
       windAnalyzedMeters: request.windAnalysis?.summary.analyzedMeters ?? 0,
       rainAnalyzedMeters: request.rainAnalysis?.summary.analyzedMeters ?? 0,
+      snowAnalyzedMeters: request.snowAnalysis?.summary.analyzedMeters ?? 0,
       heatAnalyzedMeters: request.heatAnalysis?.summary.analyzedMeters ?? 0,
       profile,
     });
@@ -60,6 +64,7 @@ export class ComfortAnalysisService {
       routeDurationSeconds: request.route.durationSeconds,
       scoreFromAverageCost: (averageCost) => engine.scoreFromAverageCost(averageCost),
       scoreComparable: completeness.comparable,
+      analyzedMeters,
     });
     const quality = {
       weatherConfidence: weightedInputAverage(inputs, (input) =>
@@ -68,6 +73,13 @@ export class ComfortAnalysisService {
             input.weather.precipitationMmPerHour === undefined
             ? 0
             : input.weather.confidence
+          : profile === "snow"
+            ? input.weather.snowfallMmPerHour === null ||
+              input.weather.snowfallMmPerHour === undefined ||
+              input.weather.iceAccumulationMmPerHour === null ||
+              input.weather.iceAccumulationMmPerHour === undefined
+              ? 0
+              : input.weather.confidence
           : input.weather.temperatureC === null || input.weather.temperatureC === undefined
             ? 0
             : input.weather.confidence,
@@ -77,6 +89,8 @@ export class ComfortAnalysisService {
       routeAnalysisCoverage:
         profile === "rain"
           ? request.rainAnalysis?.summary.completeness ?? 0
+          : profile === "snow"
+            ? request.snowAnalysis?.summary.completeness ?? 0
           : profile === "heat"
             ? request.heatAnalysis?.summary.completeness ?? 0
           : routeMeters > 0
@@ -105,6 +119,7 @@ export class ComfortAnalysisService {
 
     return {
       status: "available",
+      modelVersion: COMFORT_MODEL_VERSION,
       profile,
       routeGeometry,
       departureTime: departureDate.toISOString(),
@@ -120,6 +135,8 @@ export class ComfortAnalysisService {
             ? "Stage 9 Heat Comfort Cost is a deterministic Stay Cool estimate from normalized weather, estimated building shade, solar elevation, route timing, and bounded ventilation. It is not a medical heat-risk or WBGT value."
             : profile === "rain"
               ? "Stage 8 Rain Comfort Cost is a deterministic Stay Dry estimate from normalized precipitation and covered-network exposure. It is not a safety guarantee."
+              : profile === "snow"
+                ? "Snow Comfort v1 is a deterministic comfort estimate from normalized snowfall, ice accumulation, cold, route timing, access-aware cover, and estimated pedestrian wind. It does not claim plowed, ice-free, accessible, or safe pavement."
               : "Stage 4 Comfort Cost is a deterministic cold-profile estimate for one existing route. It is not route optimization and not a measured physiological value.",
       },
     };
@@ -141,6 +158,9 @@ function buildSegmentComfortInputs(
       (value) => value.segmentId === segment.id,
     );
     const rain = request.rainAnalysis?.segmentRain.find(
+      (value) => value.segmentId === segment.id,
+    );
+    const snow = request.snowAnalysis?.segmentSnow.find(
       (value) => value.segmentId === segment.id,
     );
     const heat = request.heatAnalysis?.segmentHeat.find(
@@ -186,6 +206,17 @@ function buildSegmentComfortInputs(
             confidence: rain.confidence,
           }
         : undefined,
+      snow: snow
+        ? {
+            estimatedSnowfallExposure: snow.estimatedSnowfallExposure,
+            estimatedIceExposure: snow.estimatedIceExposure,
+            snowfallMmPerHour: snow.snowfallMmPerHour,
+            iceAccumulationMmPerHour: snow.iceAccumulationMmPerHour,
+            coveredRatio: snow.coveredRatio,
+            windDrivenSnowFactor: snow.windDrivenSnowFactor,
+            confidence: snow.confidence,
+          }
+        : undefined,
       heat: heat
         ? {
             totalHeatExposureCost: heat.totalHeatExposureCost,
@@ -196,6 +227,8 @@ function buildSegmentComfortInputs(
             ventilationModifier: heat.ventilationModifier,
             shadeRatio: heat.shadeRatio,
             directSunRatio: heat.directSunRatio,
+            cloudCover: heat.cloudCover,
+            solarCloudModifier: heat.solarCloudModifier,
             confidence: heat.confidence,
           }
         : undefined,
@@ -209,12 +242,14 @@ function summarizeComfort({
   routeDurationSeconds,
   scoreFromAverageCost,
   scoreComparable,
+  analyzedMeters,
 }: {
   segmentComfort: SegmentComfortResult[];
   routeMeters: number;
   routeDurationSeconds: number;
   scoreFromAverageCost: (averageComfortCost: number) => number;
   scoreComparable: boolean;
+  analyzedMeters: number;
 }) {
   const durationSeconds = Math.max(
     1,
@@ -232,6 +267,12 @@ function summarizeComfort({
   const windExposure = timeWeightedAverage(segmentComfort, (segment) => segment.windCost);
   const solarExposure = timeWeightedAverage(segmentComfort, (segment) => segment.solarCost);
   const rainExposure = timeWeightedAverage(segmentComfort, (segment) => segment.rainCost);
+  const snowExposure = timeWeightedAverage(segmentComfort, (segment) =>
+    segment.contributions.snowfallExposure ?? 0,
+  );
+  const iceExposure = timeWeightedAverage(segmentComfort, (segment) =>
+    segment.contributions.iceAccumulation ?? 0,
+  );
   const heatExposure = timeWeightedAverage(segmentComfort, (segment) => segment.heatCost);
   const confidence = clamp01(
     timeWeightedAverage(segmentComfort, (segment) => segment.confidence),
@@ -246,12 +287,35 @@ function summarizeComfort({
     windExposure,
     solarExposure,
     rainExposure,
+    snowExposure,
+    iceExposure,
     heatExposure,
-    analyzedMeters: routeMeters,
-    unknownMeters: Math.max(0, routeMeters * (1 - confidence)),
+    analyzedMeters,
+    unknownMeters: Math.max(0, routeMeters - analyzedMeters),
     confidence,
     dominantFactors: dominantFactors(segmentComfort),
   } satisfies RouteComfortSummary;
+}
+
+function analyzedRouteMetersForProfile(
+  request: ComfortAnalysisRequest,
+  routeMeters: number,
+  profile: string,
+) {
+  const bounded = (value: number | undefined) =>
+    Math.max(0, Math.min(routeMeters, value ?? 0));
+  if (profile === "rain") return bounded(request.rainAnalysis?.summary.analyzedMeters);
+  if (profile === "snow") return bounded(request.snowAnalysis?.summary.analyzedMeters);
+  if (profile === "heat") {
+    return Math.min(
+      bounded(request.heatAnalysis?.summary.analyzedMeters),
+      bounded(request.shadeAnalysis?.summary.analyzedMeters),
+    );
+  }
+  return Math.min(
+    bounded(request.windAnalysis?.summary.analyzedMeters),
+    bounded(request.shadeAnalysis?.summary.analyzedMeters),
+  );
 }
 
 function calculateCompleteness({
@@ -260,10 +324,12 @@ function calculateCompleteness({
   hasShadeAnalysis,
   hasWindAnalysis,
   hasRainAnalysis,
+  hasSnowAnalysis,
   hasHeatAnalysis,
   shadeAnalyzedMeters,
   windAnalyzedMeters,
   rainAnalyzedMeters,
+  snowAnalyzedMeters,
   heatAnalyzedMeters,
   profile,
 }: {
@@ -272,10 +338,12 @@ function calculateCompleteness({
   hasShadeAnalysis: boolean;
   hasWindAnalysis: boolean;
   hasRainAnalysis: boolean;
+  hasSnowAnalysis: boolean;
   hasHeatAnalysis: boolean;
   shadeAnalyzedMeters: number;
   windAnalyzedMeters: number;
   rainAnalyzedMeters: number;
+  snowAnalyzedMeters: number;
   heatAnalyzedMeters: number;
   profile: string;
 }): ComfortAnalysisCompleteness {
@@ -283,6 +351,7 @@ function calculateCompleteness({
   const windWeight = 0.35;
   const shadeWeight = 0.15;
   const rainWeight = 0.5;
+  const snowWeight = 0.5;
   const heatWeight = 0.45;
   const weatherAvailable =
     weightedInputAverage(inputs, (input) =>
@@ -291,6 +360,15 @@ function calculateCompleteness({
           input.weather.precipitationMmPerHour === undefined
           ? 0
           : 1
+        : profile === "snow"
+          ? input.weather.snowfallMmPerHour === null ||
+            input.weather.snowfallMmPerHour === undefined ||
+            input.weather.iceAccumulationMmPerHour === null ||
+            input.weather.iceAccumulationMmPerHour === undefined ||
+            input.weather.temperatureC === null ||
+            input.weather.temperatureC === undefined
+            ? 0
+            : 1
         : input.weather.temperatureC === null || input.weather.temperatureC === undefined
           ? 0
           : 1,
@@ -298,14 +376,20 @@ function calculateCompleteness({
   const windCoverage = routeMeters > 0 ? clamp01(windAnalyzedMeters / routeMeters) : 0;
   const shadeCoverage = routeMeters > 0 ? clamp01(shadeAnalyzedMeters / routeMeters) : 0;
   const rainCoverage = routeMeters > 0 ? clamp01(rainAnalyzedMeters / routeMeters) : 0;
+  const snowCoverage = routeMeters > 0 ? clamp01(snowAnalyzedMeters / routeMeters) : 0;
   const heatCoverage = routeMeters > 0 ? clamp01(heatAnalyzedMeters / routeMeters) : 0;
   const windAvailable = hasWindAnalysis && windCoverage > 0;
   const shadeAvailable = hasShadeAnalysis && shadeCoverage > 0;
   const rainAvailable = hasRainAnalysis && rainCoverage > 0;
+  const snowAvailable = hasSnowAnalysis && snowCoverage > 0;
   const heatAvailable = hasHeatAnalysis && heatCoverage > 0;
   const analyzedWeight =
     profile === "rain"
       ? (weatherAvailable ? weatherWeight : 0) + rainCoverage * rainWeight
+      : profile === "snow"
+        ? (weatherAvailable ? 0.35 : 0) +
+          snowCoverage * snowWeight +
+          windCoverage * 0.15
       : profile === "heat"
         ? (weatherAvailable ? 0.4 : 0) +
           heatCoverage * heatWeight +
@@ -317,6 +401,8 @@ function calculateCompleteness({
   const comparable =
     profile === "rain"
       ? weatherAvailable && rainAvailable && analyzedWeight >= 0.75
+      : profile === "snow"
+        ? weatherAvailable && snowAvailable && windAvailable && analyzedWeight >= 0.75
       : profile === "heat"
         ? weatherAvailable && heatAvailable && shadeAvailable && analyzedWeight >= 0.75
       : weatherAvailable && windAvailable && shadeAvailable && analyzedWeight >= 0.75;
@@ -326,11 +412,13 @@ function calculateCompleteness({
     windAvailable,
     shadeAvailable,
     rainAvailable,
+    snowAvailable,
     heatAvailable,
     weatherWeight,
     windWeight,
     shadeWeight,
     rainWeight,
+    snowWeight,
     heatWeight,
     analyzedWeight: clamp01(analyzedWeight),
     comparable,
@@ -368,6 +456,8 @@ function dominantFactors(
     add(totals, "crosswind", segment.contributions.crosswind ?? 0, segment.durationSeconds);
     add(totals, "shade", segment.contributions.solarExposure ?? 0, segment.durationSeconds);
     add(totals, "rain", segment.contributions.rainExposure ?? 0, segment.durationSeconds);
+    add(totals, "snow", segment.contributions.snowfallExposure ?? 0, segment.durationSeconds);
+    add(totals, "ice", segment.contributions.iceAccumulation ?? 0, segment.durationSeconds);
     add(totals, "heat", segment.contributions.heatAmbient ?? 0, segment.durationSeconds);
     add(totals, "heat", segment.contributions.humidity ?? 0, segment.durationSeconds);
     add(totals, "sun", segment.contributions.sunExposure ?? 0, segment.durationSeconds);
@@ -398,9 +488,11 @@ function comfortSegmentsToFeatureCollection(
         windCost: segmentComfort?.windCost ?? 0,
         solarCost: segmentComfort?.solarCost ?? 0,
         rainCost: segmentComfort?.rainCost ?? 0,
+        snowCost: segmentComfort?.snowCost ?? 0,
         heatCost: segmentComfort?.heatCost ?? 0,
         estimatedHeatExposure: segmentComfort?.estimatedHeatExposure ?? null,
         estimatedRainExposure: segmentComfort?.estimatedRainExposure ?? null,
+        estimatedSnowExposure: segmentComfort?.estimatedSnowExposure ?? null,
         confidence: segmentComfort?.confidence ?? 0,
         estimatedMidpointTime: segment.estimatedMidpointTime,
       });

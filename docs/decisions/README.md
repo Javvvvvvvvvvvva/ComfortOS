@@ -57,3 +57,7 @@ Accepted ADRs:
 - `ADR-026-state-archive-and-local-pruning.md`
 - `ADR-027-r2-release-restoration-and-atomic-activation.md`
 - `ADR-028-cloudflare-r2-fuse-environment-staging.md`
+- `ADR-029-weather-and-comfort-model-v2.md`
+- `ADR-030-public-brand-and-accessible-product-voice.md`
+- `ADR-031-authoritative-environmental-raster-layers.md`
+- `ADR-032-snow-and-ice-comfort-routing.md`

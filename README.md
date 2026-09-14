@@ -1,10 +1,13 @@
-# ComfortOS
+# Ahhway
 
-ComfortOS is a climate-aware walking route comparison app. It keeps the fastest route available while evaluating alternate candidates for heat, shade, rain cover, wind, and winter exposure.
+**Take the nicer walk.** Ahhway is the friendly public face of the ComfortOS Engine. It keeps the fastest route available while evaluating alternate walks for heat, shade, rain cover, wind, and winter exposure.
 
-![ComfortOS route comparison](docs/assets/comfortos-mvp-route.png)
+![Ahhway route comparison](docs/assets/comfortos-mvp-route.png)
 
-The current build preserves the Stage 10 MVP and limited-beta hardening baseline while
+<img src="docs/assets/comfortos-final-mobile.png" alt="Ahhway mobile route comparison" width="320" />
+
+The public product is named Ahhway; architecture, deterministic calculation modules, and
+technical operations retain the ComfortOS name. The current build preserves the Stage 10 MVP and limited-beta hardening baseline while
 adding the Stage 11 nationwide environment-service staging candidate. Managed Mapbox search
 and walking directions are normalized behind provider interfaces, while deterministic
 environmental engines calculate route costs independently from the React UI.
@@ -16,7 +19,7 @@ environmental engines calculate route costs independently from the React UI.
 - Requests walking route candidates from Mapbox Directions.
 - Preserves the fastest route as the dependable baseline.
 - Reranks alternate candidates using raw environmental exposure cost.
-- Models heat, shade, rain cover, wind, and winter conditions.
+- Models heat, shade, rain cover, wind, snowfall, and ice exposure.
 - Reports data confidence, completeness, and comparability separately.
 - Degrades progressively when environmental data is partial or unavailable.
 - Supports time-dependent analysis without embedding calculations in the UI.
@@ -42,6 +45,26 @@ npm run data:buildings:state -- --plan /tmp/comfortos-us-state-partitions/il/sta
 
 Every real state build requires an explicit `--max-partitions` value so a nationwide data
 download cannot begin accidentally.
+
+Terrain, land cover, impervious surface, tree canopy, landform, and pedestrian-surface
+sources are pinned separately from the building release. Audit their versions and claim
+boundaries with:
+
+```bash
+npm run data:environment:sources:audit
+```
+
+Run the first bounded USGS 3DEP research pilot with:
+
+```bash
+npm run data:terrain:pilot -- \
+  --region-config config/data-regions/minneapolis.json \
+  --output /tmp/comfortos-terrain-minneapolis
+```
+
+These layers do not affect production route ranking yet. ADR-031 requires multi-region
+calibration, checksummed deployment artifacts, latency evidence, and a comfort-model version
+change before any layer can influence `RouteComfortCost`.
 
 For a resumable, pinned nationwide candidate build, use the smallest-jurisdiction-first
 runner. It does not activate or deploy the resulting data:
@@ -118,7 +141,7 @@ Search Provider
 Routing Provider
     -> normalized walking candidates
     -> environmental sampling
-    -> shade / rain / wind / heat / winter engines
+    -> shade / rain / snow / wind / heat engines
     -> RouteComfortCost
     -> route selector
     -> Fastest and Comfort presentation
@@ -149,6 +172,8 @@ Provider-specific responses stop at adapter boundaries. Environmental calculatio
 | Weather | National Weather Service | Controlled validation fixtures |
 | Buildings | Private environment query service over versioned Overture stores | Local Overture or Overpass development adapters |
 | Covered features | Optional private environment query service | Explicit unavailable-data degradation |
+| Terrain | USGS 3DEP research pilot; not active in route ranking | No production fallback |
+| Land and canopy | Annual NLCD and Forest Service candidates; not active in route ranking | Overture broad vector context only |
 
 Managed routing does not silently fall back to public OSRM. Provider metadata is retained so health checks and validation reports can verify which service answered a request.
 
@@ -215,6 +240,17 @@ Run the Stage 11 nationwide application gate against a configured release candid
 npm run smoke:stage11:nationwide -- --base-url http://localhost:3000
 ```
 
+Run the 50-state plus D.C. weather and managed-route integration gates:
+
+```bash
+npm run weather:validate:nationwide -- \
+  --output /tmp/comfortos-nationwide-weather-validation.json
+
+npm run routes:validate:nationwide -- \
+  --release 2026-08-19.0 \
+  --output /tmp/comfortos-nationwide-integration-validation.json
+```
+
 The repository also includes focused routing, provider health, latency, climate, fixture, and three-city validation scripts. See the `scripts` section of `package.json` for the complete command list.
 
 ## Project Structure
@@ -224,14 +260,14 @@ app/                  Next.js routes, API boundaries, and application shell
 components/           Map and product UI components
 lib/
   comfort/            Route comfort aggregation and scoring
-  environment/        Weather and exposure normalization
+  environment/        Environmental exposure engines
+    shade/             Solar and building-shade analysis
+    wind/              Pedestrian wind exposure analysis
+    rain/              Rain and route-cover analysis
+    snow/              Snow and ice exposure analysis
+    heat/              Heat exposure analysis
   geocoding/          Search provider interfaces and adapters
   routing/            Candidate generation, providers, and selection
-    shade/            Solar and shade analysis
-    wind/             Wind exposure analysis
-    rain/             Rain and cover analysis
-    heat/             Heat exposure analysis
-    winter/           Winter-condition analysis
   health/             Configuration and bounded live readiness
   map/                Basemap provider configuration
 docs/
@@ -272,6 +308,12 @@ Start with the canonical documents:
 - [ADR-026: State Archive and Local Pruning](docs/decisions/ADR-026-state-archive-and-local-pruning.md)
 - [ADR-027: R2 Release Restoration and Atomic Activation](docs/decisions/ADR-027-r2-release-restoration-and-atomic-activation.md)
 - [ADR-028: Cloudflare R2 FUSE Environment Staging](docs/decisions/ADR-028-cloudflare-r2-fuse-environment-staging.md)
+- [ADR-031: Authoritative Environmental Raster Layers](docs/decisions/ADR-031-authoritative-environmental-raster-layers.md)
+- [ADR-032: Snow And Ice Comfort Routing](docs/decisions/ADR-032-snow-and-ice-comfort-routing.md)
+- [Environmental Data Layers v1](docs/architecture/ENVIRONMENTAL_DATA_LAYERS_V1.md)
+- [Environmental Data Foundation Validation](docs/analysis/ENVIRONMENTAL_DATA_FOUNDATION_V1.md)
+- [Snow Comfort v1 Validation](docs/analysis/SNOW_COMFORT_V1_VALIDATION.md)
+- [Nationwide Weather and Route Validation](docs/analysis/NATIONWIDE_WEATHER_ROUTE_VALIDATION.md)
 - [Stage 9.6 Managed Routing Validation](docs/analysis/STAGE_9_6_MANAGED_ROUTING_VALIDATION.md)
 - [Stage 10 MVP Readiness Audit](docs/analysis/STAGE_10_MVP_READINESS_AUDIT.md)
 - [Stage 10.1 Production Hardening](docs/analysis/STAGE_10_1_PRODUCTION_HARDENING.md)
@@ -292,6 +334,7 @@ The source-of-truth order is architecture specification, product and design guid
 - The app compares routes but does not provide active turn-by-turn navigation.
 - Live weather coverage currently depends on the US National Weather Service.
 - Building, shade, and covered-feature quality depends on configured production datasets.
+- Snow Comfort does not know plowing, observed sidewalk ice, accessibility, or safe pavement.
 - Map and search providers have their own attribution, retention, quota, and billing requirements.
 - Custom graph routing remains outside the current MVP; candidate generation uses provider routes.
 

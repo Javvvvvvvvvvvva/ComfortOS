@@ -21,6 +21,7 @@ import type {
   SegmentRainExposure,
 } from "@/lib/environment/rain/types";
 import type { TimedRouteSegment } from "@/lib/environment/shade/types";
+import { isFrozenPrecipitation } from "@/lib/weather/precipitation";
 
 export const RAIN_ENGINE_CONSTANTS = {
   sampleSpacingMeters: 6,
@@ -122,7 +123,9 @@ function analyzeSegmentRain({
   const cover = routeCoverKnown
     ? calculateSegmentCover(segment.geometry, coveredFeatures ?? [])
     : { coveredRatio: 0, unknownRatio: 1 };
-  const intensity = normalizeRainIntensity(weather.precipitationIntensityMmPerHour);
+  const intensity = isFrozenPrecipitation(weather.precipitationType)
+    ? null
+    : normalizeRainIntensity(weather.precipitationIntensityMmPerHour);
   const precipitationFactor = intensity === null ? null : clamp01(intensity / RAIN_ENGINE_CONSTANTS.heavyRainMmPerHour);
   const windDrivenExposureFactor = calculateWindDrivenRainModifier({
     windSpeedMps: weather.regionalWindSpeedMps,

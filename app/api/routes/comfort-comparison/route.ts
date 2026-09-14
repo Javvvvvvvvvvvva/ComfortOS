@@ -17,6 +17,7 @@ import {
   RoutingProviderUnavailableError,
 } from "@/lib/routing/errors";
 import { createRequestId, logServerEvent } from "@/lib/observability/serverLog";
+import { enforceServerWeatherForPublicRequest } from "@/lib/comfort-routing/publicRequest";
 
 let comparisonService: ComfortRouteComparisonService | null = null;
 
@@ -63,9 +64,10 @@ export async function POST(request: Request) {
 
   try {
     const payload = (await request.json()) as ComfortRouteComparisonRequest;
-    const comparison = await getComparisonService().compareWalkingRoutes(payload, {
-      signal: request.signal,
-    });
+    const comparison = await getComparisonService().compareWalkingRoutes(
+      enforceServerWeatherForPublicRequest(payload),
+      { signal: request.signal },
+    );
 
     logServerEvent("info", "comfort_route_complete", {
       requestId,

@@ -3,11 +3,13 @@ import type { ShadeAnalysisResult } from "@/lib/environment/shade/types";
 import type { WindAnalysisResult } from "@/lib/environment/wind/types";
 import type { RainAnalysisResult } from "@/lib/environment/rain/types";
 import type { HeatAnalysisResult } from "@/lib/environment/heat/types";
+import type { SnowAnalysisResult } from "@/lib/environment/snow/types";
 import type { LineStringGeometry } from "@/lib/geo/types";
 import type { RouteResult } from "@/lib/routing/types";
 import type { WeatherBundle } from "@/lib/weather/types";
+import type { PrecipitationType } from "@/lib/weather/precipitation";
 
-export type ComfortProfileId = "cold" | "balanced" | "heat" | "rain";
+export type ComfortProfileId = "cold" | "balanced" | "heat" | "rain" | "snow";
 
 export type ComfortFactorType =
   | "cold"
@@ -17,16 +19,25 @@ export type ComfortFactorType =
   | "shade"
   | "sun"
   | "heat"
-  | "rain";
+  | "rain"
+  | "snow"
+  | "ice";
 
 export type SegmentComfortWeather = {
   temperatureC?: number | null;
   apparentTemperatureC?: number | null;
+  heatIndexC?: number | null;
+  windChillC?: number | null;
+  dewPointC?: number | null;
   relativeHumidity?: number | null;
+  cloudCover?: number | null;
   regionalWindSpeedMps?: number | null;
   regionalWindDirectionDeg?: number | null;
   precipitationProbability?: number | null;
   precipitationMmPerHour?: number | null;
+  snowfallMmPerHour?: number | null;
+  iceAccumulationMmPerHour?: number | null;
+  precipitationType?: PrecipitationType | null;
   condition?: string | null;
   confidence: number;
   selectionMethod: "interpolated-hourly" | "nearest-hour" | "current" | "missing";
@@ -58,6 +69,15 @@ export type SegmentComfortInput = {
     windDrivenExposureFactor: number;
     confidence: number;
   };
+  snow?: {
+    estimatedSnowfallExposure: number;
+    estimatedIceExposure: number;
+    snowfallMmPerHour?: number | null;
+    iceAccumulationMmPerHour?: number | null;
+    coveredRatio: number;
+    windDrivenSnowFactor: number;
+    confidence: number;
+  };
   heat?: {
     totalHeatExposureCost: number;
     totalHeatExposureMinutesCost: number;
@@ -67,6 +87,8 @@ export type SegmentComfortInput = {
     ventilationModifier: number;
     shadeRatio: number | null;
     directSunRatio: number | null;
+    cloudCover?: number | null;
+    solarCloudModifier?: number;
     confidence: number;
   };
 };
@@ -81,11 +103,13 @@ export type SegmentComfortResult = {
   shadeRatio: number | null;
   estimatedWindExposureMps: number | null;
   estimatedRainExposure: number | null;
+  estimatedSnowExposure: number | null;
   estimatedHeatExposure: number | null;
   thermalCost: number;
   windCost: number;
   solarCost: number;
   rainCost: number;
+  snowCost: number;
   heatCost: number;
   comfortCostRate: number;
   totalComfortCost: number;
@@ -100,6 +124,8 @@ export type SegmentComfortResult = {
     rainExposure?: number;
     uncoveredRainExposure?: number;
     windDrivenRain?: number;
+    snowfallExposure?: number;
+    iceAccumulation?: number;
     heatAmbient?: number;
     humidity?: number;
     sunExposure?: number;
@@ -122,6 +148,8 @@ export type RouteComfortSummary = {
   windExposure: number;
   solarExposure: number;
   rainExposure: number;
+  snowExposure: number;
+  iceExposure: number;
   heatExposure: number;
   analyzedMeters: number;
   unknownMeters: number;
@@ -134,11 +162,13 @@ export type ComfortAnalysisCompleteness = {
   windAvailable: boolean;
   shadeAvailable: boolean;
   rainAvailable: boolean;
+  snowAvailable: boolean;
   heatAvailable: boolean;
   weatherWeight: number;
   windWeight: number;
   shadeWeight: number;
   rainWeight: number;
+  snowWeight: number;
   heatWeight: number;
   analyzedWeight: number;
   comparable: boolean;
@@ -168,12 +198,14 @@ export type ComfortAnalysisRequest = {
   shadeAnalysis?: ShadeAnalysisResult | null;
   windAnalysis?: WindAnalysisResult | null;
   rainAnalysis?: RainAnalysisResult | null;
+  snowAnalysis?: SnowAnalysisResult | null;
   heatAnalysis?: HeatAnalysisResult | null;
   profile?: ComfortProfileId;
 };
 
 export type ComfortAnalysisResult = {
   status: "available";
+  modelVersion: string;
   profile: ComfortProfileId;
   routeGeometry: LineStringGeometry;
   departureTime: string;

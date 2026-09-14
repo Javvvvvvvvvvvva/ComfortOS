@@ -198,6 +198,7 @@ function buildDebug(
       const cost = candidate.comfortAnalysis?.routeComfortCost;
       const rainSummary = candidate.rainAnalysis?.summary;
       const heatSummary = candidate.heatAnalysis?.summary;
+      const snowSummary = candidate.snowAnalysis?.summary;
 
       return {
         id: candidate.id,
@@ -221,6 +222,12 @@ function buildDebug(
           rainSummary?.longestContinuousCoveredMeters ?? null,
         coveredSegmentCount: rainSummary?.coveredSegmentCount ?? null,
         rainConfidence: rainSummary?.confidence ?? null,
+        snowExposure: snowSummary?.averageSnowfallExposure ?? null,
+        iceExposure: snowSummary?.averageIceExposure ?? null,
+        snowfallMmPerHour: snowSummary?.maximumSnowfallMmPerHour ?? null,
+        iceAccumulationMmPerHour:
+          snowSummary?.maximumIceAccumulationMmPerHour ?? null,
+        snowConfidence: snowSummary?.confidence ?? null,
         heatExposure: heatSummary?.averageHeatExposure ?? null,
         directSunRatio: heatSummary?.directSunRatio ?? null,
         longestContinuousSunMeters: heatSummary?.longestContinuousSunMeters ?? null,

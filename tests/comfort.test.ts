@@ -7,7 +7,11 @@ import type {
   ComfortAnalysisRequest,
   SegmentComfortInput,
 } from "@/lib/comfort/types";
-import { COLD_COMFORT_WEIGHTS } from "@/lib/comfort/weights";
+import {
+  BALANCED_COMFORT_WEIGHTS,
+  COLD_COMFORT_WEIGHTS,
+  weightsForProfile,
+} from "@/lib/comfort/weights";
 import { createLocalProjection } from "@/lib/environment/shade/projection";
 import type { ShadeAnalysisResult } from "@/lib/environment/shade/types";
 import type { WindAnalysisResult } from "@/lib/environment/wind/types";
@@ -26,6 +30,28 @@ test("same temperature with more wind worsens cold comfort", () => {
   assert.ok(windy.windCost > calm.windCost);
 });
 
+test("balanced profile has its own lower-intensity wind policy", () => {
+  assert.equal(weightsForProfile("balanced"), BALANCED_COMFORT_WEIGHTS);
+  assert.ok(BALANCED_COMFORT_WEIGHTS.windExposure < COLD_COMFORT_WEIGHTS.windExposure);
+  assert.equal(BALANCED_COMFORT_WEIGHTS.temperature, 0);
+});
+
+test("cold comfort derives wind chill from ambient temperature exactly once", () => {
+  const raw = engine.evaluateSegment(
+    makeInput({ temperatureC: -8, apparentTemperatureC: -8, windExposure: 6 }),
+  );
+  const providerWindChill = engine.evaluateSegment(
+    makeInput({ temperatureC: -8, apparentTemperatureC: -30, windExposure: 6 }),
+  );
+
+  assert.equal(providerWindChill.temperatureC, -8);
+  assert.equal(
+    providerWindChill.estimatedPedestrianWindChillC,
+    raw.estimatedPedestrianWindChillC,
+  );
+  assert.equal(providerWindChill.totalComfortCost, raw.totalComfortCost);
+});
+
 test("same cold weather with lower pedestrian wind improves comfort", () => {
   const exposed = engine.evaluateSegment(makeInput({ windExposure: 7 }));
   const sheltered = engine.evaluateSegment(makeInput({ windExposure: 2, shelterFactor: 0.6 }));
@@ -39,6 +65,24 @@ test("winter daytime direct sun improves comfort modestly", () => {
 
   assert.ok(sunny.totalComfortCost < shaded.totalComfortCost);
   assert.ok(shaded.totalComfortCost - sunny.totalComfortCost < 1);
+});
+
+test("winter sun benefit is attenuated by cloud cover", () => {
+  const clear = engine.evaluateSegment(
+    makeInput({ shadeRatio: 0, solarElevationDeg: 24, cloudCover: 0 }),
+  );
+  const overcast = engine.evaluateSegment(
+    makeInput({ shadeRatio: 0, solarElevationDeg: 24, cloudCover: 100 }),
+  );
+
+  assert.ok(clear.totalComfortCost < overcast.totalComfortCost);
+  assert.ok((clear.contributions.winterSunBenefit ?? 0) < 0);
+  assert.ok(
+    Math.abs(
+      (overcast.contributions.winterSunBenefit ?? 0) /
+        (clear.contributions.winterSunBenefit ?? 1),
+    ) - 0.25 < 1e-9,
+  );
 });
 
 test("cold headwind segment is worse than cold tailwind segment", () => {
@@ -325,12 +369,14 @@ test("synthetic cold climate scenarios differentiate plausibly", () => {
 
 function makeInput(options: {
   temperatureC?: number;
+  apparentTemperatureC?: number;
   windExposure?: number | null;
   headwind?: number;
   crosswind?: number;
   shelterFactor?: number;
   shadeRatio?: number | null;
   solarElevationDeg?: number;
+  cloudCover?: number;
   durationSeconds?: number;
 } = {}): SegmentComfortInput {
   const temperatureC = options.temperatureC ?? -8;
@@ -353,6 +399,8 @@ function makeInput(options: {
     estimatedMidpointTime: "2026-01-15T18:00:00.000Z",
     weather: {
       temperatureC,
+      apparentTemperatureC: options.apparentTemperatureC,
+      cloudCover: options.cloudCover,
       regionalWindSpeedMps: windExposure ?? null,
       confidence: 0.8,
       selectionMethod: "current",

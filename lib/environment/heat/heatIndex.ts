@@ -56,36 +56,43 @@ export function calculateNwsHeatIndexC({
 
 export function selectEffectiveHeatTemperatureC({
   temperatureC,
-  apparentTemperatureC,
+  heatIndexC,
   relativeHumidity,
 }: {
   temperatureC?: number | null;
-  apparentTemperatureC?: number | null;
+  heatIndexC?: number | null;
   relativeHumidity?: number | null;
 }) {
   const ambient =
     typeof temperatureC === "number" && Number.isFinite(temperatureC) ? temperatureC : null;
-  const apparent =
-    typeof apparentTemperatureC === "number" && Number.isFinite(apparentTemperatureC)
-      ? apparentTemperatureC
+  const providerHeatIndex =
+    ambient !== null &&
+    ambient >= fahrenheitToCelsius(80) &&
+    typeof heatIndexC === "number" &&
+    Number.isFinite(heatIndexC)
+      ? heatIndexC
       : null;
-  const heatIndexC = calculateNwsHeatIndexC({ temperatureC: ambient, relativeHumidity });
+  const calculatedHeatIndexC = calculateNwsHeatIndexC({
+    temperatureC: ambient,
+    relativeHumidity,
+  });
+  const selectedHeatIndexC = providerHeatIndex ?? calculatedHeatIndexC;
 
   if (ambient === null) {
     return {
-      effectiveHeatTemperatureC: apparent ?? heatIndexC,
-      heatIndexC,
-      source: apparent !== null ? "apparent" : heatIndexC !== null ? "heat-index" : "missing",
+      effectiveHeatTemperatureC: null,
+      heatIndexC: null,
+      source: "missing",
     } as const;
   }
 
-  if (apparent !== null && ambient >= 26 && apparent >= ambient - 2) {
-    return { effectiveHeatTemperatureC: apparent, heatIndexC, source: "apparent" } as const;
+  if (selectedHeatIndexC !== null) {
+    return {
+      effectiveHeatTemperatureC: selectedHeatIndexC,
+      heatIndexC: selectedHeatIndexC,
+      source: providerHeatIndex !== null ? "provider-heat-index" : "calculated-heat-index",
+    } as const;
   }
 
-  if (heatIndexC !== null) {
-    return { effectiveHeatTemperatureC: heatIndexC, heatIndexC, source: "heat-index" } as const;
-  }
-
-  return { effectiveHeatTemperatureC: ambient, heatIndexC, source: "ambient" } as const;
+  return { effectiveHeatTemperatureC: ambient, heatIndexC: null, source: "ambient" } as const;
 }

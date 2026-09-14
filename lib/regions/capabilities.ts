@@ -7,6 +7,7 @@ export type RegionCapabilities = {
   shade: CapabilityQuality;
   wind: CapabilityQuality;
   rainCover: CapabilityQuality;
+  snow: CapabilityQuality;
   heat: CapabilityQuality;
 };
 
@@ -20,6 +21,8 @@ export type RegionCapabilityEvidence = {
   rainAvailableCount: number;
   rainCoverProviderAvailable: boolean;
   rainCoverConsumerEligible: boolean;
+  snowAvailableCount: number;
+  snowConsumerEligible: boolean;
   heatAvailableCount: number;
   heatConsumerEligible: boolean;
 };
@@ -46,6 +49,11 @@ export function deriveRegionCapabilities(
         : evidence.rainAvailableCount > 0
           ? "partial"
           : "unavailable",
+    snow: evidence.snowConsumerEligible
+      ? "ready"
+      : evidence.snowAvailableCount > 0
+        ? "partial"
+        : "unavailable",
     heat: evidence.heatConsumerEligible
       ? "ready"
       : evidence.heatAvailableCount > 0

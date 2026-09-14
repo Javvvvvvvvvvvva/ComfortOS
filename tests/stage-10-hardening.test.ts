@@ -9,6 +9,7 @@ import type { WeatherBundle } from "@/lib/weather/types";
 import { deriveRegionCapabilities } from "@/lib/regions/capabilities";
 import { evaluateMvpReadiness } from "@/lib/health/readiness";
 import { sanitizeServerLogFields } from "@/lib/observability/serverLog";
+import { enforceServerWeatherForPublicRequest } from "@/lib/comfort-routing/publicRequest";
 
 const ORIGIN: Coordinate = { latitude: 44.9778, longitude: -93.265 };
 const ROUTE: RouteResult = {
@@ -97,6 +98,8 @@ test("region capabilities distinguish unsupported, partial, and ready inputs", (
     rainAvailableCount: 3,
     rainCoverProviderAvailable: true,
     rainCoverConsumerEligible: false,
+    snowAvailableCount: 0,
+    snowConsumerEligible: false,
     heatAvailableCount: 2,
     heatConsumerEligible: false,
   });
@@ -120,6 +123,23 @@ test("structured server logs drop secrets and precise location fields", () => {
     requestId: "request-1",
     provider: "managed",
   });
+});
+
+test("public route comparison enforces server weather at route origin", () => {
+  const untrustedWeather: WeatherBundle = {
+    ...WEATHER,
+    coordinate: { latitude: 33.4484, longitude: -112.074 },
+  };
+  const request = enforceServerWeatherForPublicRequest({
+    origin: ORIGIN,
+    destination: { latitude: 44.9815, longitude: -93.2512 },
+    departureTime: "2026-08-08T18:00:00.000Z",
+    weatherCoordinate: untrustedWeather.coordinate,
+    weatherBundle: untrustedWeather,
+  });
+
+  assert.deepEqual(request.weatherCoordinate, ORIGIN);
+  assert.equal(request.weatherBundle, undefined);
 });
 
 test("readiness reports public demos and local stores as not production ready", () => {

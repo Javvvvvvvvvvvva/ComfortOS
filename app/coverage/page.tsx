@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { PUBLIC_PRODUCT_NAME } from "@/lib/brand";
 import { listUsJurisdictionCoverage } from "@/lib/regions/usStates";
 
 export const metadata: Metadata = {
-  title: "United States Coverage | ComfortOS",
+  title: `United States Coverage | ${PUBLIC_PRODUCT_NAME}`,
   description: "Search, walking route, weather, and Comfort data coverage across the United States.",
 };
 
@@ -18,7 +19,8 @@ export default function CoveragePage() {
     <main className="policy-page coverage-page">
       <header className="policy-header">
         <Link className="policy-brand" href="/">
-          ComfortOS
+          <span className="policy-brand-mark" aria-hidden="true" />
+          <span>{PUBLIC_PRODUCT_NAME}</span>
         </Link>
         <p className="eyebrow">United States coverage</p>
         <h1>50 states and D.C.</h1>
