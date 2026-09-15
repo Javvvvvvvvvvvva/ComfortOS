@@ -46,8 +46,9 @@ The older Google Cloud project visible during setup also remains unchanged.
 - Stage 10 climate smoke: Minneapolis, Seattle, Phoenix, and unsupported Puerto Rico passed.
 - Secret scans: no Mapbox token, Google key, credential name, or public OSRM URL in runtime or
   Sites logs.
-- Latest Sites deployment after credential rotation:
-  `appgdep_6aa8e570e3248191af2c0ce9da0f2edc`, version 8, environment revision 4.
+- The credential-rotation deployment that first applied environment revision 4 was
+  `appgdep_6aa8e570e3248191af2c0ce9da0f2edc`, version 8. Later documentation-only
+  publications retain the same environment revision.
 
 ## Store Resources Still To Create
 
