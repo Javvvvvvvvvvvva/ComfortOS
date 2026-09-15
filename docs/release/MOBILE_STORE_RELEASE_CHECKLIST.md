@@ -44,17 +44,14 @@ An unchecked external gate must not be described as complete.
 Run these from the repository root immediately before creating a signed build:
 
 ```bash
-npm run typecheck
-npm test
-npm run lint
-npm run build
-npm run mobile:typecheck
-npm run mobile:test
-npm run mobile:doctor
+npm run release:preflight
 npm --prefix apps/mobile run smoke:api
 npm run smoke:stage11:nationwide -- --base-url https://YOUR_API_ORIGIN
-git diff --check
 ```
+
+The same deterministic checks run on every push and pull request through
+`.github/workflows/ci.yml`. Use `npm run release:preflight -- --skip-network` only when the
+Expo API is temporarily unreachable; that mode is not sufficient for a signed release.
 
 Then produce both store binaries from the same commit:
 

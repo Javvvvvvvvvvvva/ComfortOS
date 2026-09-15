@@ -63,7 +63,9 @@
     "mobile:android": "npm --prefix apps/mobile run android",
     "mobile:typecheck": "npm --prefix apps/mobile run typecheck",
     "mobile:test": "npm --prefix apps/mobile test",
-    "mobile:doctor": "npm --prefix apps/mobile run doctor"
+    "mobile:doctor": "npm --prefix apps/mobile run doctor",
+    "release:audit-secrets": "node scripts/audit-release-secrets.mjs",
+    "release:preflight": "node scripts/run-release-preflight.mjs"
   },
   "dependencies": {
     "@turf/turf": "^7.4.0",
