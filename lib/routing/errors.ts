@@ -39,3 +39,10 @@ export class RouteNotFoundError extends Error {
     this.name = "RouteNotFoundError";
   }
 }
+
+export class InvalidRouteRequestError extends Error {
+  constructor(message: string, options?: { cause?: unknown }) {
+    super(message, options);
+    this.name = "InvalidRouteRequestError";
+  }
+}

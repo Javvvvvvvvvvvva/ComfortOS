@@ -8,23 +8,23 @@ invent retention promises that the application does not enforce.
 
 ## Data Flow
 
-| User action | Data leaving browser | ComfortOS server use | External recipient |
+| User action | Data leaving the client | ComfortOS server use | External recipient |
 | --- | --- | --- | --- |
-| Use my location | precise latitude/longitude after browser permission | origin selection, weather, routing, environment analysis | Mapbox through route requests; NWS through weather requests; building/cover services through bboxes; reverse geocoder when requested |
+| Use my location | precise latitude/longitude after foreground device or browser permission | origin selection, weather, routing, environment analysis | Mapbox through route requests; NWS through weather requests; building/cover services through bboxes; reverse geocoder when requested |
 | Search a place | search text | geocoding proxy | configured geocoder; currently Photon public demo in development |
 | Select route endpoints | precise origin and destination | normalized walking request and candidate generation | Mapbox Directions API |
 | Load weather | one precise coordinate | NWS point/station/forecast/alert flow | National Weather Service |
 | Analyze environment | route-derived bounding boxes and geometry | normalized building/cover lookup and deterministic engines | privately deployed building/cover services; no direct browser access |
-| Load map | viewport tile coordinates, IP/user-agent at network layer | none in app API | configured basemap provider; currently OSM community tiles in development |
+| Load map | viewport tile coordinates, IP/user-agent at network layer | none in app API | Mapbox on web; Apple Maps or Google Maps in the native app |
 
-The browser geolocation permission is optional. Manual search and map selection remain
+Foreground geolocation permission is optional. Manual search and map selection remain
 available when permission is denied or unsupported.
 
 ## Current Application Retention
 
 The application has no user account, route-history database, search-history database, or
 analytics SDK. Origin, destination, current location, route geometry, and weather state are
-held in browser memory for the active page session. The API does not intentionally persist
+held in client memory for the active app or page session. The API does not intentionally persist
 them to an application database.
 
 Location-derived API responses use `Cache-Control: private, no-store`, and client requests

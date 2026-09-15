@@ -88,6 +88,13 @@ export class CachedBuildingProvider implements BuildingProvider {
     return (await this.provider.getMetadata?.()) ?? null;
   }
 
+  async getMetadataForBounds(bounds: BoundingBox) {
+    if (this.provider.getMetadataForBounds) {
+      return (await this.provider.getMetadataForBounds(bounds)) ?? null;
+    }
+    return this.getMetadata();
+  }
+
   private prune(now: number) {
     for (const [key, entry] of this.cache) {
       if (entry.expiresAt <= now) this.cache.delete(key);

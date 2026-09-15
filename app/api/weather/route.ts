@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
-import { assertValidCoordinate } from "@/lib/geo/validation";
+import { isValidCoordinate } from "@/lib/geo/validation";
 import { NwsWeatherProvider } from "@/lib/weather/providers/nwsWeatherProvider";
 import { WeatherService } from "@/lib/weather/service";
 import { createRequestId, logServerEvent } from "@/lib/observability/serverLog";
+import { API_RATE_LIMITS, checkRequestRateLimit } from "@/lib/api/rateLimit";
 
 const weatherProvider = new NwsWeatherProvider({
   baseUrl: process.env.WEATHER_BASE_URL,
@@ -13,13 +14,31 @@ const weatherService = new WeatherService(weatherProvider);
 export async function GET(request: Request) {
   const requestId = createRequestId(request);
   const startedAt = performance.now();
+  const rateLimit = checkRequestRateLimit(request, API_RATE_LIMITS.weather);
+  const headers = {
+    "Cache-Control": "private, no-store",
+    "X-Request-Id": requestId,
+    ...rateLimit.headers,
+  };
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { code: "RATE_LIMITED", error: "Too many weather requests. Please try again shortly." },
+      { status: 429, headers },
+    );
+  }
   const url = new URL(request.url);
   const latitude = Number(url.searchParams.get("lat"));
   const longitude = Number(url.searchParams.get("lon"));
+  const coordinate = { latitude, longitude };
+
+  if (!isValidCoordinate(coordinate)) {
+    return NextResponse.json(
+      { error: "Invalid weather coordinate." },
+      { status: 400, headers },
+    );
+  }
 
   try {
-    const coordinate = { latitude, longitude };
-    assertValidCoordinate(coordinate, "Weather coordinate");
     const weather = await weatherService.getWeatherBundle(coordinate);
 
     logServerEvent("info", "weather_complete", {
@@ -33,12 +52,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json(
       { weather },
-      {
-        headers: {
-          "Cache-Control": "private, no-store",
-          "X-Request-Id": requestId,
-        },
-      },
+      { headers },
     );
   } catch (error) {
     logServerEvent("warn", "weather_failed", {
@@ -54,11 +68,8 @@ export async function GET(request: Request) {
             : "Live conditions unavailable.",
       },
       {
-        status: Number.isFinite(latitude) && Number.isFinite(longitude) ? 503 : 400,
-        headers: {
-          "Cache-Control": "private, no-store",
-          "X-Request-Id": requestId,
-        },
+        status: 503,
+        headers,
       },
     );
   }

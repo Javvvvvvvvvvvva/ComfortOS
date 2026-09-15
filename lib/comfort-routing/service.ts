@@ -193,10 +193,11 @@ export class ComfortRouteComparisonService {
     performanceMs.weather = Math.round(performance.now() - weatherStartedAt);
 
     throwIfAborted(options.signal);
+    const buildingBounds = unionRouteBounds(candidates);
     const buildingStartedAt = performance.now();
-    const sharedBuildings = await this.getSharedBuildings(candidates, options.signal);
+    const sharedBuildings = await this.getSharedBuildings(buildingBounds, options.signal);
     performanceMs.buildingFetch = Math.round(performance.now() - buildingStartedAt);
-    const sharedProjectionOrigin = boundsCenter(unionRouteBounds(candidates));
+    const sharedProjectionOrigin = boundsCenter(buildingBounds);
     const preparedShadowBuildingContext = sharedBuildings
       ? prepareShadowBuildingContext(sharedBuildings, sharedProjectionOrigin)
       : undefined;
@@ -204,7 +205,7 @@ export class ComfortRouteComparisonService {
       ? prepareWindBuildingContext(sharedBuildings, sharedProjectionOrigin)
       : undefined;
     const buildingMetadataStartedAt = performance.now();
-    const buildingMetadata = await this.getBuildingMetadata();
+    const buildingMetadata = await this.getBuildingMetadata(buildingBounds);
     performanceMs.buildingMetadata = Math.round(performance.now() - buildingMetadataStartedAt);
     const coveredFeatureStartedAt = performance.now();
     const coveredFeatureResult = await this.getSharedCoveredFeatures(
@@ -571,12 +572,11 @@ export class ComfortRouteComparisonService {
   }
 
   private async getSharedBuildings(
-    candidates: RouteCandidate[],
+    bounds: BoundingBox,
     signal?: AbortSignal,
   ): Promise<Building[] | null> {
-    if (candidates.length === 0) return [];
     try {
-      return await this.buildingProvider.getBuildings(unionRouteBounds(candidates), {
+      return await this.buildingProvider.getBuildings(bounds, {
         signal,
       });
     } catch {
@@ -606,8 +606,11 @@ export class ComfortRouteComparisonService {
     }
   }
 
-  private async getBuildingMetadata() {
+  private async getBuildingMetadata(bounds: BoundingBox) {
     try {
+      if (this.buildingProvider.getMetadataForBounds) {
+        return (await this.buildingProvider.getMetadataForBounds(bounds)) ?? null;
+      }
       return (await this.buildingProvider.getMetadata?.()) ?? null;
     } catch {
       return null;

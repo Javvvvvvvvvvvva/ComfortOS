@@ -15,6 +15,7 @@ import {
   normalizeMapboxRouteResponse,
 } from "@/lib/routing/providers/mapboxWalkingRoutingProvider";
 import {
+  InvalidRouteRequestError,
   RoutingProviderRateLimitError,
   RoutingProviderTimeoutError,
   RoutingProviderUnauthorizedError,
@@ -422,7 +423,8 @@ test("routing service requires a departure time from the start", async () => {
       destination: { latitude: 44.99, longitude: -93.26 },
       departureTime: "",
     }),
-    /Departure time/,
+    (error) =>
+      error instanceof InvalidRouteRequestError && /Departure time/.test(error.message),
   );
 });
 

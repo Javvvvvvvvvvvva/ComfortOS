@@ -23,7 +23,7 @@ export function PolicyPage({
         <p className="eyebrow">{eyebrow}</p>
         <h1>{title}</h1>
         <p className="policy-summary">{summary}</p>
-        <p className="policy-updated">Last updated September 2, 2026</p>
+        <p className="policy-updated">Last updated September 14, 2026</p>
       </header>
       <article className="policy-content">{children}</article>
       <nav className="policy-nav" aria-label="Legal and support">

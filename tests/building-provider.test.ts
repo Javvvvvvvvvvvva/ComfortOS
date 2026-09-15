@@ -326,6 +326,31 @@ test("HTTP building provider consumes normalized query-service buildings", async
   });
 });
 
+test("HTTP building metadata stays scoped to the requested bounds", async () => {
+  const minneapolis = { west: -93.27, south: 44.97, east: -93.26, north: 44.98 };
+  const phoenix = { west: -112.08, south: 33.44, east: -112.07, north: 33.46 };
+  const provider = new HttpBuildingProvider({
+    baseUrl: "https://buildings.example.test",
+    fetchImpl: async (input) => {
+      const bbox = new URL(String(input)).searchParams.get("bbox");
+      const region = bbox?.startsWith("-93.27") ? "minnesota" : "arizona";
+      return new Response(JSON.stringify({ buildings: [], metadata: { region } }));
+    },
+  });
+  const cached = new CachedBuildingProvider(provider);
+
+  await cached.getBuildings(minneapolis);
+  await cached.getBuildings(phoenix);
+  await cached.getBuildings(minneapolis);
+
+  assert.deepEqual(await cached.getMetadataForBounds(minneapolis), {
+    region: "minnesota",
+  });
+  assert.deepEqual(await cached.getMetadataForBounds(phoenix), {
+    region: "arizona",
+  });
+});
+
 test("configured HTTP Overture provider is explicit and requires a service URL", () => {
   const originalProvider = process.env.BUILDING_PROVIDER;
   const originalUrl = process.env.BUILDING_QUERY_SERVICE_URL;

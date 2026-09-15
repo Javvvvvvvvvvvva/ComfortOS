@@ -9,7 +9,9 @@ export const metadata: Metadata = {
 };
 
 export default function SupportPage() {
-  const supportUrl = process.env.NEXT_PUBLIC_SUPPORT_URL?.trim();
+  const supportUrl =
+    process.env.NEXT_PUBLIC_SUPPORT_URL?.trim() ||
+    "https://github.com/Javvvvvvvvvvvva/ComfortOS/issues/new";
 
   return (
     <PolicyPage
@@ -18,18 +20,11 @@ export default function SupportPage() {
       summary="Include the city, approximate area, time, and what looked wrong. Do not send precise home locations, access tokens, or other sensitive information."
     >
       <PolicySection title="Contact">
-        {supportUrl ? (
-          <p>
-            <Link className="policy-contact" href={supportUrl}>
-              Open the {PUBLIC_PRODUCT_NAME} support channel
-            </Link>
-          </p>
-        ) : (
-          <p>
-            A monitored public support channel is being configured before external beta
-            access. Please use the project owner contact during private validation.
-          </p>
-        )}
+        <p>
+          <Link className="policy-contact" href={supportUrl}>
+            Open the {PUBLIC_PRODUCT_NAME} support channel
+          </Link>
+        </p>
       </PolicySection>
       <PolicySection title="Place listing corrections">
         <p>

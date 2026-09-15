@@ -4,13 +4,13 @@ import { PUBLIC_PRODUCT_NAME } from "@/lib/brand";
 
 export const metadata: Metadata = {
   title: `Terms | ${PUBLIC_PRODUCT_NAME}`,
-  description: `Terms for the ${PUBLIC_PRODUCT_NAME} limited beta walking-route experience.`,
+  description: `Terms for the ${PUBLIC_PRODUCT_NAME} walking-route comparison experience.`,
 };
 
 export default function TermsPage() {
   return (
     <PolicyPage
-      eyebrow="Limited beta terms"
+      eyebrow="Service terms"
       title="Comfort guidance, not a safety guarantee"
       summary={`${PUBLIC_PRODUCT_NAME} compares estimated outdoor exposure along walking routes. It is not emergency guidance, medical advice, or turn-by-turn navigation.`}
     >
@@ -30,9 +30,9 @@ export default function TermsPage() {
       </PolicySection>
       <PolicySection title="Availability">
         <p>
-          The limited beta may change, pause, restrict regions, or return only the fastest
-          walking route when environmental data is unavailable. No offline routing or active
-          navigation is provided.
+          The service may change, pause, restrict regions, or return only the fastest walking
+          route when environmental data is unavailable. No offline routing or active navigation
+          is provided.
         </p>
       </PolicySection>
       <PolicySection title="Acceptable use">

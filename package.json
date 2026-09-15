@@ -57,7 +57,13 @@
     "weather:validate:nationwide": "node --import tsx scripts/validate-nationwide-weather.ts",
     "routes:validate:nationwide": "node --import tsx scripts/validate-nationwide-integration.ts",
     "smoke:stage10": "node --import tsx scripts/smoke-stage-10-mvp.ts",
-    "smoke:stage11:nationwide": "node --import tsx scripts/smoke-stage-11-nationwide.ts"
+    "smoke:stage11:nationwide": "node --import tsx scripts/smoke-stage-11-nationwide.ts",
+    "mobile:start": "npm --prefix apps/mobile start",
+    "mobile:ios": "npm --prefix apps/mobile run ios",
+    "mobile:android": "npm --prefix apps/mobile run android",
+    "mobile:typecheck": "npm --prefix apps/mobile run typecheck",
+    "mobile:test": "npm --prefix apps/mobile test",
+    "mobile:doctor": "npm --prefix apps/mobile run doctor"
   },
   "dependencies": {
     "@turf/turf": "^7.4.0",

@@ -1,5 +1,8 @@
 # ComfortOS Limited MVP Release Checklist
 
+> Historical web limited-beta checklist. For the current native store candidate, use
+> `docs/release/MOBILE_STORE_RELEASE_CHECKLIST.md`.
+
 Date: 2026-09-02
 Release state: **Blocked pending P0 items**
 Target shape: one primary capability region with Minneapolis, Seattle, and Phoenix presented

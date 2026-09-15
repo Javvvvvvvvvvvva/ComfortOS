@@ -27,6 +27,7 @@ export type Building = {
 export type BuildingProvider = {
   getBuildings(bounds: BoundingBox, options?: { signal?: AbortSignal }): Promise<Building[]>;
   getMetadata?(): Promise<BuildingProviderMetadata | null>;
+  getMetadataForBounds?(bounds: BoundingBox): Promise<BuildingProviderMetadata | null>;
 };
 
 export type BuildingProviderMetadata = {

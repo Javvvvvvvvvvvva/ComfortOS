@@ -1,4 +1,5 @@
 import catalogData from "@/config/data-regions/us-states.json";
+import activeEnvironmentDeployment from "@/deploy/cloudflare-environment/generated/deployment/deployments/production-active.json";
 
 export type UsBaselineEligibility = {
   placeSearch: boolean;
@@ -26,7 +27,14 @@ export type UsJurisdiction = {
 
 export type UsJurisdictionCoverage = UsJurisdiction & {
   baselineEligibility: UsBaselineEligibility;
-  environmentalData: "validated-metro" | "not-deployed";
+  environmentalData: "nationwide-production" | "not-deployed";
+};
+
+export type ActiveEnvironmentRelease = {
+  deploymentId: string;
+  activatedAt: string;
+  release: string;
+  jurisdictionCount: number;
 };
 
 type UsStateCatalogFile = {
@@ -43,6 +51,7 @@ type UsStateCatalogFile = {
 };
 
 const catalog = validateCatalog(catalogData as UsStateCatalogFile);
+const activeRelease = validateActiveRelease(activeEnvironmentDeployment);
 
 export function getUsStateCatalog() {
   return catalog;
@@ -52,9 +61,12 @@ export function listUsJurisdictionCoverage(): UsJurisdictionCoverage[] {
   return catalog.jurisdictions.map((jurisdiction) => ({
     ...jurisdiction,
     baselineEligibility: catalog.baselineEligibility,
-    environmentalData:
-      jurisdiction.validationRegions.length > 0 ? "validated-metro" : "not-deployed",
+    environmentalData: activeRelease ? "nationwide-production" : "not-deployed",
   }));
+}
+
+export function getActiveEnvironmentRelease(): ActiveEnvironmentRelease | null {
+  return activeRelease;
 }
 
 export function findUsJurisdiction(codeOrFips: string) {
@@ -88,4 +100,20 @@ function validateCatalog(value: UsStateCatalogFile) {
   }
 
   return value;
+}
+
+function validateActiveRelease(value: typeof activeEnvironmentDeployment) {
+  if (
+    value.format !== "comfortos-environment-deployment-v1" ||
+    value.status !== "active" ||
+    value.summary.jurisdictionCount !== catalog.jurisdictions.length
+  ) {
+    return null;
+  }
+  return {
+    deploymentId: value.deploymentId,
+    activatedAt: value.activatedAt,
+    release: value.release,
+    jurisdictionCount: value.summary.jurisdictionCount,
+  } satisfies ActiveEnvironmentRelease;
 }

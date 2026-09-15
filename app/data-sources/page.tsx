@@ -16,9 +16,9 @@ export default function DataSourcesPage() {
     >
       <PolicySection title="Maps, places, and routes">
         <p>
-          Mapbox supplies managed place search, walking route candidates, and production map
-          tiles. Map content includes data from OpenStreetMap contributors and retains the
-          required on-map attribution.
+          Mapbox supplies managed place search, walking route candidates, and web map tiles.
+          The mobile app uses the native Apple Maps or Google Maps renderer. Map content retains
+          the attribution required by each platform and data provider.
         </p>
       </PolicySection>
       <PolicySection title="Weather and alerts">
@@ -31,8 +31,9 @@ export default function DataSourcesPage() {
       <PolicySection title="Coverage geography">
         <p>
           The nationwide coverage catalog uses the United States Census Bureau&apos;s 2025
-          state cartographic boundary file. State boundaries organize data deployment; they
-          do not imply that detailed Comfort data is active statewide.
+          state cartographic boundary file. Overture building data is deployed across all 50
+          states and D.C.; route-level feature availability and confidence still vary with the
+          local source data.
         </p>
       </PolicySection>
       <PolicySection title="Buildings and covered features">

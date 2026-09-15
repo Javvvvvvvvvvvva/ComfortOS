@@ -20,6 +20,10 @@ OBSERVABILITY_ALERTS_CONFIGURED=true
 `OBSERVABILITY_ALERTS_CONFIGURED=true` is release evidence, not a feature flag. Set it only
 after the dashboards, destinations, and incident owner below have been verified.
 
+Public geocoding, weather, walking, and Comfort endpoints also enforce bounded in-process
+fixed-window limits. A production Cloudflare rate-limit rule remains required because counters
+inside one Worker isolate do not coordinate across the full edge fleet.
+
 ## Required Signals
 
 | Signal | Source event or endpoint | Initial alert |

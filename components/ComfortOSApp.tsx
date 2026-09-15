@@ -147,6 +147,8 @@ export function ComfortOSApp() {
       snowCapable: false,
       heatCapable: false,
     });
+  const rainCoverQuality =
+    routeComparison?.debug.capabilities?.rainCover ?? "unavailable";
   const debugMode =
     typeof window !== "undefined"
       ? new URLSearchParams(window.location.search).get("debug")
@@ -1092,9 +1094,19 @@ export function ComfortOSApp() {
               <>
                 <strong>{formatRainExposureLabel(rainAnalysis.summary.averageRainExposure)}</strong>
                 <span>
-                  {Math.round(rainAnalysis.summary.exposedMeters)} m exposed ·{" "}
-                  {Math.round(rainAnalysis.summary.coveredMeters)} m covered · confidence{" "}
-                  {Math.round(rainAnalysis.summary.confidence * 100)}%
+                  {rainCoverQuality === "unavailable" ? (
+                    <>
+                      Overhead cover data unavailable · weather confidence{" "}
+                      {Math.round(rainAnalysis.summary.confidence * 100)}%
+                    </>
+                  ) : (
+                    <>
+                      {Math.round(rainAnalysis.summary.exposedMeters)} m exposed ·{" "}
+                      {Math.round(rainAnalysis.summary.coveredMeters)} m covered
+                      {rainCoverQuality === "partial" ? " (limited coverage)" : ""} · confidence{" "}
+                      {Math.round(rainAnalysis.summary.confidence * 100)}%
+                    </>
+                  )}
                 </span>
                 {showRainDebug ? (
                   <div className="shade-debug-grid">

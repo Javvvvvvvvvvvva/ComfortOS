@@ -61,3 +61,4 @@ Accepted ADRs:
 - `ADR-030-public-brand-and-accessible-product-voice.md`
 - `ADR-031-authoritative-environmental-raster-layers.md`
 - `ADR-032-snow-and-ice-comfort-routing.md`
+- `ADR-033-native-mobile-client-boundary.md`

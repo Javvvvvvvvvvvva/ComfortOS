@@ -8,6 +8,7 @@ import type {
   RoutingRequestOptions,
 } from "./types";
 import { assertValidCoordinate } from "@/lib/geo/validation";
+import { InvalidRouteRequestError } from "./errors";
 
 export class RoutingService {
   constructor(private readonly provider: RoutingProvider) {}
@@ -74,14 +75,21 @@ async function recordRoutingRequest<T>(
   }
 }
 
-function validateRouteRequest(request: RouteRequest) {
-  assertValidCoordinate(request.origin, "Origin");
-  assertValidCoordinate(request.destination, "Destination");
-  for (const [index, waypoint] of (request.waypoints ?? []).entries()) {
-    assertValidCoordinate(waypoint, `Waypoint ${index + 1}`);
-  }
+export function validateRouteRequest(request: RouteRequest) {
+  try {
+    assertValidCoordinate(request.origin, "Origin");
+    assertValidCoordinate(request.destination, "Destination");
+    for (const [index, waypoint] of (request.waypoints ?? []).entries()) {
+      assertValidCoordinate(waypoint, `Waypoint ${index + 1}`);
+    }
 
-  if (!request.departureTime || Number.isNaN(Date.parse(request.departureTime))) {
-    throw new Error("Departure time must be a valid ISO timestamp.");
+    if (!request.departureTime || Number.isNaN(Date.parse(request.departureTime))) {
+      throw new Error("Departure time must be a valid ISO timestamp.");
+    }
+  } catch (error) {
+    throw new InvalidRouteRequestError(
+      error instanceof Error ? error.message : "Invalid routing request.",
+      { cause: error },
+    );
   }
 }

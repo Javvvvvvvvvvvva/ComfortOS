@@ -3,19 +3,29 @@ import { createConfiguredRoutingProvider } from "@/lib/routing/providers/configu
 import { RoutingService } from "@/lib/routing/service";
 import type { RouteRequest } from "@/lib/routing/types";
 import {
+  InvalidRouteRequestError,
   RouteNotFoundError,
   RoutingProviderConfigurationError,
   RoutingProviderUnavailableError,
 } from "@/lib/routing/errors";
 import { createRequestId, logServerEvent } from "@/lib/observability/serverLog";
+import { API_RATE_LIMITS, checkRequestRateLimit } from "@/lib/api/rateLimit";
 
 export async function POST(request: Request) {
   const requestId = createRequestId(request);
   const startedAt = performance.now();
+  const rateLimit = checkRequestRateLimit(request, API_RATE_LIMITS.walking);
   const headers = {
     "Cache-Control": "private, no-store",
     "X-Request-Id": requestId,
+    ...rateLimit.headers,
   };
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { code: "RATE_LIMITED", error: "Too many route requests. Please try again shortly." },
+      { status: 429, headers },
+    );
+  }
 
   try {
     const routeRequest = (await request.json()) as RouteRequest;
@@ -33,6 +43,17 @@ export async function POST(request: Request) {
     });
     return NextResponse.json({ route }, { headers });
   } catch (error) {
+    if (error instanceof InvalidRouteRequestError || error instanceof SyntaxError) {
+      logServerEvent("warn", "fastest_route_failed", {
+        requestId,
+        failureCategory: "invalid_request",
+        latencyMs: Math.round(performance.now() - startedAt),
+      });
+      return NextResponse.json(
+        { error: "Invalid routing request." },
+        { status: 400, headers },
+      );
+    }
     if (error instanceof RouteNotFoundError) {
       logServerEvent("warn", "fastest_route_failed", {
         requestId,
@@ -61,14 +82,14 @@ export async function POST(request: Request) {
         { status: 503, headers },
       );
     }
-    logServerEvent("warn", "fastest_route_failed", {
+    logServerEvent("error", "fastest_route_failed", {
       requestId,
-      failureCategory: "invalid_request",
+      failureCategory: "unexpected",
       latencyMs: Math.round(performance.now() - startedAt),
     });
     return NextResponse.json(
-      { error: "Invalid routing request." },
-      { status: 400, headers },
+      { error: "Walking route temporarily unavailable. Please try again." },
+      { status: 503, headers },
     );
   }
 }

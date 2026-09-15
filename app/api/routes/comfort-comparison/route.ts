@@ -9,15 +9,17 @@ import { CompositeCandidateGenerator } from "@/lib/routing/generators/compositeC
 import { CorridorWaypointGenerator } from "@/lib/routing/generators/corridorWaypointGenerator";
 import { ProviderAlternativeGenerator } from "@/lib/routing/generators/providerAlternativeGenerator";
 import { createConfiguredRoutingProvider } from "@/lib/routing/providers/configuredRoutingProvider";
-import { RoutingService } from "@/lib/routing/service";
+import { RoutingService, validateRouteRequest } from "@/lib/routing/service";
 import { NwsWeatherProvider } from "@/lib/weather/providers/nwsWeatherProvider";
 import { WeatherService } from "@/lib/weather/service";
 import {
+  InvalidRouteRequestError,
   RoutingProviderConfigurationError,
   RoutingProviderUnavailableError,
 } from "@/lib/routing/errors";
 import { createRequestId, logServerEvent } from "@/lib/observability/serverLog";
 import { enforceServerWeatherForPublicRequest } from "@/lib/comfort-routing/publicRequest";
+import { API_RATE_LIMITS, checkRequestRateLimit } from "@/lib/api/rateLimit";
 
 let comparisonService: ComfortRouteComparisonService | null = null;
 
@@ -57,13 +59,22 @@ function getComparisonService() {
 export async function POST(request: Request) {
   const requestId = createRequestId(request);
   const startedAt = performance.now();
+  const rateLimit = checkRequestRateLimit(request, API_RATE_LIMITS.comfort);
   const headers = {
     "Cache-Control": "private, no-store",
     "X-Request-Id": requestId,
+    ...rateLimit.headers,
   };
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { code: "RATE_LIMITED", error: "Too many route comparisons. Please try again shortly." },
+      { status: 429, headers },
+    );
+  }
 
   try {
     const payload = (await request.json()) as ComfortRouteComparisonRequest;
+    validateRouteRequest(payload);
     const comparison = await getComparisonService().compareWalkingRoutes(
       enforceServerWeatherForPublicRequest(payload),
       { signal: request.signal },
@@ -88,6 +99,17 @@ export async function POST(request: Request) {
       { headers },
     );
   } catch (error) {
+    if (error instanceof InvalidRouteRequestError || error instanceof SyntaxError) {
+      logServerEvent("warn", "comfort_route_failed", {
+        requestId,
+        failureCategory: "invalid_request",
+        latencyMs: Math.round(performance.now() - startedAt),
+      });
+      return NextResponse.json(
+        { error: "Invalid routing request." },
+        { status: 400, headers },
+      );
+    }
     if (
       error instanceof RoutingProviderUnavailableError ||
       error instanceof RoutingProviderConfigurationError

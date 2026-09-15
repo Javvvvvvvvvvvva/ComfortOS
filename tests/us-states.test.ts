@@ -28,13 +28,16 @@ test("United States catalog contains 50 states and the District of Columbia", ()
   assert.equal(findUsJurisdiction("06")?.name, "California");
 });
 
-test("nationwide eligibility remains separate from deployed Comfort data", () => {
+test("nationwide deployment remains separate from metro climate validation", () => {
   const coverage = listUsJurisdictionCoverage();
   assert.ok(coverage.every((state) => state.baselineEligibility.walkingRouting));
   assert.ok(coverage.every((state) => state.baselineEligibility.nwsWeather));
+  assert.ok(
+    coverage.every((state) => state.environmentalData === "nationwide-production"),
+  );
   assert.deepEqual(
     coverage
-      .filter((state) => state.environmentalData === "validated-metro")
+      .filter((state) => state.validationRegions.length > 0)
       .map((state) => state.code)
       .sort(),
     ["AZ", "IL", "MN", "WA"],

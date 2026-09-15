@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PUBLIC_PRODUCT_NAME } from "@/lib/brand";
-import { listUsJurisdictionCoverage } from "@/lib/regions/usStates";
+import {
+  getActiveEnvironmentRelease,
+  listUsJurisdictionCoverage,
+} from "@/lib/regions/usStates";
 
 export const metadata: Metadata = {
   title: `United States Coverage | ${PUBLIC_PRODUCT_NAME}`,
@@ -10,6 +13,7 @@ export const metadata: Metadata = {
 
 export default function CoveragePage() {
   const jurisdictions = listUsJurisdictionCoverage();
+  const activeRelease = getActiveEnvironmentRelease();
   const validationRegionCount = jurisdictions.reduce(
     (total, jurisdiction) => total + jurisdiction.validationRegions.length,
     0,
@@ -26,10 +30,14 @@ export default function CoveragePage() {
         <h1>50 states and D.C.</h1>
         <p className="policy-summary">
           Place search, walking routes, and National Weather Service conditions share one
-          nationwide provider scope. Detailed Comfort analysis has been validated only in
-          the metro regions listed below.
+          nationwide provider scope. Overture building data is deployed for all 51
+          jurisdictions. Detailed climate scenarios have been validated in the metro
+          regions listed below, and route-level availability still depends on local data.
         </p>
-        <p className="policy-updated">Coverage catalog updated September 3, 2026</p>
+        <p className="policy-updated">
+          Environment release {activeRelease?.release ?? "not active"} · updated September
+          13, 2026
+        </p>
       </header>
 
       <section className="coverage-summary" aria-label="Coverage summary">
@@ -42,8 +50,8 @@ export default function CoveragePage() {
           <span>metro validation regions</span>
         </div>
         <div>
-          <strong>0</strong>
-          <span>states claiming full Comfort coverage</span>
+          <strong>{activeRelease?.jurisdictionCount ?? 0}</strong>
+          <span>environmental data jurisdictions</span>
         </div>
       </section>
 
@@ -61,12 +69,14 @@ export default function CoveragePage() {
               <span className="coverage-baseline">Routes + weather</span>
               <span
                 className={
-                  jurisdiction.environmentalData === "validated-metro"
+                  jurisdiction.environmentalData === "nationwide-production"
                     ? "coverage-comfort validated"
                     : "coverage-comfort"
                 }
               >
-                {validationLabels || "Comfort data not validated"}
+                {validationLabels
+                  ? `Data deployed · climate-tested: ${validationLabels}`
+                  : "Environmental data deployed"}
               </span>
             </article>
           );
@@ -74,8 +84,9 @@ export default function CoveragePage() {
       </section>
 
       <p className="coverage-note">
-        Metro validation does not mean statewide coverage. Missing local buildings or cover
-        data never receives a perfect Comfort score and never borrows another region&apos;s data.
+        Nationwide deployment does not guarantee every environmental feature on every
+        block. Missing local buildings or cover data never receives a perfect Comfort score
+        and never borrows another region&apos;s data.
       </p>
 
       <nav className="policy-nav" aria-label="Product information">

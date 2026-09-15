@@ -5,7 +5,7 @@ import type { RouteResult } from "@/lib/routing/types";
 import type { WeatherBundle } from "@/lib/weather/types";
 
 type SmokeCase = {
-  id: "minneapolis" | "seattle" | "phoenix" | "chicago-unsupported";
+  id: "minneapolis" | "seattle" | "phoenix" | "puerto-rico-unsupported";
   origin: Coordinate;
   destination: Coordinate;
   supported: boolean;
@@ -31,9 +31,9 @@ const CASES: SmokeCase[] = [
     supported: true,
   },
   {
-    id: "chicago-unsupported",
-    origin: { latitude: 41.8819, longitude: -87.6278 },
-    destination: { latitude: 41.8897, longitude: -87.6244 },
+    id: "puerto-rico-unsupported",
+    origin: { latitude: 18.4655, longitude: -66.1057 },
+    destination: { latitude: 18.4515, longitude: -66.0689 },
     supported: false,
   },
 ];
@@ -130,7 +130,7 @@ async function main() {
     passed:
       rows.length === CASES.length &&
       rows.every((row) => row.fastest === "ready") &&
-      rows.find((row) => row.id === "chicago-unsupported")?.comparableCandidates === 0,
+      rows.find((row) => row.id === "puerto-rico-unsupported")?.comparableCandidates === 0,
   };
 
   if (options.output) {

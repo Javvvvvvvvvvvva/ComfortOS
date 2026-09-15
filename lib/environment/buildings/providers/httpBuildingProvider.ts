@@ -27,6 +27,7 @@ export class HttpBuildingProvider implements BuildingProvider {
   private readonly maxBuildings: number;
   private readonly fetchImpl: typeof fetch;
   private lastMetadata: BuildingProviderMetadata | null = null;
+  private readonly metadataByBounds = new Map<string, BuildingProviderMetadata | null>();
 
   constructor(options: HttpBuildingProviderOptions) {
     this.baseUrl = options.baseUrl.replace(/\/$/, "");
@@ -63,6 +64,7 @@ export class HttpBuildingProvider implements BuildingProvider {
       throw new Error("Building query service returned too many buildings.");
     }
     this.lastMetadata = payload.metadata ?? null;
+    this.rememberBoundsMetadata(bounds, this.lastMetadata);
 
     return payload.buildings.map(normalizeServiceBuilding);
   }
@@ -78,6 +80,26 @@ export class HttpBuildingProvider implements BuildingProvider {
     );
     this.lastMetadata = payload.metadata ?? null;
     return this.lastMetadata;
+  }
+
+  async getMetadataForBounds(
+    bounds: BoundingBox,
+  ): Promise<BuildingProviderMetadata | null> {
+    return this.metadataByBounds.get(bboxKey(bounds)) ?? null;
+  }
+
+  private rememberBoundsMetadata(
+    bounds: BoundingBox,
+    metadata: BuildingProviderMetadata | null,
+  ) {
+    const key = bboxKey(bounds);
+    this.metadataByBounds.delete(key);
+    this.metadataByBounds.set(key, metadata);
+    while (this.metadataByBounds.size > 128) {
+      const oldestKey = this.metadataByBounds.keys().next().value as string | undefined;
+      if (!oldestKey) break;
+      this.metadataByBounds.delete(oldestKey);
+    }
   }
 
   private async request(input: URL | string, signal?: AbortSignal) {
@@ -101,6 +123,10 @@ export class HttpBuildingProvider implements BuildingProvider {
       signal?.removeEventListener("abort", abortFromCaller);
     }
   }
+}
+
+function bboxKey(bounds: BoundingBox) {
+  return [bounds.west, bounds.south, bounds.east, bounds.north].join(",");
 }
 
 async function readBoundedJson<T>(response: Response, maxBytes: number): Promise<T> {

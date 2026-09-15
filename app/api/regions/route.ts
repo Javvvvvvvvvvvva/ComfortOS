@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import {
+  getActiveEnvironmentRelease,
   getUsStateCatalog,
   listUsJurisdictionCoverage,
 } from "@/lib/regions/usStates";
@@ -7,6 +8,7 @@ import {
 export async function GET() {
   const catalog = getUsStateCatalog();
   const jurisdictions = listUsJurisdictionCoverage();
+  const activeEnvironmentRelease = getActiveEnvironmentRelease();
 
   return NextResponse.json(
     {
@@ -16,10 +18,16 @@ export async function GET() {
       summary: {
         jurisdictionCount: jurisdictions.length,
         validatedMetroStateCount: jurisdictions.filter(
-          (jurisdiction) => jurisdiction.environmentalData === "validated-metro",
+          (jurisdiction) => jurisdiction.validationRegions.length > 0,
         ).length,
-        fullyDeployedStateCount: 0,
+        environmentalDataDeployedJurisdictionCount: jurisdictions.filter(
+          (jurisdiction) => jurisdiction.environmentalData === "nationwide-production",
+        ).length,
+        fullyDeployedStateCount: jurisdictions.filter(
+          (jurisdiction) => jurisdiction.environmentalData === "nationwide-production",
+        ).length,
       },
+      activeEnvironmentRelease,
       jurisdictions,
     },
     {

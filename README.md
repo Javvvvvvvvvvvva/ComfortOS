@@ -26,17 +26,48 @@ environmental engines calculate route costs independently from the React UI.
 
 Minneapolis, Seattle, and Phoenix are validation scenarios for winter, rain, and heat. They are not hard-coded architecture limits.
 
+## Native Mobile App
+
+The repository includes an Expo SDK 57 iOS and Android client in `apps/mobile`. It is a
+native map and location experience, not a WebView wrapper. The mobile client calls the same
+normalized Ahhway API while all provider credentials and ComfortOS calculations remain on
+the server.
+
+```bash
+npm run dev
+npm run mobile:ios
+```
+
+Use `EXPO_PUBLIC_API_BASE_URL` for the public Ahhway API origin and
+`EXPO_PUBLIC_SITE_URL` for policy/support links. Never place Mapbox, R2, or
+environment-service credentials in an `EXPO_PUBLIC_*` variable. Android store builds also
+need a Google Maps key restricted to the app ID and release certificate. Run the mobile checks
+with:
+
+```bash
+npm run mobile:typecheck
+npm run mobile:test
+npm run mobile:doctor
+npm --prefix apps/mobile run smoke:api
+```
+
+The iOS and Android bundles, live API contract, timeout/cancellation behavior, release config
+guards, policy links, and privacy manifest are validated in source. Native device, signing,
+store account, screenshot, monitoring, and legal approval gates are tracked in
+`docs/release/MOBILE_STORE_RELEASE_CHECKLIST.md`.
+
 ## United States Coverage
 
 Place search, managed walking routes, and National Weather Service conditions are eligible
 across all 50 states and the District of Columbia. The public `/coverage` page and
 `/api/regions` endpoint expose that catalog separately from environmental-data readiness.
 
-The pinned `2026-08-19.0` building release is built, validated, checksum-verified, and
-archived in R2 for all 50 states and the District of Columbia. Archival is not production
-deployment: statewide building and shade coverage is not claimed until the release is
-restored to a durable environment-service volume and explicitly activated. Rain-cover data
-remains a separate capability. Generate bounded state ingestion plans with:
+The pinned `2026-08-19.0` building release is built, validated, checksum-verified, archived
+in R2, and explicitly activated for all 50 states and the District of Columbia. The active
+deployment descriptor records 51 jurisdictions, 20,758 stores, and 186,043,651 buildings.
+This is nationwide data deployment, not a claim that every feature is available on every
+block. Rain-cover data remains a separate capability. Generate bounded state ingestion plans
+with:
 
 ```bash
 npm run data:buildings:plan:states -- --states IL
@@ -126,10 +157,10 @@ The environment service then starts with
 `ENVIRONMENT_ACTIVE_DEPLOYMENT_MANIFEST=/data/comfortos/deployments/production-active.json`.
 See the deployment runbook before restoring the roughly 100 GB release.
 
-The Stage 11 Cloudflare candidate instead mounts the immutable release read-only from R2 and
-keeps only the verified catalog in the container image. Its local native-container and
-nine-region application rehearsals pass, but ADR-028 remains proposed until the native
-Cloudflare latency, operation-cost, read-only credential, and rollback gates are complete.
+The Stage 11 Cloudflare environment service mounts the immutable release read-only from R2
+and keeps only the verified catalog in the container image. Nationwide weather and managed
+routing/environment integration have passed in all 51 jurisdictions. Runtime monitoring,
+signed-client testing, and store release controls remain separate gates.
 
 ## Architecture
 
@@ -166,7 +197,7 @@ Provider-specific responses stop at adapter boundaries. Environmental calculatio
 
 | Capability | Current managed path | Development or fallback path |
 | --- | --- | --- |
-| Map rendering | MapLibre GL with server-proxied Mapbox Static Tiles | OpenStreetMap-compatible raster style in explicit development mode |
+| Map rendering | Web: MapLibre GL with server-proxied Mapbox tiles. Mobile: native Apple Maps/Google Maps | OpenStreetMap-compatible raster style in explicit web development mode |
 | Place search | Mapbox Search Box v1 | Photon, when explicitly configured |
 | Walking routes | Mapbox Directions v5 (`mapbox/walking`) | Public or self-hosted OSRM, when explicitly configured |
 | Weather | National Weather Service | Controlled validation fixtures |
@@ -257,6 +288,7 @@ The repository also includes focused routing, provider health, latency, climate,
 
 ```text
 app/                  Next.js routes, API boundaries, and application shell
+apps/mobile/          Expo iOS and Android client
 components/           Map and product UI components
 lib/
   comfort/            Route comfort aggregation and scoring
