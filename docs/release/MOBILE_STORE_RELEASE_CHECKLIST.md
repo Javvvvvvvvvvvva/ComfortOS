@@ -1,6 +1,6 @@
 # Ahhway Mobile Store Release Checklist
 
-Date: September 14, 2026
+Date: September 15, 2026
 Release candidate: `0.1.0 (1)`
 Bundle identifiers: iOS and Android `com.ahhway.app`
 Current judgment: **REPOSITORY READY; EXTERNAL RELEASE GATES OPEN**
@@ -72,7 +72,7 @@ npx eas-cli@latest build --platform android --profile production
   `EXPO_PUBLIC_API_BASE_URL` and `EXPO_PUBLIC_SITE_URL` in the EAS production environment.
 - [ ] Verify `/privacy`, `/terms`, `/coverage`, `/data-sources`, and `/support` at the final
   public site origin.
-- [ ] Configure a Google Maps Android key restricted to `com.ahhway.app`, the release signing
+- [x] Configure a Google Maps Android key restricted to `com.ahhway.app`, the release signing
   SHA-1 `2F:36:AA:48:66:D2:6E:29:6D:CD:53:07:F0:5D:4E:93:09:24:A3:CB`, and Maps SDK for
   Android.
 - [ ] Enroll/verify Apple Developer and Google Play Console accounts; accept current
@@ -85,8 +85,9 @@ npx eas-cli@latest build --platform android --profile production
   routing, weather, building, timeout, quota, and billing alerts reach an incident owner.
 - [ ] Have a qualified reviewer approve the privacy notice, terms, attribution, provider
   retention, support process, and store privacy answers.
-- [ ] Confirm the previously exposed Mapbox token has been rotated and only a restricted
-  production token remains active.
+- [x] Create a separate Ahhway production Mapbox token and switch Ahhway local and hosted
+  runtime configuration to it. The pre-existing default token remains untouched because it
+  is owned by another application.
 - [x] D1-backed edge limiting is deployed and probed in the owner-only production runtime;
   repeat the same probe after changing to the final public audience.
 
@@ -149,6 +150,19 @@ npx eas-cli@latest build --platform android --profile production
   corresponding hosted logs.
 - Sites v7 serves the bundled 506,723-byte MapLibre worker and a real Minneapolis Mapbox tile
   with `200` responses. GitHub Release CI passed exact commit `e3b91a5`.
+- A new Google Cloud project, `Ahhway Production` (`ahhway-production-20260915`), is linked to
+  paid billing. Its `Ahhway Android Production` key is limited to Maps SDK for Android,
+  `com.ahhway.app`, and the EAS release SHA-1. EAS stores it as a Sensitive production-only
+  variable; the value is absent from source and logs.
+- A new Mapbox token, `Ahhway Production Routing 2026-09-15`, was created without changing or
+  revoking the pre-existing default token. Direct Directions, Search Box, and tile probes
+  returned `200`; the app API reported `mapbox-managed` and `mapbox-directions-walking` with
+  no public OSRM fallback.
+- Sites deployment `appgdep_6aa8e570e3248191af2c0ce9da0f2edc` published version 8 with
+  environment revision 4. The owner-only audience was preserved.
+- The post-rotation Stage 10 smoke passed Minneapolis, Seattle, Phoenix, and the Puerto Rico
+  unsupported boundary. Runtime and Sites log scans found no Mapbox token, Google key,
+  credential name, or public OSRM endpoint.
 
 ## Release Decision
 

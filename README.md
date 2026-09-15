@@ -356,6 +356,8 @@ Start with the canonical documents:
 - [State Archive Pipeline](docs/analysis/STAGE_10_5_STATE_ARCHIVE_PIPELINE.md)
 - [Stage 11 Nationwide Data Activation](docs/analysis/STAGE_11_NATIONWIDE_DATA_ACTIVATION.md)
 - [MVP Release Checklist](docs/release/MVP_RELEASE_CHECKLIST.md)
+- [Mobile Store Release Checklist](docs/release/MOBILE_STORE_RELEASE_CHECKLIST.md)
+- [Production Resource Inventory](docs/release/PRODUCTION_RESOURCE_INVENTORY.md)
 - [Environment Query Service Deployment](docs/operations/ENVIRONMENT_QUERY_SERVICE_DEPLOYMENT.md)
 - [Observability Runbook](docs/operations/OBSERVABILITY_RUNBOOK.md)
 
