@@ -1,0 +1,80 @@
+{
+  "version": "6",
+  "dialect": "sqlite",
+  "id": "f53d4f39-2792-4aab-b7d9-e03427c336ac",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "tables": {
+    "edge_rate_limit_windows": {
+      "name": "edge_rate_limit_windows",
+      "columns": {
+        "scope": {
+          "name": "scope",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "client_hash": {
+          "name": "client_hash",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "window_start_ms": {
+          "name": "window_start_ms",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "request_count": {
+          "name": "request_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "expires_at_ms": {
+          "name": "expires_at_ms",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "idx_edge_rate_limit_windows_expires_at_ms": {
+          "name": "idx_edge_rate_limit_windows_expires_at_ms",
+          "columns": [
+            "expires_at_ms"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "edge_rate_limit_windows_scope_client_hash_window_start_ms_pk": {
+          "columns": [
+            "scope",
+            "client_hash",
+            "window_start_ms"
+          ],
+          "name": "edge_rate_limit_windows_scope_client_hash_window_start_ms_pk"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    }
+  },
+  "views": {},
+  "enums": {},
+  "_meta": {
+    "schemas": {},
+    "tables": {},
+    "columns": {}
+  },
+  "internal": {
+    "indexes": {}
+  }
+}

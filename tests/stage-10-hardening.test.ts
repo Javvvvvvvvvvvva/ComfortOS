@@ -187,6 +187,8 @@ test("readiness accepts a managed Phoenix-primary provider set without rain-cove
     REQUIRE_RAIN_COVER: "false",
     COVERED_FEATURE_PROVIDER: "disabled",
     NEXT_PUBLIC_SUPPORT_URL: "https://github.com/Javvvvvvvvvvvva/ComfortOS/issues",
+    DISTRIBUTED_RATE_LIMIT_PROVIDER: "cloudflare-d1",
+    RATE_LIMIT_HASH_SALT: "test-only-hash-salt",
     LEGAL_REVIEW_APPROVED: "true",
     OBSERVABILITY_PROVIDER: "cloudflare",
     OBSERVABILITY_ALERTS_CONFIGURED: "true",

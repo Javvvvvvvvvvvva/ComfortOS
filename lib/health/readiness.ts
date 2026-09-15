@@ -18,6 +18,7 @@ export type MvpReadiness = {
     coveredFeatures: ReadinessSubsystem;
     geocoding: ReadinessSubsystem;
     basemap: ReadinessSubsystem;
+    rateLimiting: ReadinessSubsystem;
     legal: ReadinessSubsystem;
     observability: ReadinessSubsystem;
   };
@@ -84,6 +85,17 @@ export function evaluateMvpReadiness(
         ? "public-community"
         : basemapMode,
   };
+  const rateLimitProvider = env.DISTRIBUTED_RATE_LIMIT_PROVIDER?.trim() ?? "in-memory";
+  const rateLimiting = {
+    configured:
+      rateLimitProvider === "cloudflare-d1" &&
+      Boolean(env.RATE_LIMIT_HASH_SALT?.trim()),
+    productionReady:
+      rateLimitProvider === "cloudflare-d1" &&
+      (env.RATE_LIMIT_HASH_SALT?.trim().length ?? 0) >= 16,
+    required: true,
+    mode: rateLimitProvider,
+  };
   const supportUrl = env.NEXT_PUBLIC_SUPPORT_URL?.trim() ?? "";
   const legalReviewApproved = env.LEGAL_REVIEW_APPROVED === "true";
   const legal = {
@@ -108,6 +120,7 @@ export function evaluateMvpReadiness(
     coveredFeatures,
     geocoding,
     basemap,
+    rateLimiting,
     legal,
     observability,
   };

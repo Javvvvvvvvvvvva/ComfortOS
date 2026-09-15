@@ -27,8 +27,8 @@ An unchecked external gate must not be described as complete.
   transport remains enabled and ATS arbitrary loads remain disabled.
 - [x] Production config rejects local, placeholder, and non-HTTPS API or policy URLs.
 - [x] Android production config rejects a missing Google Maps key.
-- [x] Cost-bearing public APIs use bounded per-client application rate limits and return
-  `429` with `Retry-After`; production must add a distributed edge limit as defense in depth.
+- [x] Cost-bearing public APIs use bounded per-client application limits plus atomic D1 edge
+  limits and return `429` with `Retry-After`; raw client addresses are not persisted.
 - [x] iOS ATS disallows arbitrary HTTP loads.
 - [x] App icon, adaptive icon, monochrome icon, and splash assets exist.
 - [x] Primary native controls, route choices, map interaction, and modal actions expose
@@ -87,8 +87,8 @@ npx eas-cli@latest build --platform android --profile production
   retention, support process, and store privacy answers.
 - [ ] Confirm the previously exposed Mapbox token has been rotated and only a restricted
   production token remains active.
-- [ ] Configure Cloudflare edge rate limits for geocoding, weather, walking, and Comfort APIs;
-  the in-process limiter does not coordinate counters across Worker isolates.
+- [ ] Deploy and probe the D1-backed edge limiter with the final public audience and production
+  API origin; source, migration, hosted secret contract, and readiness gate are complete.
 
 ## Signed-Binary And Device Gates
 

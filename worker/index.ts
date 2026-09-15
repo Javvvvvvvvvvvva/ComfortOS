@@ -1,10 +1,16 @@
 /** Cloudflare Worker entry point for the vinext-starter template. */
 import { handleImageOptimization, DEFAULT_DEVICE_SIZES, DEFAULT_IMAGE_SIZES } from "vinext/server/image-optimization";
 import handler from "vinext/server/app-router-entry";
+import {
+  DistributedFixedWindowRateLimiter,
+  getEdgeRateLimitPolicy,
+} from "../lib/api/distributedRateLimit";
 
 interface Env {
   ASSETS: Fetcher;
   DB: D1Database;
+  DISTRIBUTED_RATE_LIMIT_PROVIDER?: string;
+  RATE_LIMIT_HASH_SALT?: string;
   IMAGES: {
     input(stream: ReadableStream): {
       transform(options: Record<string, unknown>): {
@@ -41,12 +47,73 @@ const worker = {
       return withSecurityHeaders(response);
     }
 
-    return withSecurityHeaders(await handler.fetch(request, env, ctx));
+    const edgeLimit = await applyEdgeRateLimit(request, env, ctx);
+    if (edgeLimit?.response) return withSecurityHeaders(edgeLimit.response);
+
+    return withSecurityHeaders(
+      await handler.fetch(request, env, ctx),
+      edgeLimit?.headers,
+    );
   },
 };
 
-function withSecurityHeaders(response: Response) {
+async function applyEdgeRateLimit(
+  request: Request,
+  env: Env,
+  ctx: ExecutionContext,
+) {
+  const policy = getEdgeRateLimitPolicy(new URL(request.url).pathname);
+  if (!policy) return null;
+
+  const provider = env.DISTRIBUTED_RATE_LIMIT_PROVIDER?.trim();
+  if (!provider) return null;
+  if (provider !== "cloudflare-d1" || !env.DB || !env.RATE_LIMIT_HASH_SALT) {
+    return { response: unavailableRateLimitResponse() };
+  }
+
+  try {
+    const limiter = new DistributedFixedWindowRateLimiter(
+      env.DB,
+      env.RATE_LIMIT_HASH_SALT,
+    );
+    const clientAddress = request.headers.get("cf-connecting-ip")?.trim() || "unknown-client";
+    const decision = await limiter.check(clientAddress, policy);
+    if (decision.shouldPrune) {
+      ctx.waitUntil(limiter.prune());
+    }
+    if (!decision.allowed) {
+      return {
+        response: Response.json(
+          { error: "Too many requests. Please try again shortly." },
+          { status: 429, headers: decision.headers },
+        ),
+      };
+    }
+    return { headers: decision.headers };
+  } catch {
+    console.error(JSON.stringify({
+      event: "distributed_rate_limit_failed",
+      scope: policy.scope,
+    }));
+    return { response: unavailableRateLimitResponse() };
+  }
+}
+
+function unavailableRateLimitResponse() {
+  return Response.json(
+    { error: "Request protection is temporarily unavailable." },
+    { status: 503, headers: { "Retry-After": "30" } },
+  );
+}
+
+function withSecurityHeaders(
+  response: Response,
+  additionalHeaders: Record<string, string> = {},
+) {
   const headers = new Headers(response.headers);
+  for (const [name, value] of Object.entries(additionalHeaders)) {
+    headers.set(name, value);
+  }
   headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=(self)");
   headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
   headers.set("X-Content-Type-Options", "nosniff");
