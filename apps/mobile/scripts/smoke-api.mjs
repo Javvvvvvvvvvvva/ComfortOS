@@ -16,10 +16,12 @@ assert.equal(liveHealth.checks.weather.ok, true);
 assert.equal(liveHealth.checks.buildings.ok, true);
 
 const [weatherPayload, searchPayload, fastestPayload] = await Promise.all([
-  get(`/api/weather?lat=${origin.latitude}&lon=${origin.longitude}`),
-  get(
-    `/api/geocoding/search?q=${encodeURIComponent("Target Field")}&lat=${origin.latitude}&lon=${origin.longitude}&session=mobile-smoke`,
-  ),
+  post("/api/weather", { coordinate: origin }),
+  post("/api/geocoding/search", {
+    query: "Target Field",
+    proximity: origin,
+    sessionToken: "mobile-smoke",
+  }),
   post("/api/routes/walking", { origin, destination, departureTime }),
 ]);
 

@@ -59,6 +59,10 @@ Conservative App Store Connect answers for final legal verification:
   build a persistent search-history database.
 - Diagnostics/Product Interaction: **No** for the current binary because no analytics or
   crash-reporting SDK is integrated. Re-answer before release if one is added.
+- Abuse prevention: the API stores a short-lived request counter keyed by a salted one-way
+  hash of the hosting provider's network address. The app does not store the raw address in
+  that counter. Legal review must determine the final Apple "Other Data" and Google device-ID
+  answers for this server-side processing before submission.
 - Contact, financial, health, contacts, photos, audio, advertising, and purchases: **Not
   collected** by the current binary.
 

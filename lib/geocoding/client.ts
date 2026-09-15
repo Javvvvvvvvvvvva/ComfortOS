@@ -8,15 +8,7 @@ export async function searchPlaces(
   signal?: AbortSignal,
 ): Promise<PlaceSuggestion[]> {
   const url = new URL("/api/geocoding/search", window.location.origin);
-  url.searchParams.set("q", query);
-
-  if (proximity) {
-    url.searchParams.set("lat", String(proximity.latitude));
-    url.searchParams.set("lon", String(proximity.longitude));
-  }
-  if (sessionToken) url.searchParams.set("session", sessionToken);
-
-  const response = await fetch(url, { signal, cache: "no-store" });
+  const response = await postJson(url, { query, proximity, sessionToken }, signal);
   const payload = (await response.json()) as {
     places?: PlaceSuggestion[];
     error?: string;
@@ -35,10 +27,7 @@ export async function retrievePlace(
   signal?: AbortSignal,
 ): Promise<PlaceResult> {
   const url = new URL("/api/geocoding/retrieve", window.location.origin);
-  url.searchParams.set("id", suggestionId);
-  url.searchParams.set("session", sessionToken);
-
-  const response = await fetch(url, { signal, cache: "no-store" });
+  const response = await postJson(url, { suggestionId, sessionToken }, signal);
   const payload = (await response.json()) as {
     place?: PlaceResult;
     error?: string;
@@ -56,10 +45,7 @@ export async function reverseGeocode(
   signal?: AbortSignal,
 ): Promise<PlaceResult | null> {
   const url = new URL("/api/geocoding/reverse", window.location.origin);
-  url.searchParams.set("lat", String(coordinate.latitude));
-  url.searchParams.set("lon", String(coordinate.longitude));
-
-  const response = await fetch(url, { signal, cache: "no-store" });
+  const response = await postJson(url, { coordinate }, signal);
   const payload = (await response.json()) as {
     place?: PlaceResult | null;
     error?: string;
@@ -70,4 +56,14 @@ export async function reverseGeocode(
   }
 
   return payload.place ?? null;
+}
+
+function postJson(url: URL, body: unknown, signal?: AbortSignal) {
+  return fetch(url, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(body),
+    signal,
+    cache: "no-store",
+  });
 }

@@ -1,11 +1,15 @@
 import { NextResponse } from "next/server";
-import { isValidCoordinate } from "@/lib/geo/validation";
 import { createConfiguredGeocodingProvider } from "@/lib/geocoding/providers/configuredGeocodingProvider";
 import { normalizeSearchQuery, shouldRequestSearch } from "@/lib/search/searchBehavior";
 import { createRequestId, logServerEvent } from "@/lib/observability/serverLog";
 import { API_RATE_LIMITS, checkRequestRateLimit } from "@/lib/api/rateLimit";
+import {
+  parseCoordinateBody,
+  parseOptionalBodyString,
+  requireJsonObject,
+} from "@/lib/api/locationRequestBody";
 
-export async function GET(request: Request) {
+export async function POST(request: Request) {
   const requestId = createRequestId(request);
   const startedAt = performance.now();
   const rateLimit = checkRequestRateLimit(request, API_RATE_LIMITS.geocoding);
@@ -21,19 +25,17 @@ export async function GET(request: Request) {
     );
   }
   try {
-    const url = new URL(request.url);
-    const query = normalizeSearchQuery(url.searchParams.get("q") ?? "");
+    const payload = requireJsonObject(await request.json());
+    const query = normalizeSearchQuery(
+      typeof payload.query === "string" ? payload.query : "",
+    );
 
     if (!shouldRequestSearch(query)) {
       return NextResponse.json({ places: [] }, { headers });
     }
 
-    const lat = Number(url.searchParams.get("lat"));
-    const lon = Number(url.searchParams.get("lon"));
-    const proximity = isValidCoordinate({ latitude: lat, longitude: lon })
-      ? { latitude: lat, longitude: lon }
-      : undefined;
-    const sessionToken = url.searchParams.get("session")?.trim();
+    const proximity = parseCoordinateBody(payload.proximity) ?? undefined;
+    const sessionToken = parseOptionalBodyString(payload.sessionToken, 128);
 
     const configured = createConfiguredGeocodingProvider();
     const places = await configured.provider.search(query, proximity, {
@@ -50,7 +52,13 @@ export async function GET(request: Request) {
     });
 
     return NextResponse.json({ places }, { headers });
-  } catch {
+  } catch (error) {
+    if (error instanceof SyntaxError) {
+      return NextResponse.json(
+        { error: "Invalid place search request." },
+        { status: 400, headers },
+      );
+    }
     logServerEvent("warn", "geocoding_search_failed", {
       requestId,
       failureCategory: "geocoding_provider",

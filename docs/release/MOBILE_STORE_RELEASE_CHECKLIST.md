@@ -87,8 +87,8 @@ npx eas-cli@latest build --platform android --profile production
   retention, support process, and store privacy answers.
 - [ ] Confirm the previously exposed Mapbox token has been rotated and only a restricted
   production token remains active.
-- [ ] Deploy and probe the D1-backed edge limiter with the final public audience and production
-  API origin; source, migration, hosted secret contract, and readiness gate are complete.
+- [x] D1-backed edge limiting is deployed and probed in the owner-only production runtime;
+  repeat the same probe after changing to the final public audience.
 
 ## Signed-Binary And Device Gates
 
@@ -138,6 +138,9 @@ npx eas-cli@latest build --platform android --profile production
 - Expo/EAS authentication and project linkage were verified for `@javacoding2022/ahhway`.
 - EAS generated and assigned the default Android production keystore; iOS credentials and
   both store submission credentials remain intentionally unset until store-owner login.
+- Sites v5 applied the D1 migration and hosted hash secret. A live weather request returned
+  limit `60`, remaining `59`, and the persisted client key was a 64-character digest rather
+  than a raw address; readiness reported `cloudflare-d1` as production-ready.
 
 ## Release Decision
 

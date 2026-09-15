@@ -20,9 +20,10 @@ OBSERVABILITY_ALERTS_CONFIGURED=true
 `OBSERVABILITY_ALERTS_CONFIGURED=true` is release evidence, not a feature flag. Set it only
 after the dashboards, destinations, and incident owner below have been verified.
 
-Public geocoding, weather, walking, and Comfort endpoints also enforce bounded in-process
-fixed-window limits. A production Cloudflare rate-limit rule remains required because counters
-inside one Worker isolate do not coordinate across the full edge fleet.
+Public geocoding, weather, walking, and Comfort endpoints enforce atomic D1 fixed-window
+limits at the Worker entry point and retain the in-process limiter as defense in depth. The
+D1 key contains a salted hash rather than the raw client address. Production readiness
+requires the `cloudflare-d1` provider, its hosted secret, and a live response-header probe.
 
 ## Required Signals
 
@@ -38,6 +39,7 @@ inside one Worker isolate do not coordinate across the full edge fleet.
 | Building service | `/api/health/live` and service `/health` | two consecutive failures |
 | Covered-feature service | `/api/health/live` when required | one failed release probe |
 | Basemap | `/api/health/live` | two consecutive failures |
+| Edge rate limiting | D1 errors and response headers | any sustained fail-closed 503 burst |
 | Full readiness | `/api/health` | any production `not-ready` after deploy |
 
 Tune thresholds only from measured beta traffic. Do not remove alerts merely to make a release

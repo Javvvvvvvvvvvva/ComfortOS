@@ -6,10 +6,13 @@ export async function requestWeatherBundle(
   signal?: AbortSignal,
 ): Promise<WeatherBundle> {
   const url = new URL("/api/weather", window.location.origin);
-  url.searchParams.set("lat", String(coordinate.latitude));
-  url.searchParams.set("lon", String(coordinate.longitude));
-
-  const response = await fetch(url, { signal, cache: "no-store" });
+  const response = await fetch(url, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ coordinate }),
+    signal,
+    cache: "no-store",
+  });
   const payload = (await response.json()) as {
     weather?: WeatherBundle;
     error?: string;

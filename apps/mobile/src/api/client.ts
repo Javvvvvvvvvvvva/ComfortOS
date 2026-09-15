@@ -37,16 +37,10 @@ export async function searchPlaces(
   sessionToken: string,
   signal?: AbortSignal,
 ) {
-  const url = apiUrl("/api/geocoding/search");
-  url.searchParams.set("q", query);
-  url.searchParams.set("session", sessionToken);
-  if (proximity) {
-    url.searchParams.set("lat", String(proximity.latitude));
-    url.searchParams.set("lon", String(proximity.longitude));
-  }
-  const payload = await requestJson<{ places?: PlaceSuggestion[]; error?: string }>(url, {
-    signal,
-  });
+  const payload = await requestJson<{ places?: PlaceSuggestion[]; error?: string }>(
+    apiUrl("/api/geocoding/search"),
+    jsonRequest({ query, proximity, sessionToken }, signal),
+  );
   if (!payload.places) throw new Error(payload.error ?? "Unable to search places.");
   return payload.places;
 }
@@ -56,27 +50,27 @@ export async function retrievePlace(
   sessionToken: string,
   signal?: AbortSignal,
 ) {
-  const url = apiUrl("/api/geocoding/retrieve");
-  url.searchParams.set("id", id);
-  url.searchParams.set("session", sessionToken);
-  const payload = await requestJson<{ place?: Place; error?: string }>(url, { signal });
+  const payload = await requestJson<{ place?: Place; error?: string }>(
+    apiUrl("/api/geocoding/retrieve"),
+    jsonRequest({ suggestionId: id, sessionToken }, signal),
+  );
   if (!payload.place) throw new Error(payload.error ?? "Unable to load this place.");
   return payload.place;
 }
 
 export async function reverseGeocode(coordinate: Coordinate, signal?: AbortSignal) {
-  const url = apiUrl("/api/geocoding/reverse");
-  url.searchParams.set("lat", String(coordinate.latitude));
-  url.searchParams.set("lon", String(coordinate.longitude));
-  const payload = await requestJson<{ place?: Place | null; error?: string }>(url, { signal });
+  const payload = await requestJson<{ place?: Place | null; error?: string }>(
+    apiUrl("/api/geocoding/reverse"),
+    jsonRequest({ coordinate }, signal),
+  );
   return payload.place ?? null;
 }
 
 export async function getWeather(coordinate: Coordinate, signal?: AbortSignal) {
-  const url = apiUrl("/api/weather");
-  url.searchParams.set("lat", String(coordinate.latitude));
-  url.searchParams.set("lon", String(coordinate.longitude));
-  const payload = await requestJson<{ weather?: WeatherBundle; error?: string }>(url, { signal });
+  const payload = await requestJson<{ weather?: WeatherBundle; error?: string }>(
+    apiUrl("/api/weather"),
+    jsonRequest({ coordinate }, signal),
+  );
   if (!payload.weather) throw new Error(payload.error ?? "Live conditions unavailable.");
   return payload.weather;
 }

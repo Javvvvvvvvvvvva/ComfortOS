@@ -2,8 +2,12 @@ import { NextResponse } from "next/server";
 import { createConfiguredGeocodingProvider } from "@/lib/geocoding/providers/configuredGeocodingProvider";
 import { createRequestId, logServerEvent } from "@/lib/observability/serverLog";
 import { API_RATE_LIMITS, checkRequestRateLimit } from "@/lib/api/rateLimit";
+import {
+  parseOptionalBodyString,
+  requireJsonObject,
+} from "@/lib/api/locationRequestBody";
 
-export async function GET(request: Request) {
+export async function POST(request: Request) {
   const requestId = createRequestId(request);
   const startedAt = performance.now();
   const rateLimit = checkRequestRateLimit(request, API_RATE_LIMITS.geocoding);
@@ -20,9 +24,9 @@ export async function GET(request: Request) {
   }
 
   try {
-    const url = new URL(request.url);
-    const suggestionId = url.searchParams.get("id")?.trim() ?? "";
-    const sessionToken = url.searchParams.get("session")?.trim();
+    const payload = requireJsonObject(await request.json());
+    const suggestionId = parseOptionalBodyString(payload.suggestionId, 512) ?? "";
+    const sessionToken = parseOptionalBodyString(payload.sessionToken, 128);
     if (!suggestionId) {
       return NextResponse.json(
         { error: "A place selection is required." },
@@ -44,7 +48,13 @@ export async function GET(request: Request) {
     });
 
     return NextResponse.json({ place }, { headers });
-  } catch {
+  } catch (error) {
+    if (error instanceof SyntaxError) {
+      return NextResponse.json(
+        { error: "Invalid place selection request." },
+        { status: 400, headers },
+      );
+    }
     logServerEvent("warn", "geocoding_retrieve_failed", {
       requestId,
       failureCategory: "geocoding_provider",

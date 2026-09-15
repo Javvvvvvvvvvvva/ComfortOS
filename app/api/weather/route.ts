@@ -1,9 +1,12 @@
 import { NextResponse } from "next/server";
-import { isValidCoordinate } from "@/lib/geo/validation";
 import { NwsWeatherProvider } from "@/lib/weather/providers/nwsWeatherProvider";
 import { WeatherService } from "@/lib/weather/service";
 import { createRequestId, logServerEvent } from "@/lib/observability/serverLog";
 import { API_RATE_LIMITS, checkRequestRateLimit } from "@/lib/api/rateLimit";
+import {
+  parseCoordinateBody,
+  requireJsonObject,
+} from "@/lib/api/locationRequestBody";
 
 const weatherProvider = new NwsWeatherProvider({
   baseUrl: process.env.WEATHER_BASE_URL,
@@ -11,7 +14,7 @@ const weatherProvider = new NwsWeatherProvider({
 });
 const weatherService = new WeatherService(weatherProvider);
 
-export async function GET(request: Request) {
+export async function POST(request: Request) {
   const requestId = createRequestId(request);
   const startedAt = performance.now();
   const rateLimit = checkRequestRateLimit(request, API_RATE_LIMITS.weather);
@@ -26,19 +29,15 @@ export async function GET(request: Request) {
       { status: 429, headers },
     );
   }
-  const url = new URL(request.url);
-  const latitude = Number(url.searchParams.get("lat"));
-  const longitude = Number(url.searchParams.get("lon"));
-  const coordinate = { latitude, longitude };
-
-  if (!isValidCoordinate(coordinate)) {
-    return NextResponse.json(
-      { error: "Invalid weather coordinate." },
-      { status: 400, headers },
-    );
-  }
-
   try {
+    const payload = requireJsonObject(await request.json());
+    const coordinate = parseCoordinateBody(payload.coordinate);
+    if (!coordinate) {
+      return NextResponse.json(
+        { error: "Invalid weather coordinate." },
+        { status: 400, headers },
+      );
+    }
     const weather = await weatherService.getWeatherBundle(coordinate);
 
     logServerEvent("info", "weather_complete", {
@@ -55,6 +54,12 @@ export async function GET(request: Request) {
       { headers },
     );
   } catch (error) {
+    if (error instanceof SyntaxError) {
+      return NextResponse.json(
+        { error: "Invalid weather request." },
+        { status: 400, headers },
+      );
+    }
     logServerEvent("warn", "weather_failed", {
       requestId,
       failureCategory: "weather_provider",

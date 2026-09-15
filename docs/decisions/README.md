@@ -62,3 +62,5 @@ Accepted ADRs:
 - `ADR-031-authoritative-environmental-raster-layers.md`
 - `ADR-032-snow-and-ice-comfort-routing.md`
 - `ADR-033-native-mobile-client-boundary.md`
+- `ADR-034-distributed-api-rate-limits.md`
+- `ADR-035-sensitive-location-request-bodies.md`

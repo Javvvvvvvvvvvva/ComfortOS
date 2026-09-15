@@ -50,8 +50,9 @@ async function main() {
       destination: scenario.destination,
       departureTime,
     };
-    const weatherResponse = await getJson(
-      `${baseUrl}/api/weather?lat=${scenario.origin.latitude}&lon=${scenario.origin.longitude}`,
+    const weatherResponse = await postJson(
+      `${baseUrl}/api/weather`,
+      { coordinate: scenario.origin },
       12_000,
     );
     const weatherBundle = (weatherResponse.payload as { weather?: WeatherBundle }).weather;
@@ -137,13 +138,6 @@ async function main() {
     await fs.writeFile(options.output, `${JSON.stringify(report, null, 2)}\n`, "utf8");
   }
   console.log(JSON.stringify(report, null, 2));
-}
-
-async function getJson(url: string, timeoutMs: number) {
-  const response = await fetch(url, {
-    signal: AbortSignal.timeout(timeoutMs),
-  });
-  return { ok: response.ok, payload: await response.json() as unknown };
 }
 
 async function postJson(url: string, body: unknown, timeoutMs: number) {

@@ -38,6 +38,10 @@ export default function PrivacyPage() {
           Current route state stays in device or browser memory for the active session.
           Location-derived API responses are marked private and no-store. Operational logs
           exclude precise coordinates, destinations, authorization headers, and credentials.
+          To limit abusive request volume, the service stores a short-lived counter keyed by
+          a salted one-way hash of the network address supplied by its hosting provider. The
+          application does not store the raw address in that counter, and expired windows are
+          periodically deleted.
         </p>
       </PolicySection>
       <PolicySection title="Provider retention">

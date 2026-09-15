@@ -1,10 +1,13 @@
 import { NextResponse } from "next/server";
 import { createConfiguredGeocodingProvider } from "@/lib/geocoding/providers/configuredGeocodingProvider";
-import { isValidCoordinate } from "@/lib/geo/validation";
 import { createRequestId, logServerEvent } from "@/lib/observability/serverLog";
 import { API_RATE_LIMITS, checkRequestRateLimit } from "@/lib/api/rateLimit";
+import {
+  parseCoordinateBody,
+  requireJsonObject,
+} from "@/lib/api/locationRequestBody";
 
-export async function GET(request: Request) {
+export async function POST(request: Request) {
   const requestId = createRequestId(request);
   const startedAt = performance.now();
   const rateLimit = checkRequestRateLimit(request, API_RATE_LIMITS.geocoding);
@@ -20,12 +23,9 @@ export async function GET(request: Request) {
     );
   }
   try {
-    const url = new URL(request.url);
-    const coordinate = {
-      latitude: Number(url.searchParams.get("lat")),
-      longitude: Number(url.searchParams.get("lon")),
-    };
-    if (!isValidCoordinate(coordinate)) {
+    const payload = requireJsonObject(await request.json());
+    const coordinate = parseCoordinateBody(payload.coordinate);
+    if (!coordinate) {
       return NextResponse.json(
         { error: "Invalid reverse geocode coordinate." },
         { status: 400, headers },
@@ -46,7 +46,13 @@ export async function GET(request: Request) {
     });
 
     return NextResponse.json({ place }, { headers });
-  } catch {
+  } catch (error) {
+    if (error instanceof SyntaxError) {
+      return NextResponse.json(
+        { error: "Invalid reverse geocode request." },
+        { status: 400, headers },
+      );
+    }
     logServerEvent("warn", "reverse_geocoding_failed", {
       requestId,
       failureCategory: "geocoding_provider",
