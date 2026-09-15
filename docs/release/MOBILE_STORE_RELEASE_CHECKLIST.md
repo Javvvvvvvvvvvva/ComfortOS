@@ -141,6 +141,8 @@ npx eas-cli@latest build --platform android --profile production
 - Sites v5 applied the D1 migration and hosted hash secret. A live weather request returned
   limit `60`, remaining `59`, and the persisted client key was a 64-character digest rather
   than a raw address; readiness reported `cloudflare-d1` as production-ready.
+- The production web build bundles MapLibre's module worker through Vite's worker pipeline.
+  Browser validation confirmed a rendered Mapbox raster map with no worker console errors.
 
 ## Release Decision
 

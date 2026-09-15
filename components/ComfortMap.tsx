@@ -7,11 +7,13 @@ import {
   Map as MapLibreMap,
   Marker,
   NavigationControl,
+  setWorkerUrl,
   type GeoJSONSource,
   type LngLatBoundsLike,
   type Map,
   type MapMouseEvent,
 } from "maplibre-gl";
+import maplibreWorkerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url";
 import type { FeatureCollection, LineString, MultiPolygon, Polygon } from "geojson";
 import type { Coordinate, LineStringGeometry } from "@/lib/geo/types";
 import { MINNEAPOLIS_CENTER } from "@/lib/geo/types";
@@ -22,6 +24,8 @@ import type { HeatAnalysisResult } from "@/lib/environment/heat/types";
 import type { ComfortAnalysisResult } from "@/lib/comfort/types";
 import { createBasemapStyle } from "@/lib/map/basemap";
 import { PUBLIC_PRODUCT_NAME } from "@/lib/brand";
+
+setWorkerUrl(maplibreWorkerUrl);
 
 type SelectionMode = "origin" | "destination";
 
