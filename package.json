@@ -64,6 +64,7 @@
     "mobile:typecheck": "npm --prefix apps/mobile run typecheck",
     "mobile:test": "npm --prefix apps/mobile test",
     "mobile:doctor": "npm --prefix apps/mobile run doctor",
+    "mobile:bundle-audit": "npm --prefix apps/mobile run audit:release-bundles",
     "release:audit-secrets": "node scripts/audit-release-secrets.mjs",
     "release:preflight": "node scripts/run-release-preflight.mjs"
   },

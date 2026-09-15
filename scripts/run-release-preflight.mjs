@@ -12,6 +12,7 @@ const steps = [
   ["Production web build", "npm", ["run", "build"]],
   ["Mobile typecheck", "npm", ["run", "mobile:typecheck"]],
   ["Mobile tests", "npm", ["run", "mobile:test"]],
+  ["Mobile release bundle audit", "npm", ["run", "mobile:bundle-audit"]],
   ...(skipNetwork ? [] : [["Expo Doctor", "npm", ["run", "mobile:doctor"]]]),
   ["Tracked secret audit", "npm", ["run", "release:audit-secrets"]],
   ["Patch whitespace audit", "git", ["diff", "--check"]],
@@ -31,4 +32,3 @@ for (const [label, command, args] of steps) {
 }
 
 console.log("\nRelease preflight passed.");
-

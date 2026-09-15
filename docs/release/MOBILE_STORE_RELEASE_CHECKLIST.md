@@ -52,6 +52,9 @@ npm run smoke:stage11:nationwide -- --base-url https://YOUR_API_ORIGIN
 The same deterministic checks run on every push and pull request through
 `.github/workflows/ci.yml`. Use `npm run release:preflight -- --skip-network` only when the
 Expo API is temporarily unreachable; that mode is not sufficient for a signed release.
+The preflight also creates fresh production-profile iOS and Android Hermes exports in a
+temporary directory, verifies the configured HTTPS origin is embedded, scans for server
+credentials and local API addresses, and removes the temporary artifacts.
 
 Then produce both store binaries from the same commit:
 
@@ -70,7 +73,8 @@ npx eas-cli@latest build --platform android --profile production
 - [ ] Verify `/privacy`, `/terms`, `/coverage`, `/data-sources`, and `/support` at the final
   public site origin.
 - [ ] Configure a Google Maps Android key restricted to `com.ahhway.app`, the release signing
-  SHA-1, and Maps SDK for Android.
+  SHA-1 `2F:36:AA:48:66:D2:6E:29:6D:CD:53:07:F0:5D:4E:93:09:24:A3:CB`, and Maps SDK for
+  Android.
 - [ ] Enroll/verify Apple Developer and Google Play Console accounts; accept current
   agreements and complete tax/banking records where requested.
 - [ ] Create App Store Connect and Play Console app records. Add the App Store Connect Apple
@@ -132,6 +136,8 @@ npx eas-cli@latest build --platform android --profile production
 - The nationwide deployment attestation is Git-tracked separately from the host-local active
   runtime pointer, so typecheck and production web builds no longer depend on ignored files.
 - Expo/EAS authentication and project linkage were verified for `@javacoding2022/ahhway`.
+- EAS generated and assigned the default Android production keystore; iOS credentials and
+  both store submission credentials remain intentionally unset until store-owner login.
 
 ## Release Decision
 
