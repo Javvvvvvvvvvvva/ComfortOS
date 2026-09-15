@@ -63,8 +63,8 @@ npx eas-cli@latest build --platform android --profile production
 
 ## External P0 Gates
 
-- [ ] Log in to Expo/EAS, create the Ahhway project, and add its owner/project ID to the app
-  config. `npx eas-cli@latest whoami` currently reports `Not logged in`.
+- [x] Expo/EAS project `@javacoding2022/ahhway` is created and the owner/project ID are
+  pinned in the dynamic app config.
 - [ ] Deploy the public web/API service and record non-placeholder HTTPS values for
   `EXPO_PUBLIC_API_BASE_URL` and `EXPO_PUBLIC_SITE_URL` in the EAS production environment.
 - [ ] Verify `/privacy`, `/terms`, `/coverage`, `/data-sources`, and `/support` at the final
@@ -128,6 +128,10 @@ npx eas-cli@latest build --platform android --profile production
   state partitions and building counts.
 - Public readiness remains `not-ready` because legal review is pending and observability is
   still console-only. Provider readiness and protected live health pass.
+- GitHub `Release CI` passed both Web and engine and Mobile jobs from a clean Linux checkout.
+- The nationwide deployment attestation is Git-tracked separately from the host-local active
+  runtime pointer, so typecheck and production web builds no longer depend on ignored files.
+- Expo/EAS authentication and project linkage were verified for `@javacoding2022/ahhway`.
 
 ## Release Decision
 

@@ -19,12 +19,19 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     ...config,
     name: "Ahhway",
     slug: "ahhway",
+    owner: "javacoding2022",
     description: "Compare walking routes for current weather and street exposure.",
     scheme: "ahhway",
     version: "0.1.0",
     orientation: "portrait",
     icon: "./assets/icon.png",
     userInterfaceStyle: "light",
+    extra: {
+      ...config.extra,
+      eas: {
+        projectId: "37e24e5f-e04d-414f-870c-14c0aa54411d",
+      },
+    },
     ios: {
       supportsTablet: false,
       bundleIdentifier: "com.ahhway.app",
