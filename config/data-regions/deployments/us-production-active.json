@@ -1,0 +1,22 @@
+{
+  "format": "comfortos-environment-deployment-v1",
+  "deploymentId": "us-2026-08-19.0-r2-fuse-rc1",
+  "activatedAt": "2026-09-13T18:09:20.078Z",
+  "status": "active",
+  "release": "2026-08-19.0",
+  "catalogPath": "releases/2026-08-19.0/catalogs/696aaa54406c45672ca9e019034549afe1e2bcd23f88ee2a330e0b0f7c760ea8.json",
+  "catalogSha256": "696aaa54406c45672ca9e019034549afe1e2bcd23f88ee2a330e0b0f7c760ea8",
+  "source": {
+    "provider": "cloudflare-r2",
+    "location": "comfortos-environment-data",
+    "prefix": "overture-buildings"
+  },
+  "summary": {
+    "jurisdictionCount": 51,
+    "storeCount": 20758,
+    "objectCount": 83032,
+    "storedBytes": 99541442479,
+    "buildingCount": 186043651,
+    "usableHeightCount": 136825594
+  }
+}

@@ -32,6 +32,13 @@ catalog bounds for partition selection, while each selected local provider verif
 on-disk partition manifest before loading its data. Explicit store roots remain available
 for development but cannot be combined with an active deployment manifest.
 
+The runtime pointer under `deploy/cloudflare-environment/generated/` remains host-local and
+is not a web-build input. After an operator-approved activation, its non-secret release
+attestation is copied to the Git-tracked
+`config/data-regions/deployments/us-production-active.json`. Product coverage UI and API
+responses read that attestation, which keeps clean CI checkouts reproducible without
+pretending that a locally generated runtime pointer is production state.
+
 R2 remains storage, not an application query engine. Production requests continue through
 the authenticated environment service, and activation never changes the app worker's
 provider boundary.

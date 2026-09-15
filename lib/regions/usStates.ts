@@ -1,5 +1,5 @@
 import catalogData from "@/config/data-regions/us-states.json";
-import activeEnvironmentDeployment from "@/deploy/cloudflare-environment/generated/deployment/deployments/production-active.json";
+import activeEnvironmentDeployment from "@/config/data-regions/deployments/us-production-active.json";
 
 export type UsBaselineEligibility = {
   placeSearch: boolean;
