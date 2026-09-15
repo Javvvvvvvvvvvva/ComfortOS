@@ -81,13 +81,14 @@ Play Console definitions before answering the form.
 
 ## Required URLs
 
-- Privacy policy: `https://FINAL_SITE/privacy`
-- Terms: `https://FINAL_SITE/terms`
-- Support: `https://FINAL_SITE/support`
-- Coverage: `https://FINAL_SITE/coverage`
-- Data sources: `https://FINAL_SITE/data-sources`
+- Privacy policy: `https://ahhway.javacoding2022.chatgpt.site/privacy`
+- Terms: `https://ahhway.javacoding2022.chatgpt.site/terms`
+- Support: `https://ahhway.javacoding2022.chatgpt.site/support`
+- Coverage: `https://ahhway.javacoding2022.chatgpt.site/coverage`
+- Data sources: `https://ahhway.javacoding2022.chatgpt.site/data-sources`
 
-Do not submit placeholder URLs. The production config intentionally rejects them.
+These URLs currently remain owner-only. Verify public access before entering them in either
+store. The production config intentionally rejects placeholder URLs.
 
 ## Screenshot Matrix
 

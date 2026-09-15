@@ -113,7 +113,7 @@ npx eas-cli@latest build --platform android --profile production
 
 ## September 14 Evidence
 
-- Root deterministic/integration suite: 280 passed.
+- Root deterministic/integration suite: 287 passed.
 - Mobile request, release-config, and presentation suite: 11 passed.
 - Root and mobile TypeScript: passed.
 - ESLint and production web build: passed.
@@ -143,6 +143,12 @@ npx eas-cli@latest build --platform android --profile production
   than a raw address; readiness reported `cloudflare-d1` as production-ready.
 - The production web build bundles MapLibre's module worker through Vite's worker pipeline.
   Browser validation confirmed a rendered Mapbox raster map with no worker console errors.
+- Sites v6 verified JSON-body location requests: live weather and managed place search
+  returned `200`, legacy location-query `GET` returned `405`, and unique coordinates, search
+  text, session identifiers, authorization headers, and credentials were absent from the
+  corresponding hosted logs.
+- Sites v7 serves the bundled 506,723-byte MapLibre worker and a real Minneapolis Mapbox tile
+  with `200` responses. GitHub Release CI passed exact commit `e3b91a5`.
 
 ## Release Decision
 
