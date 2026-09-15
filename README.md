@@ -7,10 +7,11 @@
 <img src="docs/assets/comfortos-final-mobile.png" alt="Ahhway mobile route comparison" width="320" />
 
 The public product is named Ahhway; architecture, deterministic calculation modules, and
-technical operations retain the ComfortOS name. The current build preserves the Stage 10 MVP and limited-beta hardening baseline while
-adding the Stage 11 nationwide environment-service staging candidate. Managed Mapbox search
-and walking directions are normalized behind provider interfaces, while deterministic
-environmental engines calculate route costs independently from the React UI.
+technical operations retain the ComfortOS name. The current build uses the explicitly
+activated nationwide environment release while keeping metro climate validation separate
+from data deployment. Managed Mapbox search and walking directions are normalized behind
+provider interfaces, while deterministic environmental engines calculate route costs
+independently from the React UI.
 
 ## What It Does
 
