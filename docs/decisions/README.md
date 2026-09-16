@@ -64,3 +64,4 @@ Accepted ADRs:
 - `ADR-033-native-mobile-client-boundary.md`
 - `ADR-034-distributed-api-rate-limits.md`
 - `ADR-035-sensitive-location-request-bodies.md`
+- `ADR-036-pwa-first-public-release.md`

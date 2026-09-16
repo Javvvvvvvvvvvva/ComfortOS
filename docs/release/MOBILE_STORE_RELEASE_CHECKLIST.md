@@ -1,5 +1,8 @@
 # Ahhway Mobile Store Release Checklist
 
+> Deferred by ADR-036. Ahhway launches first as a public PWA; this checklist remains the
+> source of truth when native store distribution resumes.
+
 Date: September 15, 2026
 Release candidate: `0.1.0 (1)`
 Bundle identifiers: iOS and Android `com.ahhway.app`

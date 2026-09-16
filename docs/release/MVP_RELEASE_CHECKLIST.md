@@ -1,7 +1,7 @@
 # ComfortOS Limited MVP Release Checklist
 
-> Historical web limited-beta checklist. For the current native store candidate, use
-> `docs/release/MOBILE_STORE_RELEASE_CHECKLIST.md`.
+> Historical limited-beta checklist. The current public distribution gate is
+> `docs/release/PWA_RELEASE_CHECKLIST.md`; native store work is deferred under ADR-036.
 
 Date: 2026-09-02
 Release state: **Blocked pending P0 items**
