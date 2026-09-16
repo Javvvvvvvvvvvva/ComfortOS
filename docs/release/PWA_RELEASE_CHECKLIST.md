@@ -3,7 +3,7 @@
 Date: September 15, 2026
 Release candidate: `0.1.0`
 Distribution: public HTTPS web application
-Current judgment: **SOURCE READY; PUBLIC DEPLOYMENT IN PROGRESS**
+Current judgment: **PUBLIC PORTFOLIO RELEASE LIVE**
 
 ## Product And Installability
 
@@ -35,8 +35,8 @@ Current judgment: **SOURCE READY; PUBLIC DEPLOYMENT IN PROGRESS**
 - [x] `git diff --check`
 - [x] Manifest and service-worker URLs respond in the local release candidate.
 - [x] Live Phoenix search, NWS weather, managed routing, and Comfort analysis pass.
-- [ ] Public deployment status is successful.
-- [ ] Public URL passes post-deployment health and route smoke checks.
+- [x] Public deployment status is successful.
+- [x] Public URL passes post-deployment resource and route smoke checks.
 
 ## Public Operations
 
@@ -54,3 +54,22 @@ Current judgment: **SOURCE READY; PUBLIC DEPLOYMENT IN PROGRESS**
 The public PWA and GitHub case study are the first distribution surfaces under ADR-036.
 Apple App Store and Google Play work is deferred, not abandoned. Resume store work only when
 product demand or a native-only capability justifies the recurring account and release cost.
+
+## Public Release Evidence
+
+- Public URL: `https://ahhway.javacoding2022.chatgpt.site`
+- Sites version: 11
+- Source commit: `5832123a642b18dd77919838ca52c7d32c1b895e`
+- Unauthenticated home, manifest, service worker, privacy, and support requests returned `200`.
+- Minneapolis, Seattle, Phoenix, and the unsupported Puerto Rico boundary passed the public
+  Stage 10 route smoke.
+- Each supported scenario returned five candidates and five comparable environmental
+  analyses; the unsupported boundary returned zero comparable analyses.
+- Public Comfort latency was 2,615 ms in Minneapolis, 3,586 ms in Seattle, and 1,119 ms in
+  Phoenix for this release check.
+- Phoenix activated the heat context and `Stay Cool`; managed routing issued no public OSRM
+  fallback.
+
+This is a public portfolio release, not an operational-support claim. The aggregate readiness
+endpoint remains intentionally not-ready until centralized monitoring and human legal review
+are complete.
