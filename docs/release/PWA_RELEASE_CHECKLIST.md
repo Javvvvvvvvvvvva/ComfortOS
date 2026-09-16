@@ -43,6 +43,8 @@ Current judgment: **PUBLIC PORTFOLIO RELEASE LIVE**
 - [x] Privacy, terms, support, coverage, and data-source routes are included.
 - [x] Production credentials are configured outside source control.
 - [x] Managed routing has no public OSRM fallback.
+- [x] Six-hour public availability smoke covers the app shell, PWA resources, jurisdiction
+  catalog, managed routing, and NWS weather without using private user locations.
 - [ ] Confirm centralized error and uptime monitoring before describing the service as an
   operationally supported production product.
 - [ ] Obtain human legal review before representing the policy pages as legal advice or final

@@ -1,0 +1,28 @@
+name: Public PWA Smoke
+
+on:
+  schedule:
+    - cron: "17 */6 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: public-pwa-smoke
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    name: Public availability
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22.13.0
+          package-manager-cache: false
+      - run: node scripts/smoke-public-pwa.mjs
+        env:
+          AHHWAY_PUBLIC_URL: https://ahhway.javacoding2022.chatgpt.site

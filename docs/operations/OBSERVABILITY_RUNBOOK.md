@@ -52,6 +52,18 @@ p50/p95/max latency, provider mode, candidate count, managed routing request cou
 rate, building region, and selected climate context. Do not add raw query text or coordinates as
 labels, dimensions, breadcrumbs, or log fields.
 
+## Public Availability Smoke
+
+`.github/workflows/public-smoke.yml` runs every six hours and can also be dispatched manually.
+It checks the public home page, PWA manifest, service-worker API exclusion, 51-jurisdiction
+catalog, managed Mapbox routing health, and one fixed National Weather Service lookup. The
+workflow uses no private location or provider credentials and makes only one managed routing
+health request per run.
+
+A failed workflow is an availability signal, not a replacement for centralized runtime error
+monitoring. Keep `OBSERVABILITY_ALERTS_CONFIGURED=false` until server-event dashboards, alert
+delivery, and an incident owner have separate production evidence.
+
 ## Release Verification
 
 1. Deploy the release to staging with an immutable `APP_VERSION`.

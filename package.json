@@ -58,6 +58,7 @@
     "routes:validate:nationwide": "node --import tsx scripts/validate-nationwide-integration.ts",
     "smoke:stage10": "node --import tsx scripts/smoke-stage-10-mvp.ts",
     "smoke:stage11:nationwide": "node --import tsx scripts/smoke-stage-11-nationwide.ts",
+    "smoke:public": "node scripts/smoke-public-pwa.mjs",
     "mobile:start": "npm --prefix apps/mobile start",
     "mobile:ios": "npm --prefix apps/mobile run ios",
     "mobile:android": "npm --prefix apps/mobile run android",
